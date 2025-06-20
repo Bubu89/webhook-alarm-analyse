@@ -5,12 +5,16 @@ from email.message import EmailMessage
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify
 from threading import Timer
+from dotenv import load_dotenv
 
-# === KONFIGURATION ===
-EMAIL_ABSENDER = "yo.chris@gmx.at"
-EMAIL_PASSWORT = "kY3N&CyLNPd&iZp2"
-EMAIL_EMPFÄNGER = "yo.chris@gmx.at"
-LOG_DATEI = "webhook_logs.json"
+# === ENV-VARIABLEN LADEN (für lokale Nutzung mit .env) ===
+load_dotenv()
+
+# === KONFIGURATION AUS ENV ===
+EMAIL_ABSENDER   = os.getenv("EMAIL_ABSENDER")
+EMAIL_PASSWORT   = os.getenv("EMAIL_PASSWORT")
+EMAIL_EMPFÄNGER  = os.getenv("EMAIL_EMPFÄNGER")
+LOG_DATEI        = "webhook_logs.json"
 
 app = Flask(__name__)
 
@@ -59,8 +63,11 @@ def analysiere_und_benachrichtige():
         interv = eintrag.get("interval")
         zeitstempel = eintrag.get("timestamp")
         if symbol and interv and zeitstempel and interv in niedere_zeitfenster:
-            zeit = datetime.fromisoformat(zeitstempel)
-            gruppiert.setdefault(symbol, []).append(zeit)
+            try:
+                zeit = datetime.fromisoformat(zeitstempel)
+                gruppiert.setdefault(symbol, []).append(zeit)
+            except Exception as e:
+                print("Ungültiger Zeitstempel:", zeitstempel)
 
     for symbol, zeiten in gruppiert.items():
         zeiten = [z for z in zeiten if jetzt - z <= intervall]
