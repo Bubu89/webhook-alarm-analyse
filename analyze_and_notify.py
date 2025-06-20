@@ -13,7 +13,7 @@ load_dotenv()
 # === KONFIGURATION AUS ENV ===
 EMAIL_ABSENDER   = os.getenv("EMAIL_ABSENDER")
 EMAIL_PASSWORT   = os.getenv("EMAIL_PASSWORT")
-EMAIL_EMPFÄNGER  = os.getenv("EMAIL_EMPFÄNGER")
+EMAIL_EMPFAENGER = os.getenv("EMAIL_EMPFÄNGER")
 LOG_DATEI        = "webhook_logs.json"
 
 app = Flask(__name__)
