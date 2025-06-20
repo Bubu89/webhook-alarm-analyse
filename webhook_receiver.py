@@ -9,7 +9,7 @@ from threading import Timer
 # === SICHER: Lade Konfiguration aus Umgebungsvariablen ===
 EMAIL_ABSENDER = os.environ.get("EMAIL_ABSENDER")
 EMAIL_PASSWORT = os.environ.get("EMAIL_PASSWORT")
-EMAIL_EMPFÄNGER = os.environ.get("EMAIL_EMPFÄNGER")
+EMAIL_EMPFAENGER = os.environ.get("EMAIL_EMPFÄNGER")
 LOG_DATEI = "webhook_logs.json"
 
 app = Flask(__name__)
