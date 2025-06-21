@@ -41,31 +41,35 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
+    if not request.is_json:
+        return jsonify({"error": "Content-Type muss application/json sein"}), 415
+
     data = request.get_json()
-    if data:
-        data["timestamp"] = datetime.now(MEZ).isoformat()
-        daten = []
-        if os.path.exists(LOG_DATEI):
-            with open(LOG_DATEI, "r") as f:
-                daten = json.load(f)
-        daten.append(data)
-        with open(LOG_DATEI, "w") as f:
-            json.dump(daten, f, indent=2)
+    if not data:
+        return jsonify({"error": "Keine gültigen JSON-Daten erhalten"}), 400
 
-        if os.path.exists(SETTINGS_DATEI):
-            with open(SETTINGS_DATEI, "r") as f:
-                symbol_settings = json.load(f)
+    data["timestamp"] = datetime.now(MEZ).isoformat()
+    daten = []
+    if os.path.exists(LOG_DATEI):
+        with open(LOG_DATEI, "r") as f:
+            daten = json.load(f)
+    daten.append(data)
+    with open(LOG_DATEI, "w") as f:
+        json.dump(daten, f, indent=2)
 
-            df = pd.DataFrame(daten)
-            df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
-            df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
-            df = df[df["timestamp"].notnull()]
+    if os.path.exists(SETTINGS_DATEI):
+        with open(SETTINGS_DATEI, "r") as f:
+            symbol_settings = json.load(f)
 
-            for symbol, settings in symbol_settings.items():
-                zeitraum = datetime.now(MEZ) - timedelta(hours=settings.get("interval_hours", 1))
-                symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
-                if len(symbol_df) >= settings.get("max_alarms", 3):
-                    sende_email("Alarm: Häufung erkannt", f"Symbol: {symbol} - {len(symbol_df)} Alarme innerhalb der letzten {settings.get('interval_hours', 1)} Stunden.")
+        df = pd.DataFrame(daten)
+        df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
+        df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
+
+        for symbol, settings in symbol_settings.items():
+            zeitraum = datetime.now(MEZ) - timedelta(hours=settings.get("interval_hours", 1))
+            symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
+            if len(symbol_df) >= settings.get("max_alarms", 3):
+                sende_email("Alarm: Häufung erkannt", f"Symbol: {symbol} – {len(symbol_df)} Alarme innerhalb der letzten {settings.get('interval_hours', 1)} Stunden.")
 
     return jsonify({"status": "ok"})
 
@@ -79,9 +83,8 @@ def dashboard():
             daten = json.load(f)
 
     df = pd.DataFrame(daten) if daten else pd.DataFrame(columns=["timestamp", "symbol", "event", "price", "interval"])
-    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
+    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
     df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
-    df = df[df["timestamp"].notnull()]
 
     df["symbol"] = df["symbol"].astype(str)
     df["jahr"] = df["timestamp"].dt.year
@@ -97,7 +100,7 @@ def dashboard():
         for symbol in df["symbol"].unique()
     }
 
-    letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(5).to_dict("records")
+    letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
 
     einstellungen = {}
     if os.path.exists(SETTINGS_DATEI):
