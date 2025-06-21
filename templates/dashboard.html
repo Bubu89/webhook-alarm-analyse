@@ -23,8 +23,7 @@
             display: grid;
             grid-template-columns: repeat(13, 1fr);
             gap: 2px;
-            margin-bottom: 20px;
-            overflow-x: auto;
+            margin-top: 10px;
             font-size: 14px;
         }
 
@@ -35,7 +34,7 @@
             border-radius: 4px;
         }
 
-        .settings, .testdaten {
+        .section {
             margin-bottom: 20px;
             padding: 10px;
             background: #222;
@@ -43,8 +42,9 @@
         }
 
         input, select {
+            display: block;
             padding: 8px;
-            margin: 5px 0;
+            margin: 8px 0;
             min-width: 2cm;
             width: auto;
             font-size: 16px;
@@ -58,10 +58,15 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 16px;
+            margin-top: 10px;
         }
 
         ul {
             font-size: 14px;
+        }
+
+        #verteilungContainer {
+            display: none;
         }
 
         @media (max-width: 600px) {
@@ -83,22 +88,18 @@
             }
         }
     </style>
+    <script>
+        function toggleVerteilung() {
+            const container = document.getElementById("verteilungContainer");
+            container.style.display = container.style.display === "none" ? "block" : "none";
+        }
+    </script>
 </head>
 <body>
     <h1>Webhook Alarm Dashboard</h1>
 
-    <div class="testdaten">
-        <form action="/generate-testdata" method="post">
-            <button type="submit">🔁 Testdaten erzeugen</button>
-        </form>
-    </div>
-
-    <form action="/test-email" method="get" style="margin-bottom: 20px;">
-        <button class="btn btn-warning" type="submit">📧 Test-E-Mail senden</button>
-    </form>
-
-    <div class="settings">
-        <h2>Alarmeinstellungen</h2>
+    <div class="section">
+        <h2>1. Alarmeinstellungen</h2>
         <form action="/update-settings" method="post">
             <label>Symbol</label>
             <input type="text" name="symbol" value="{{ einstellungen.get('symbol_filter', '') }}" required>
@@ -112,7 +113,7 @@
                 <option value="24">24 Stunden</option>
             </select>
 
-            <label>oder manuell (z. B. 5 für 5 Stunden)</label>
+            <label>Oder manuell (z. B. 5 für 5 Stunden)</label>
             <input type="number" name="interval_hours_manual" placeholder="Manuelle Eingabe (hat Vorrang)">
 
             <label>Maximale Alarme pro Intervall</label>
@@ -122,7 +123,22 @@
         </form>
     </div>
 
-    <div>
+    <div class="section">
+        <h2>2. Aktive Einstellungen</h2>
+        <p><strong>{{ einstellungs_info|safe }}</strong></p>
+    </div>
+
+    <div class="section">
+        <h2>3. Letzte Alarme</h2>
+        <ul>
+            {% for eintrag in letzte_ereignisse %}
+                <li>{{ eintrag.timestamp }} | {{ eintrag.symbol }}: {{ eintrag.nachricht }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>4. Monatliche Alarmverteilung</h2>
         <form method="get" action="/dashboard">
             <label>Jahr wählen:</label>
             <select name="year" onchange="this.form.submit()">
@@ -131,29 +147,33 @@
                 {% endfor %}
             </select>
         </form>
+
+        <button onclick="toggleVerteilung()">📊 Verteilung ein-/ausblenden</button>
+
+        <div id="verteilungContainer">
+            <div class="matrix">
+                <div><strong>Symbol</strong></div>
+                {% for monat in monate %}
+                    <div><strong>{{ monat }}</strong></div>
+                {% endfor %}
+                {% for symbol, werte in matrix.items() %}
+                    <div><strong>{{ symbol }}</strong></div>
+                    {% for wert in werte %}
+                        <div>{{ wert }}</div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
-    <h2>📊 Monatliche Alarmverteilung ({{ aktuelles_jahr }})</h2>
-    <div class="matrix">
-        <div><strong>Symbol</strong></div>
-        {% for monat in monate %}
-            <div><strong>{{ monat }}</strong></div>
-        {% endfor %}
-        {% for symbol, werte in matrix.items() %}
-            <div><strong>{{ symbol }}</strong></div>
-            {% for wert in werte %}
-                <div>{{ wert }}</div>
-            {% endfor %}
-        {% endfor %}
+    <div class="section">
+        <form action="/generate-testdata" method="post">
+            <button type="submit">🔁 Testdaten erzeugen</button>
+        </form>
+
+        <form action="/test-email" method="get" style="margin-top: 10px;">
+            <button type="submit">📧 Test-E-Mail senden</button>
+        </form>
     </div>
-
-    <h2>📋 Letzte Alarme</h2>
-    <ul>
-        {% for eintrag in letzte_ereignisse %}
-            <li>{{ eintrag.timestamp }} | {{ eintrag.symbol }}: {{ eintrag.nachricht }}</li>
-        {% endfor %}
-    </ul>
-
-    <p><strong>{{ einstellungs_info|safe }}</strong></p>
 </body>
 </html>
