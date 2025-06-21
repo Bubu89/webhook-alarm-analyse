@@ -66,20 +66,11 @@
         }
 
         #verteilungContainer {
-            display: none;
+            display: block;
         }
 
         #alarmListe li.hidden {
             display: none;
-        }
-
-        .checkbox-symbol {
-            display: flex;
-            align-items: center;
-        }
-
-        .checkbox-symbol input[type="radio"] {
-            margin-right: 10px;
         }
 
         @media (max-width: 600px) {
@@ -102,11 +93,6 @@
         }
     </style>
     <script>
-        function toggleVerteilung() {
-            const container = document.getElementById("verteilungContainer");
-            container.style.display = container.style.display === "none" ? "block" : "none";
-        }
-
         function toggleAlarme() {
             const btn = document.getElementById("toggleAlarmeBtn");
             const liste = document.querySelectorAll("#alarmListe li");
@@ -122,11 +108,11 @@
             btn.setAttribute("data-expanded", expanded ? "false" : "true");
         }
 
-        function setActive(symbol, interval, maxAlarms, trend) {
-            document.querySelector('[name="symbol"]').value = symbol;
-            document.querySelector('[name="interval_hours_manual"]').value = interval;
-            document.querySelector('[name="max_alarms"]').value = maxAlarms;
-            document.querySelector('[name="trend_richtung"]').value = trend;
+        function ladeEinstellungen(symbol, interval, max, trend) {
+            document.querySelector("input[name='symbol']").value = symbol;
+            document.querySelector("select[name='interval_hours_dropdown']").value = interval;
+            document.querySelector("input[name='max_alarms']").value = max;
+            document.querySelector("select[name='trend_richtung']").value = trend;
         }
     </script>
 </head>
@@ -167,16 +153,83 @@
 
     <div class="section">
         <h2>2. Aktive Einstellungen</h2>
-        <form>
-            {% for symbol, einstellung in einstellungen.items() %}
-                <div class="checkbox-symbol">
-                    <input type="radio" name="active_setting" onclick="setActive('{{ symbol }}', '{{ einstellung.interval_hours }}', '{{ einstellung.max_alarms }}', '{{ einstellung.trend_richtung }}')">
-                    <label><strong>{{ symbol }}</strong>: Intervall = {{ einstellung.interval_hours }} Std, Max. Alarme = {{ einstellung.max_alarms }}, Trend = {{ einstellung.trend_richtung }}</label>
-                </div>
-            {% endfor %}
-        </form>
+        {% if einstellungen %}
+            <ul>
+                {% for symbol, config in einstellungen.items() %}
+                    <li>
+                        <input type="radio" name="select_einstellung" onclick="ladeEinstellungen('{{ symbol }}', '{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">
+                        {{ symbol }}: Intervall = {{ config.interval_hours }} Std, Max. Alarme = {{ config.max_alarms }}, Trend = {{ config.trend_richtung }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Keine aktiven Einstellungen</p>
+        {% endif %}
     </div>
 
-    <!-- Weitere Abschnitte identisch wie zuvor (Letzte Alarme, Verteilung, Testdaten etc.) -->
+    <div class="section">
+        <h2>3. Letzte Alarme</h2>
+        <ul id="alarmListe">
+            {% if letzte_ereignisse %}
+                {% for eintrag in letzte_ereignisse %}
+                    <li class="{% if loop.index > 5 %}hidden{% endif %}">
+                        {{ eintrag.timestamp.strftime('%Y-%m-%d %H:%M:%S') }} | {{ eintrag.symbol }}: {{ eintrag.nachricht }}
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li>Keine Alarme registriert.</li>
+            {% endif %}
+        </ul>
+        {% if letzte_ereignisse|length > 5 %}
+            <button id="toggleAlarmeBtn" onclick="toggleAlarme()" data-expanded="false">📋 Alle anzeigen</button>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>4. Monatliche Alarmverteilung</h2>
+        <form method="get" action="/dashboard">
+            <label>Jahr wählen:</label>
+            <select name="year" onchange="this.form.submit()">
+                {% for jahr in verfuegbare_jahre %}
+                    <option value="{{ jahr }}" {% if jahr == aktuelles_jahr %}selected{% endif %}>{{ jahr }}</option>
+                {% endfor %}
+            </select>
+        </form>
+
+        <div id="verteilungContainer">
+            <div class="matrix">
+                <div><strong>Symbol</strong></div>
+                {% for monat in monate %}
+                    <div><strong>{{ monat }}</strong></div>
+                {% endfor %}
+                {% if matrix %}
+                    {% for symbol, werte in matrix.items() %}
+                        <div><strong>{{ symbol }}</strong></div>
+                        {% for wert in werte %}
+                            <div>{{ wert }}</div>
+                        {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    {% set dummy_symbole = ['BTC', 'ETH', 'XRP'] %}
+                    {% for symbol in dummy_symbole %}
+                        <div><strong>{{ symbol }}</strong></div>
+                        {% for _ in range(12) %}
+                            <div>-</div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <form action="/generate-testdata" method="post">
+            <button type="submit">🔁 Testdaten erzeugen</button>
+        </form>
+
+        <form action="/test-email" method="get" style="margin-top: 10px;">
+            <button type="submit">📧 Test-E-Mail senden</button>
+        </form>
+    </div>
 </body>
 </html>
