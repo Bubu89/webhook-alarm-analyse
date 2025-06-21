@@ -56,10 +56,13 @@ def webhook():
             df = pd.DataFrame(daten)
             df["timestamp"] = pd.to_datetime(df["timestamp"])
             zeitraum = datetime.now() - timedelta(hours=einstellungen.get("interval_hours", 1))
-            gefiltert = df[(df["timestamp"] >= zeitraum) & (df["symbol"] == data["symbol"])]
+            df = df[df["timestamp"] >= zeitraum]
 
-            if len(gefiltert) >= einstellungen.get("max_alarms", 3):
-                sende_email("Alarm: Häufung erkannt", f"Symbol: {data['symbol']} - {len(gefiltert)} Alarme innerhalb des Zeitfensters.")
+            symbole = df["symbol"].unique()
+            for symbol in symbole:
+                symbol_df = df[df["symbol"] == symbol]
+                if len(symbol_df) >= einstellungen.get("max_alarms", 3):
+                    sende_email("Alarm: Häufung erkannt", f"Symbol: {symbol} - {len(symbol_df)} Alarme innerhalb der letzten {einstellungen.get('interval_hours', 1)} Stunden.")
 
     return jsonify({"status": "ok"})
 
@@ -98,6 +101,8 @@ def dashboard():
         with open(SETTINGS_DATEI, "r") as f:
             einstellungen = json.load(f)
 
+    einstellungs_info = f"Aktive Einstellungen: Intervall = {einstellungen.get('interval_hours', '?')} Std, Max. Alarme = {einstellungen.get('max_alarms', '?')} pro Symbol"
+
     return render_template("dashboard.html",
         matrix=matrix,
         monate=monate,
@@ -105,7 +110,8 @@ def dashboard():
         verfuegbare_jahre=jahre,
         aktuelles_jahr=aktuelles_jahr,
         letzte_ereignisse=letzte_ereignisse,
-        einstellungen=einstellungen
+        einstellungen=einstellungen,
+        einstellungs_info=einstellungs_info
     )
 
 @app.route("/generate-testdata", methods=["GET", "POST"])
