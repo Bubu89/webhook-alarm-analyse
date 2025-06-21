@@ -140,9 +140,9 @@
 
             <label>Trendrichtung</label>
             <select name="trend_richtung">
-                <option value="neutral" selected>Keine Trendvorgabe</option>
-                <option value="bullish">Positiver Trend (aufwärts)</option>
-                <option value="bearish">Negativer Trend (abwärts)</option>
+                <option value="neutral" {% if einstellungen.get('trend_richtung') == 'neutral' %}selected{% endif %}>Keine Trendvorgabe</option>
+                <option value="bullish" {% if einstellungen.get('trend_richtung') == 'bullish' %}selected{% endif %}>Positiver Trend (aufwärts)</option>
+                <option value="bearish" {% if einstellungen.get('trend_richtung') == 'bearish' %}selected{% endif %}>Negativer Trend (abwärts)</option>
             </select>
 
             <button type="submit">💾 Einstellungen speichern</button>
@@ -160,7 +160,7 @@
             {% if letzte_ereignisse %}
                 {% for eintrag in letzte_ereignisse %}
                     <li class="{% if loop.index > 5 %}hidden{% endif %}">
-                        {{ eintrag.timestamp }} | {{ eintrag.symbol }}: {{ eintrag.nachricht }}
+                        {{ eintrag.timestamp.strftime('%Y-%m-%d %H:%M:%S') }} | {{ eintrag.symbol }}: {{ eintrag.nachricht }}
                     </li>
                 {% endfor %}
             {% else %}
