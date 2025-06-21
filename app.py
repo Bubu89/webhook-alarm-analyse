@@ -17,7 +17,6 @@ EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
 
 app = Flask(__name__)
 
-
 def sende_email(betreff, inhalt):
     try:
         msg = MIMEText(inhalt)
@@ -33,11 +32,9 @@ def sende_email(betreff, inhalt):
     except Exception as e:
         print(f"E-Mail konnte nicht gesendet werden: {e}")
 
-
 @app.route("/")
 def home():
     return redirect("/dashboard")
-
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -65,7 +62,6 @@ def webhook():
                 sende_email("Alarm: Häufung erkannt", f"Symbol: {data['symbol']} - {len(gefiltert)} Alarme innerhalb des Zeitfensters.")
 
     return jsonify({"status": "ok"})
-
 
 @app.route("/dashboard")
 def dashboard():
@@ -112,8 +108,7 @@ def dashboard():
         einstellungen=einstellungen
     )
 
-
-@app.route("/generate-testdata", methods=["POST"])
+@app.route("/generate-testdata", methods=["GET", "POST"])
 def generate_testdata():
     symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT"]
     now = datetime.now()
@@ -129,7 +124,6 @@ def generate_testdata():
         json.dump(daten, f, indent=2)
     return redirect(url_for("dashboard"))
 
-
 @app.route("/update-settings", methods=["POST"])
 def update_settings():
     einstellungen = {
@@ -141,13 +135,6 @@ def update_settings():
     with open(SETTINGS_DATEI, "w") as f:
         json.dump(einstellungen, f, indent=2)
     return redirect(url_for("dashboard"))
-
-
-@app.route("/test-email")
-def test_email():
-    sende_email("GMX-Testalarm", "Das ist eine Test-E-Mail vom GMX-Server.")
-    return "Test-E-Mail gesendet."
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
