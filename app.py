@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from dotenv import load_dotenv
 import pandas as pd
+import random
 import smtplib
 from email.mime.text import MIMEText
 import pytz
@@ -55,23 +56,26 @@ def webhook():
     with open(LOG_DATEI, "w") as f:
         json.dump(daten, f, indent=2)
 
-    settings = {"default": {"interval_hours": 6, "max_alarms": 3}}  # Fallback
+    settings = {"default_bullish": {"interval_hours": 6, "max_alarms": 3},
+                "default_bearish": {"interval_hours": 6, "max_alarms": 3}}
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
             settings = json.load(f)
-
-    config = settings.get("default", {"interval_hours": 6, "max_alarms": 3})
 
     df = pd.DataFrame(daten)
     df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
     df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
 
-    symbol = data.get("symbol", "UNBEKANNT")
-    zeitraum = datetime.now(MEZ) - timedelta(hours=config["interval_hours"])
+    symbol = data.get("symbol")
+    trend = data.get("trend", "neutral").lower()
+    key = f"default_{trend}" if trend in ["bullish", "bearish"] else "default"
+
+    config = settings.get(key, settings.get("default"))
+    zeitraum = datetime.now(MEZ) - timedelta(hours=config.get("interval_hours", 6))
     symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
 
-    if len(symbol_df) >= config["max_alarms"]:
-        sende_email(f"Alarm: {symbol}", f"{len(symbol_df)} Alarme in {config['interval_hours']}h")
+    if len(symbol_df) >= config.get("max_alarms", 3):
+        sende_email(f"Alarm: {symbol}", f"{len(symbol_df)} Alarme in {config['interval_hours']}h ({trend})")
 
     return jsonify({"status": "ok"})
 
@@ -119,6 +123,12 @@ def dashboard():
 
 @app.route("/update-settings", methods=["POST"])
 def update_settings():
+    trend = request.form.get("trend_richtung", "neutral").lower()
+    if trend not in ["bullish", "bearish"]:
+        trend = "neutral"
+
+    key = f"default_{trend}" if trend != "neutral" else "default"
+
     dropdown_value = request.form.get("interval_hours_dropdown", "6")
     manual_value = request.form.get("interval_hours_manual", "").strip()
     try:
@@ -127,17 +137,15 @@ def update_settings():
         interval_hours = 6
 
     max_alarms = int(request.form.get("max_alarms", 3))
-    trend_richtung = request.form.get("trend_richtung", "neutral")
 
     settings = {}
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
             settings = json.load(f)
 
-    settings["default"] = {
+    settings[key] = {
         "interval_hours": interval_hours,
-        "max_alarms": max_alarms,
-        "trend_richtung": trend_richtung
+        "max_alarms": max_alarms
     }
     with open(SETTINGS_DATEI, "w") as f:
         json.dump(settings, f, indent=2)
