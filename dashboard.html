@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Webhook Dashboard</title>
+    <style>
+        table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h2>Alarm Heatmap</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                {% for monat in matrix.values()|first %}
+                    <th>{{ monat }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for symbol, werte in matrix.items() %}
+                <tr>
+                    <td>{{ symbol }}</td>
+                    {% for wert in werte.values() %}
+                        <td>{{ wert }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
