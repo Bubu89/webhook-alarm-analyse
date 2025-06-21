@@ -14,11 +14,9 @@
             padding: 10px;
             font-size: 16px;
         }
-
         h1, h2, h3 {
             color: #00ffcc;
         }
-
         .matrix {
             display: grid;
             grid-template-columns: repeat(13, 1fr);
@@ -26,21 +24,18 @@
             margin-top: 10px;
             font-size: 14px;
         }
-
         .matrix div {
             padding: 4px;
             background: #333;
             text-align: center;
             border-radius: 4px;
         }
-
         .section {
             margin-bottom: 20px;
             padding: 10px;
             background: #222;
             border-radius: 5px;
         }
-
         input, select {
             display: block;
             padding: 8px;
@@ -49,7 +44,6 @@
             width: auto;
             font-size: 16px;
         }
-
         button {
             padding: 10px;
             background: #00ffcc;
@@ -60,36 +54,20 @@
             font-size: 16px;
             margin-top: 10px;
         }
-
         ul {
             font-size: 14px;
         }
-
         #verteilungContainer {
             display: block;
         }
-
         #alarmListe li.hidden {
             display: none;
         }
-
         @media (max-width: 600px) {
-            body {
-                font-size: 14px;
-            }
-
-            .matrix {
-                font-size: 12px;
-                grid-template-columns: repeat(13, minmax(20px, 1fr));
-            }
-
-            button, input, select {
-                font-size: 14px;
-            }
-
-            h1, h2, h3 {
-                font-size: 18px;
-            }
+            body { font-size: 14px; }
+            .matrix { font-size: 12px; grid-template-columns: repeat(13, minmax(20px, 1fr)); }
+            button, input, select { font-size: 14px; }
+            h1, h2, h3 { font-size: 18px; }
         }
     </style>
     <script>
@@ -97,17 +75,12 @@
             const btn = document.getElementById("toggleAlarmeBtn");
             const liste = document.querySelectorAll("#alarmListe li");
             const expanded = btn.getAttribute("data-expanded") === "true";
-
             liste.forEach((el, idx) => {
-                if (idx >= 5) {
-                    el.classList.toggle("hidden", !expanded);
-                }
+                if (idx >= 5) el.classList.toggle("hidden", !expanded);
             });
-
             btn.textContent = expanded ? "📋 Alle anzeigen" : "📋 Weniger anzeigen";
             btn.setAttribute("data-expanded", expanded ? "false" : "true");
         }
-
         function ladeEinstellungen(symbol, interval, max, trend) {
             if (!confirm("Diese Aktion überschreibt die aktuellen Eingaben. Fortfahren?")) return;
             document.querySelector("input[name='symbol']").value = symbol;
@@ -125,7 +98,6 @@
         <form action="/update-settings" method="post">
             <label>Symbol</label>
             <input type="text" name="symbol" required>
-
             <label>Intervall in Stunden (Dropdown)</label>
             <select name="interval_hours_dropdown">
                 <option value="1">1 Stunde</option>
@@ -134,22 +106,17 @@
                 <option value="12">12 Stunden</option>
                 <option value="24">24 Stunden</option>
             </select>
-
-            <label>Oder manuell (z. B. 5 für 5 Stunden)</label>
+            <label>Oder manuell</label>
             <input type="number" name="interval_hours_manual" placeholder="Manuelle Eingabe (hat Vorrang)">
-
             <label>Maximale Alarme pro Intervall</label>
             <input type="number" name="max_alarms" value="3" required>
-
             <label>Trendrichtung</label>
             <select name="trend_richtung">
                 <option value="neutral">Keine Trendvorgabe</option>
                 <option value="bullish">Positiver Trend (aufwärts)</option>
                 <option value="bearish">Negativer Trend (abwärts)</option>
             </select>
-
             <input type="hidden" name="force_overwrite" value="false" id="overwriteFlag">
-
             <button type="submit">💾 Einstellungen speichern</button>
         </form>
     </div>
@@ -157,16 +124,21 @@
     <div class="section">
         <h2>2. Aktive Einstellungen</h2>
         {% if einstellungen %}
-            <ul>
-                {% for key, config in einstellungen.items() %}
-                    <li>
-                        <input type="radio" name="select_einstellung" onclick="ladeEinstellungen('{{ config.symbol }}', '{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}'); document.getElementById('overwriteFlag').value='true'">
-                        {{ config.symbol }} ({{ config.trend_richtung }}): Intervall = {{ config.interval_hours }} Std, Max. Alarme = {{ config.max_alarms }}
-                    </li>
-                {% endfor %}
-            </ul>
+        <ul>
+            {% for key, config in einstellungen.items() %}
+                <li>
+                    <input type="radio" name="select_einstellung"
+                        onclick="ladeEinstellungen('{{ config.symbol }}', '{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}'); document.getElementById('overwriteFlag').value='true'">
+                    {{ config.symbol }} ({{ config.trend_richtung }}): Intervall = {{ config.interval_hours }} Std, Max. Alarme = {{ config.max_alarms }}
+                    <form action="/delete-setting" method="post" style="display:inline;">
+                        <input type="hidden" name="key" value="{{ key }}">
+                        <button type="submit">❌</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
         {% else %}
-            <p>Keine aktiven Einstellungen</p>
+        <p>Keine aktiven Einstellungen</p>
         {% endif %}
     </div>
 
@@ -198,7 +170,6 @@
                 {% endfor %}
             </select>
         </form>
-
         <div id="verteilungContainer">
             <div class="matrix">
                 <div><strong>Symbol</strong></div>
@@ -213,8 +184,7 @@
                         {% endfor %}
                     {% endfor %}
                 {% else %}
-                    {% set dummy_symbole = ['BTC', 'ETH', 'XRP'] %}
-                    {% for symbol in dummy_symbole %}
+                    {% for symbol in ['BTC', 'ETH', 'XRP'] %}
                         <div><strong>{{ symbol }}</strong></div>
                         {% for _ in range(12) %}
                             <div>-</div>
@@ -223,16 +193,6 @@
                 {% endif %}
             </div>
         </div>
-    </div>
-
-    <div class="section">
-        <form action="/generate-testdata" method="post">
-            <button type="submit">🔁 Testdaten erzeugen</button>
-        </form>
-
-        <form action="/test-email" method="get" style="margin-top: 10px;">
-            <button type="submit">📧 Test-E-Mail senden</button>
-        </form>
     </div>
 </body>
 </html>
