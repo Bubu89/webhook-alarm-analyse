@@ -40,49 +40,39 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    try:
-        data = request.get_json(force=True)
-    except Exception as e:
-        return jsonify({"error": "Ungültige oder nicht lesbare JSON-Daten", "details": str(e)}), 400
+    if not request.is_json:
+        return jsonify({"error": "Content-Type muss application/json sein"}), 415
 
+    data = request.get_json()
     if not data:
         return jsonify({"error": "Keine gültigen JSON-Daten erhalten"}), 400
 
     data["timestamp"] = datetime.now(MEZ).isoformat()
-
     daten = []
     if os.path.exists(LOG_DATEI):
-        try:
-            with open(LOG_DATEI, "r") as f:
-                daten = json.load(f)
-        except json.JSONDecodeError:
-            daten = []
-
+        with open(LOG_DATEI, "r") as f:
+            daten = json.load(f)
     daten.append(data)
     with open(LOG_DATEI, "w") as f:
         json.dump(daten, f, indent=2)
 
+    settings = {"default": {"interval_hours": 6, "max_alarms": 3}}  # Fallback-Standard
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
-            symbol_settings = json.load(f)
+            settings = json.load(f)
 
-        df = pd.DataFrame(daten)
-        df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
-        df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
+    df = pd.DataFrame(daten)
+    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
+    df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
 
-        for key, settings in symbol_settings.items():
-            try:
-                symbol, interval_key = key.rsplit("_", 1)
-            except ValueError:
-                continue
+    symbol = data.get("symbol")
+    config = settings.get(symbol, settings.get("default"))
 
-            zeitraum = datetime.now(MEZ) - timedelta(hours=settings.get("interval_hours", 1))
-            symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
-            if len(symbol_df) >= settings.get("max_alarms", 3):
-                sende_email(
-                    "Alarm: Häufung erkannt",
-                    f"Symbol: {symbol} – {len(symbol_df)} Alarme innerhalb der letzten {settings.get('interval_hours', 1)} Stunden."
-                )
+    zeitraum = datetime.now(MEZ) - timedelta(hours=config.get("interval_hours", 6))
+    symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
+
+    if len(symbol_df) >= config.get("max_alarms", 3):
+        sende_email(f"Alarm: {symbol}", f"{len(symbol_df)} Alarme in {config['interval_hours']}h")
 
     return jsonify({"status": "ok"})
 
@@ -91,11 +81,8 @@ def dashboard():
     year = request.args.get("year")
     daten = []
     if os.path.exists(LOG_DATEI):
-        try:
-            with open(LOG_DATEI, "r") as f:
-                daten = json.load(f)
-        except json.JSONDecodeError:
-            daten = []
+        with open(LOG_DATEI, "r") as f:
+            daten = json.load(f)
 
     df = pd.DataFrame(daten) if daten else pd.DataFrame(columns=["timestamp", "symbol", "event", "price", "interval"])
     df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
@@ -133,37 +120,28 @@ def dashboard():
 
 @app.route("/update-settings", methods=["POST"])
 def update_settings():
-    symbol = request.form.get("symbol", "").strip().upper()
-    if not symbol:
-        return redirect(url_for("dashboard"))
-
-    dropdown_value = request.form.get("interval_hours_dropdown", "1")
+    symbol = request.form.get("symbol", "default").strip().upper()
+    dropdown_value = request.form.get("interval_hours_dropdown", "6")
     manual_value = request.form.get("interval_hours_manual", "").strip()
     try:
         interval_hours = int(manual_value) if manual_value else int(dropdown_value)
     except ValueError:
-        interval_hours = 1
+        interval_hours = 6
 
     max_alarms = int(request.form.get("max_alarms", 3))
-    trend_richtung = request.form.get("trend_richtung", "neutral")
-    overwrite = request.form.get("force_overwrite") == "true"
 
-    key = f"{symbol}_{interval_hours}_{trend_richtung}"
-
-    einstellungen = {}
+    settings = {}
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
-            einstellungen = json.load(f)
+            settings = json.load(f)
 
-    if key not in einstellungen or overwrite:
-        einstellungen[key] = {
-            "symbol": symbol,
-            "interval_hours": interval_hours,
-            "max_alarms": max_alarms,
-            "trend_richtung": trend_richtung
-        }
-        with open(SETTINGS_DATEI, "w") as f:
-            json.dump(einstellungen, f, indent=2)
+    settings[symbol] = {
+        "symbol": symbol,
+        "interval_hours": interval_hours,
+        "max_alarms": max_alarms
+    }
+    with open(SETTINGS_DATEI, "w") as f:
+        json.dump(settings, f, indent=2)
 
     return redirect(url_for("dashboard"))
 
@@ -185,29 +163,6 @@ def delete_setting():
             json.dump(einstellungen, f, indent=4)
 
     return redirect("/dashboard")
-
-@app.route("/generate-testdata", methods=["GET", "POST"])
-def generate_testdata():
-    symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT"]
-    now = datetime.now(MEZ)
-    daten = []
-    for days_ago in range(365):
-        for _ in range(random.randint(0, 3)):
-            daten.append({
-                "symbol": random.choice(symbols),
-                "timestamp": (now - timedelta(days=days_ago)).isoformat(),
-                "event": random.choice(["Breakout", "Support", "New 52W High"]),
-                "price": round(random.uniform(10, 100), 2),
-                "interval": "1h"
-            })
-    with open(LOG_DATEI, "w") as f:
-        json.dump(daten, f, indent=2)
-    return redirect(url_for("dashboard"))
-
-@app.route("/test-email")
-def test_email():
-    sende_email("Test-E-Mail vom Dashboard", "Dies ist eine Testnachricht, um die E-Mail-Funktion zu prüfen.")
-    return redirect(url_for("dashboard"))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
