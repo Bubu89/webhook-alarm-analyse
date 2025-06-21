@@ -6,6 +6,7 @@ import pandas as pd
 import random
 import smtplib
 from email.mime.text import MIMEText
+import pytz
 
 load_dotenv()
 
@@ -14,6 +15,8 @@ SETTINGS_DATEI = "settings.json"
 EMAIL_ABSENDER = os.getenv("EMAIL_ABSENDER")
 EMAIL_PASSWORT = os.getenv("EMAIL_PASSWORT")
 EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
+
+MEZ = pytz.timezone("Europe/Vienna")
 
 app = Flask(__name__)
 
@@ -40,7 +43,7 @@ def home():
 def webhook():
     data = request.get_json()
     if data:
-        data["timestamp"] = datetime.now().isoformat()
+        data["timestamp"] = datetime.now(MEZ).isoformat()
         daten = []
         if os.path.exists(LOG_DATEI):
             with open(LOG_DATEI, "r") as f:
@@ -55,9 +58,10 @@ def webhook():
 
             df = pd.DataFrame(daten)
             df["timestamp"] = pd.to_datetime(df["timestamp"])
+            df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
 
             for symbol, settings in symbol_settings.items():
-                zeitraum = datetime.now() - timedelta(hours=settings.get("interval_hours", 1))
+                zeitraum = datetime.now(MEZ) - timedelta(hours=settings.get("interval_hours", 1))
                 symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
                 if len(symbol_df) >= settings.get("max_alarms", 3):
                     sende_email("Alarm: Häufung erkannt", f"Symbol: {symbol} - {len(symbol_df)} Alarme innerhalb der letzten {settings.get('interval_hours', 1)} Stunden.")
@@ -78,6 +82,7 @@ def dashboard():
 
     df = pd.DataFrame(daten)
     df["timestamp"] = pd.to_datetime(df["timestamp"])
+    df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
     df["symbol"] = df["symbol"].astype(str)
     df["jahr"] = df["timestamp"].dt.year
     df["monat"] = df["timestamp"].dt.strftime("%b")
@@ -117,7 +122,7 @@ def dashboard():
 @app.route("/generate-testdata", methods=["GET", "POST"])
 def generate_testdata():
     symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT"]
-    now = datetime.now()
+    now = datetime.now(MEZ)
     daten = []
     for days_ago in range(365):
         for _ in range(random.randint(0, 3)):
