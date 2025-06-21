@@ -51,18 +51,16 @@ def webhook():
 
         if os.path.exists(SETTINGS_DATEI):
             with open(SETTINGS_DATEI, "r") as f:
-                einstellungen = json.load(f)
+                symbol_settings = json.load(f)
 
             df = pd.DataFrame(daten)
             df["timestamp"] = pd.to_datetime(df["timestamp"])
-            zeitraum = datetime.now() - timedelta(hours=einstellungen.get("interval_hours", 1))
-            df = df[df["timestamp"] >= zeitraum]
 
-            symbole = df["symbol"].unique()
-            for symbol in symbole:
-                symbol_df = df[df["symbol"] == symbol]
-                if len(symbol_df) >= einstellungen.get("max_alarms", 3):
-                    sende_email("Alarm: Häufung erkannt", f"Symbol: {symbol} - {len(symbol_df)} Alarme innerhalb der letzten {einstellungen.get('interval_hours', 1)} Stunden.")
+            for symbol, settings in symbol_settings.items():
+                zeitraum = datetime.now() - timedelta(hours=settings.get("interval_hours", 1))
+                symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
+                if len(symbol_df) >= settings.get("max_alarms", 3):
+                    sende_email("Alarm: Häufung erkannt", f"Symbol: {symbol} - {len(symbol_df)} Alarme innerhalb der letzten {settings.get('interval_hours', 1)} Stunden.")
 
     return jsonify({"status": "ok"})
 
@@ -101,7 +99,9 @@ def dashboard():
         with open(SETTINGS_DATEI, "r") as f:
             einstellungen = json.load(f)
 
-    einstellungs_info = f"Aktive Einstellungen: Intervall = {einstellungen.get('interval_hours', '?')} Std, Max. Alarme = {einstellungen.get('max_alarms', '?')} pro Symbol"
+    einstellungs_info = "<br>".join([
+        f"{symbol}: Intervall = {einstellungen[symbol]['interval_hours']} Std, Max. Alarme = {einstellungen[symbol]['max_alarms']}" 
+        for symbol in einstellungen]) if einstellungen else "Keine aktiven Einstellungen"
 
     return render_template("dashboard.html",
         matrix=matrix,
@@ -132,10 +132,22 @@ def generate_testdata():
 
 @app.route("/update-settings", methods=["POST"])
 def update_settings():
-    einstellungen = {
-        "interval_hours": int(request.form.get("interval_hours", 1)),
-        "max_alarms": int(request.form.get("max_alarms", 3))
+    symbol = request.form.get("symbol_filter", "").strip().upper()
+    if not symbol:
+        return redirect(url_for("dashboard"))
+    interval_hours = int(request.form.get("interval_hours", 1))
+    max_alarms = int(request.form.get("max_alarms", 3))
+
+    einstellungen = {}
+    if os.path.exists(SETTINGS_DATEI):
+        with open(SETTINGS_DATEI, "r") as f:
+            einstellungen = json.load(f)
+
+    einstellungen[symbol] = {
+        "interval_hours": interval_hours,
+        "max_alarms": max_alarms
     }
+
     with open(SETTINGS_DATEI, "w") as f:
         json.dump(einstellungen, f, indent=2)
     return redirect(url_for("dashboard"))
