@@ -63,6 +63,14 @@
         #alarmListe li.hidden {
             display: none;
         }
+        form.inline {
+            display: inline;
+        }
+        .delete-btn {
+            background: #cc0000;
+            color: white;
+            margin-left: 10px;
+        }
         @media (max-width: 600px) {
             body { font-size: 14px; }
             .matrix { font-size: 12px; grid-template-columns: repeat(13, minmax(20px, 1fr)); }
@@ -114,23 +122,32 @@
                 <option value="bearish">Negativer Trend (abwärts)</option>
             </select>
             <input type="hidden" name="symbol" value="ALL">
-            <input type="hidden" name="force_overwrite" value="true" id="overwriteFlag">
             <button type="submit">💾 Einstellungen speichern</button>
         </form>
     </div>
 
     <div class="section">
-        <h2>2. Aktuelle globale Einstellung</h2>
-        {% if einstellungen.default %}
-            {% set config = einstellungen.default %}
-            <p>
-                Intervall: {{ config.interval_hours }} Stunden |
-                Max. Alarme: {{ config.max_alarms }} |
-                Trend: {{ config.trend_richtung }}
-                <button onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">⟳ Laden</button>
-            </p>
-        {% else %}
-            <p>Keine globale Einstellung gesetzt.</p>
+        <h2>2. Aktuelle globale Einstellungen</h2>
+        {% set globale_keys = ['global_bullish', 'global_bearish', 'global_neutral'] %}
+        {% set count = 0 %}
+        {% for key in globale_keys %}
+            {% if einstellungen[key] is defined %}
+                {% set config = einstellungen[key] %}
+                <p>
+                    <strong>{{ key.replace('global_', '')|capitalize }}</strong> |
+                    Intervall: {{ config.interval_hours }}h |
+                    Max. Alarme: {{ config.max_alarms }}
+                    <form class="inline" method="post" action="/delete-setting">
+                        <input type="hidden" name="key" value="{{ key }}">
+                        <button type="submit" class="delete-btn">❌ Löschen</button>
+                    </form>
+                    <button onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ key.replace('global_', '') }}')">⟳ Laden</button>
+                </p>
+                {% set count = count + 1 %}
+            {% endif %}
+        {% endfor %}
+        {% if count == 0 %}
+            <p>Keine globalen Einstellungen vorhanden.</p>
         {% endif %}
     </div>
 
@@ -140,7 +157,7 @@
             {% if letzte_ereignisse %}
                 {% for eintrag in letzte_ereignisse %}
                     <li class="{% if loop.index > 5 %}hidden{% endif %}">
-                        {{ eintrag.timestamp.strftime('%Y-%m-%d %H:%M:%S') }} | {{ eintrag.symbol }}: {{ eintrag.nachricht }}
+                        {{ eintrag.timestamp.strftime('%Y-%m-%d %H:%M:%S') }} | {{ eintrag.symbol }}: {{ eintrag.nachricht or eintrag.get('event', '-') }}
                     </li>
                 {% endfor %}
             {% else %}
