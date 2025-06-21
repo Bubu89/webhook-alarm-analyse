@@ -2,21 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Webhook Dashboard</title>
+    <title>Webhook-Alarm Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
+            font-family: Arial, sans-serif;
             background: #111;
-            color: #eee;
-            font-family: sans-serif;
-            margin: 20px;
+            color: #fff;
+            padding: 20px;
         }
         h2 {
-            text-align: center;
+            margin-top: 40px;
         }
-        .select-wrapper {
-            text-align: center;
-            margin-bottom: 20px;
+        select {
+            font-size: 16px;
+            margin-bottom: 10px;
         }
         table {
             border-collapse: collapse;
@@ -35,78 +35,139 @@
         td.medium { background-color: #3b82f6; }
         td.high { background-color: #60a5fa; }
         td.veryhigh { background-color: #93c5fd; }
-        canvas {
-            margin-top: 30px;
+
+        .section {
+            margin-top: 60px;
+        }
+        .log-table {
+            width: 80%;
+            margin: 0 auto;
         }
     </style>
 </head>
 <body>
-    <h2>Webhook-Alarm Dashboard</h2>
 
-    <div class="select-wrapper">
+    <h1>Webhook-Alarm Dashboard</h1>
+
+    <!-- Jahresfilter -->
+    <div style="text-align: center;">
         <label for="yearSelect">Jahr auswählen:</label>
         <select id="yearSelect" onchange="filterByYear()">
-            <option value="all">Alle Jahre</option>
             {% for jahr in jahre %}
-            <option value="{{ jahr }}">{{ jahr }}</option>
+                <option value="{{ jahr }}">{{ jahr }}</option>
             {% endfor %}
         </select>
     </div>
 
-    <div id="heatmap-container">
-        {{ heatmap_table|safe }}
+    <!-- Heatmap -->
+    <div class="section">
+        <h2>Alarm Heatmap (12 Monate)</h2>
+        <table id="heatmapTable">
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    {% for monat in matrix.values()|first %}
+                        <th class="monat-column">{{ monat }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for symbol, monatsdaten in matrix.items() %}
+                    <tr>
+                        <td>{{ symbol }}</td>
+                        {% for monat, count in monatsdaten.items() %}
+                            {% set klasse = "low" %}
+                            {% if count > 5 %} {% set klasse = "medium" %} {% endif %}
+                            {% if count > 15 %} {% set klasse = "high" %} {% endif %}
+                            {% if count > 30 %} {% set klasse = "veryhigh" %} {% endif %}
+                            <td class="{{ klasse }} monat-column" data-monat="{{ monat }}">{{ count }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
-    <canvas id="lineChart" width="900" height="400"></canvas>
+    <!-- Chart -->
+    <div class="section">
+        <h2>Alarme im Zeitverlauf (Liniendiagramm)</h2>
+        <canvas id="lineChart" height="120"></canvas>
+        <script>
+            const chartLabels = {{ monate_js|safe }};
+            const chartData = {{ chart_daten_js|safe }};
+            const colors = ['#60a5fa', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'];
 
-    <script>
-        const yearSelect = document.getElementById("yearSelect");
-        const fullTableHTML = document.getElementById("heatmap-container").innerHTML;
+            const datasets = Object.keys(chartData).map((symbol, index) => ({
+                label: symbol,
+                data: chartData[symbol],
+                borderColor: colors[index % colors.length],
+                fill: false
+            }));
 
-        function filterByYear() {
-            const year = yearSelect.value;
-            const rows = document.querySelectorAll("tbody tr");
-            const headerCells = document.querySelectorAll("thead th");
-            headerCells.forEach((th, i) => {
-                if (i === 0) return;
-                const colYear = th.innerText.split("-")[0];
-                th.style.display = (year === "all" || year === colYear) ? "" : "none";
-                rows.forEach(row => {
-                    const td = row.children[i];
-                    if (td) td.style.display = (year === "all" || year === colYear) ? "" : "none";
-                });
-            });
-        }
-
-        const chartData = {{ chart_data | safe }};
-        const ctx = document.getElementById('lineChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: chartData.labels,
-                datasets: chartData.datasets
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
+            new Chart(document.getElementById('lineChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
                     },
-                    title: {
-                        display: true,
-                        text: 'Alarm-Verlauf pro Symbol'
+                    scales: {
+                        y: { beginAtZero: true }
                     }
-                },
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                scales: {
-                    x: { display: true, title: { display: true, text: 'Monat' }},
-                    y: { display: true, title: { display: true, text: 'Anzahl Alarme' }}
                 }
+            });
+
+            function filterByYear() {
+                const jahr = document.getElementById("yearSelect").value;
+                document.querySelectorAll(".monat-column").forEach(td => {
+                    td.style.display = td.innerText.startsWith(jahr + "-") ? "" : "none";
+                });
             }
-        });
-    </script>
+        </script>
+    </div>
+
+    <!-- Letzte Alarme -->
+    <div class="section">
+        <h2>Letzte 10 empfangene Alarme</h2>
+        <table class="log-table">
+            <thead>
+                <tr><th>Timestamp</th><th>Symbol</th><th>Weitere Daten</th></tr>
+            </thead>
+            <tbody>
+                {% for eintrag in letzte_alarme %}
+                    <tr>
+                        <td>{{ eintrag.timestamp }}</td>
+                        <td>{{ eintrag.symbol }}</td>
+                        <td>{{ eintrag.extra }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Intervall-Erkennung -->
+    <div class="section">
+        <h2>Per E-Mail gesendete Alarmsignale (erkanntes Intervall)</h2>
+        <table class="log-table">
+            <thead>
+                <tr><th>Symbol</th><th>Anzahl Alarme</th><th>Zeitraum (Min)</th><th>Versendet am</th></tr>
+            </thead>
+            <tbody>
+                {% for alarm in erkannte_intervalle %}
+                    <tr>
+                        <td>{{ alarm.symbol }}</td>
+                        <td>{{ alarm.count }}</td>
+                        <td>{{ alarm.zeitraum }}</td>
+                        <td>{{ alarm.zeitpunkt }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 </body>
 </html>
