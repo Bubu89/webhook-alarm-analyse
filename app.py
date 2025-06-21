@@ -133,9 +133,7 @@ def generate_testdata():
 @app.route("/update-settings", methods=["POST"])
 def update_settings():
     einstellungen = {
-        "symbol_filter": request.form.get("symbol_filter"),
         "interval_hours": int(request.form.get("interval_hours", 1)),
-        "threshold_percent": int(request.form.get("threshold_percent", 10)),
         "max_alarms": int(request.form.get("max_alarms", 3))
     }
     with open(SETTINGS_DATEI, "w") as f:
