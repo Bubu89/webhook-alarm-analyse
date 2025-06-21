@@ -2,152 +2,166 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Alarm Dashboard</title>
+    <title>Webhook Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #111;
             color: #fff;
-            margin: 0;
             padding: 20px;
         }
         h2, h3 {
             text-align: center;
         }
-        form {
-            background-color: #222;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 0 auto 30px auto;
-            width: 80%;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-        }
-        input {
-            width: 100%;
-            padding: 5px;
-            margin-top: 5px;
-        }
-        button {
-            margin-top: 10px;
-            background-color: #4caf50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-        }
-        table {
+        table, th, td {
+            border: 1px solid #555;
             border-collapse: collapse;
-            margin: 0 auto 30px auto;
-            width: 95%;
+            padding: 8px;
         }
-        th, td {
-            border: 1px solid #444;
-            padding: 6px;
-            text-align: center;
-        }
-        th {
-            background-color: #222;
-        }
-        td.low { background-color: #1e3a5f; }
-        td.medium { background-color: #3b82f6; }
-        td.high { background-color: #60a5fa; }
-        td.veryhigh { background-color: #93c5fd; }
-        .section {
+        .heatmap td.low { background-color: #1e3a5f; }
+        .heatmap td.medium { background-color: #3b82f6; }
+        .heatmap td.high { background-color: #60a5fa; }
+        .heatmap td.veryhigh { background-color: #93c5fd; }
+        form, .section {
+            background: #222;
             margin: 20px auto;
-            width: 90%;
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 900px;
         }
-        .testlink {
-            text-align: center;
-            margin-bottom: 30px;
+        label, input, select {
+            margin-right: 10px;
         }
-        .dropdown {
-            text-align: center;
-            margin-bottom: 20px;
+        input[type="submit"], button {
+            padding: 6px 12px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
-        select {
-            padding: 5px 10px;
+        canvas {
+            background-color: #fff;
+            margin-top: 30px;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
 
-<h2>Alarm Dashboard</h2>
+<h2>Webhook-Alarm Dashboard</h2>
 
-<div class="dropdown">
-    <form method="get" action="/dashboard">
-        Jahr auswählen:
-        <select name="year" onchange="this.form.submit()">
-            {% for jahr in verfuegbare_jahre %}
-                <option value="{{ jahr }}" {% if jahr == aktuelles_jahr %}selected{% endif %}>{{ jahr }}</option>
-            {% endfor %}
-        </select>
-    </form>
-</div>
-
-<form method="post" action="/update-settings">
-    <h3>Alarmeinstellungen</h3>
-    <label>
-        Symbol-Filter:
-        <input name="symbol_filter" type="text" value="{{ einstellungen.symbol_filter }}">
-    </label>
-    <label>
-        Alarm-Intervall (Stunden):
-        <input name="interval_hours" type="number" value="{{ einstellungen.interval_hours }}" min="1" max="168">
-    </label>
-    <label>
-        Schwellenwert (%):
-        <input name="threshold_percent" type="number" value="{{ einstellungen.threshold_percent }}" min="1" max="100">
-    </label>
-    <label>
-        Maximale Alarme pro Intervall:
-        <input name="max_alarms" type="number" value="{{ einstellungen.max_alarms }}" min="1" max="100">
-    </label>
-    <button type="submit">Speichern</button>
+<!-- 📅 Jahr-Auswahl -->
+<form method="get" action="/dashboard" class="section">
+    <label for="year">Jahr wählen:</label>
+    <select name="year" id="year">
+        {% for jahr in verfuegbare_jahre %}
+            <option value="{{ jahr }}" {% if jahr == aktuelles_jahr %}selected{% endif %}>{{ jahr }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Anzeigen">
 </form>
 
-<h3>Alarm Heatmap – {{ aktuelles_jahr }}</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Symbol</th>
-            {% for monat in monate %}
-                <th>{{ monat }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for symbol, werte in matrix.items() %}
+<!-- 🔥 Heatmap -->
+<div class="section">
+    <h3>Heatmap</h3>
+    <table class="heatmap">
+        <thead>
             <tr>
-                <td>{{ symbol }}</td>
-                {% for count in werte %}
-                    {% set klasse = "low" %}
-                    {% if count > 5 %} {% set klasse = "medium" %} {% endif %}
-                    {% if count > 15 %} {% set klasse = "high" %} {% endif %}
-                    {% if count > 30 %} {% set klasse = "veryhigh" %} {% endif %}
-                    <td class="{{ klasse }}">{{ count }}</td>
+                <th>Symbol</th>
+                {% for monat in monate %}
+                    <th>{{ monat }}</th>
                 {% endfor %}
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<div class="section">
-    <h3>Letzte 10 Ereignisse</h3>
-    <ul>
-        {% for eintrag in letzte_ereignisse %}
-            <li>{{ eintrag.timestamp }} – <strong>{{ eintrag.symbol }}</strong>: {{ eintrag.nachricht }}</li>
-        {% endfor %}
-    </ul>
+        </thead>
+        <tbody>
+            {% for symbol, werte in matrix.items() %}
+                <tr>
+                    <td>{{ symbol }}</td>
+                    {% for count in werte %}
+                        {% set klasse = "low" %}
+                        {% if count > 5 %} {% set klasse = "medium" %} {% endif %}
+                        {% if count > 15 %} {% set klasse = "high" %} {% endif %}
+                        {% if count > 30 %} {% set klasse = "veryhigh" %} {% endif %}
+                        <td class="{{ klasse }}">{{ count }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
-<div class="testlink">
+<!-- 📈 Chart -->
+<div class="section">
+    <h3>Liniengrafik Jahresverlauf</h3>
+    <canvas id="lineChart" width="800" height="300"></canvas>
+</div>
+
+<!-- ⚙️ Einstellungen -->
+<form method="post" action="/update-settings" class="section">
+    <h3>Alarmeinstellungen</h3>
+    <label>Symbol-Filter:</label>
+    <input type="text" name="symbol_filter" value="{{ einstellungen.symbol_filter or '' }}">
+    <label>Intervall (Stunden):</label>
+    <input type="number" name="interval_hours" value="{{ einstellungen.interval_hours or 1 }}">
+    <label>Max. Alarme:</label>
+    <input type="number" name="max_alarms" value="{{ einstellungen.max_alarms or 3 }}">
+    <input type="submit" value="Speichern">
+</form>
+
+<!-- 📤 Testdaten erzeugen -->
+<div class="section">
     <form method="post" action="/generate-testdata">
-        <button type="submit">🔁 Testdaten generieren (365 Tage)</button>
+        <button type="submit">🔄 Testdaten generieren</button>
     </form>
 </div>
+
+<!-- 📋 Letzte Ereignisse -->
+<div class="section">
+    <h3>Letzte Ereignisse</h3>
+    <table>
+        <tr><th>Zeit</th><th>Symbol</th><th>Nachricht</th></tr>
+        {% for eintrag in letzte_ereignisse %}
+            <tr>
+                <td>{{ eintrag.timestamp }}</td>
+                <td>{{ eintrag.symbol }}</td>
+                <td>{{ eintrag.nachricht }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<!-- 📊 JS: Chart zeichnen -->
+<script>
+    const monate = {{ monate_js | safe }};
+    const matrix = {{ matrix | tojson }};
+    const farben = ["red", "blue", "green", "orange", "purple", "cyan", "magenta"];
+
+    const datasets = Object.keys(matrix).map((symbol, index) => ({
+        label: symbol,
+        data: matrix[symbol],
+        borderColor: farben[index % farben.length],
+        tension: 0.3,
+        fill: false
+    }));
+
+    new Chart(document.getElementById("lineChart"), {
+        type: "line",
+        data: {
+            labels: monate,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: "#000" } } },
+            scales: {
+                x: { ticks: { color: "#000" } },
+                y: { ticks: { color: "#000" } }
+            }
+        }
+    });
+</script>
 
 </body>
 </html>
