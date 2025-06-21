@@ -148,6 +148,8 @@
                 <option value="bearish">Negativer Trend (abwärts)</option>
             </select>
 
+            <input type="hidden" name="force_overwrite" value="false" id="overwriteFlag">
+
             <button type="submit">💾 Einstellungen speichern</button>
         </form>
     </div>
@@ -156,10 +158,10 @@
         <h2>2. Aktive Einstellungen</h2>
         {% if einstellungen %}
             <ul>
-                {% for symbol, config in einstellungen.items() %}
+                {% for key, config in einstellungen.items() %}
                     <li>
-                        <input type="radio" name="select_einstellung" onclick="ladeEinstellungen('{{ symbol }}', '{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">
-                        {{ symbol }}: Intervall = {{ config.interval_hours }} Std, Max. Alarme = {{ config.max_alarms }}, Trend = {{ config.trend_richtung }}
+                        <input type="radio" name="select_einstellung" onclick="ladeEinstellungen('{{ config.symbol }}', '{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}'); document.getElementById('overwriteFlag').value='true'">
+                        {{ config.symbol }} ({{ config.trend_richtung }}): Intervall = {{ config.interval_hours }} Std, Max. Alarme = {{ config.max_alarms }}
                     </li>
                 {% endfor %}
             </ul>
