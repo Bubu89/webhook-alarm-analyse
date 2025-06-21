@@ -58,6 +58,8 @@ def webhook():
 
             df = pd.DataFrame(daten)
             df["timestamp"] = pd.to_datetime(df["timestamp"])
+            if df["timestamp"].dt.tz is None:
+                df["timestamp"] = df["timestamp"].dt.tz_localize("UTC")
             df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
 
             for symbol, settings in symbol_settings.items():
@@ -79,7 +81,10 @@ def dashboard():
 
     df = pd.DataFrame(daten) if daten else pd.DataFrame(columns=["timestamp", "symbol", "event", "price", "interval"])
     df["timestamp"] = pd.to_datetime(df["timestamp"])
+    if df["timestamp"].dt.tz is None:
+        df["timestamp"] = df["timestamp"].dt.tz_localize("UTC")
     df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
+
     df["symbol"] = df["symbol"].astype(str)
     df["jahr"] = df["timestamp"].dt.year
     df["monat"] = df["timestamp"].dt.strftime("%b")
