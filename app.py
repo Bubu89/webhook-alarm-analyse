@@ -1,12 +1,11 @@
-import os
-import json
-from datetime import datetime
+import os, json
+import random
+from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, render_template_string
 import pandas as pd
 
 LOG_DATEI = "webhook_logs.json"
-
-app = Flask(__name__, template_folder=".")
+app = Flask(__name__)
 
 @app.route("/")
 def index():
@@ -20,25 +19,69 @@ def empfang():
         speichere_webhook_daten(data)
     return jsonify({"status": "ok"})
 
+@app.route("/generate-testdata")
+def generate_testdata():
+    symbole = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "AVAXUSDT", "DOGEUSDT"]
+    start = datetime.now() - timedelta(days=365)
+    eintraege = []
+
+    for _ in range(300):
+        eintraege.append({
+            "timestamp": (start + timedelta(days=random.randint(0, 365))).isoformat(),
+            "symbol": random.choice(symbole),
+            "info": "test"
+        })
+
+    with open(LOG_DATEI, "w") as f:
+        json.dump(eintraege, f, indent=2)
+
+    return "Testdaten generiert."
+
 @app.route("/dashboard")
 def dashboard():
     if not os.path.exists(LOG_DATEI):
         return "Keine Daten vorhanden."
+
     with open(LOG_DATEI, "r") as f:
         daten = json.load(f)
+
     if not daten:
         return "Keine Eintraege."
+
     df = pd.DataFrame(daten)
     if df.empty or "timestamp" not in df.columns or "symbol" not in df.columns:
         return "Unzureichende Daten."
 
     df["timestamp"] = pd.to_datetime(df["timestamp"])
     df["monat"] = df["timestamp"].dt.to_period("M").astype(str)
-
     pivot = df.groupby(["symbol", "monat"]).size().unstack(fill_value=0)
-    table_html = pivot.to_html(classes="heatmap-table", border=0)
 
-    return render_template_string(lade_heatmap_template(), table_html=table_html)
+    html = """
+    <html><head>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { border-collapse: collapse; }
+        th, td { padding: 6px 10px; text-align: center; border: 1px solid #ccc; }
+        th { background-color: #eee; }
+        td[data-count] {
+            background-color: rgb(255, calc(255 - min(200, data-count * 8)), calc(255 - min(200, data-count * 16)));
+        }
+    </style>
+    </head><body>
+    <h2>Webhook-Alarm Heatmap</h2>
+    <table><thead><tr><th>Symbol</th>{% for col in data.columns %}<th>{{ col }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for index, row in data.iterrows() %}
+    <tr><td>{{ index }}</td>
+    {% for val in row %}
+        <td data-count="{{ val }}">{{ val }}</td>
+    {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody></table>
+    </body></html>
+    """
+    return render_template_string(html, data=pivot)
 
 def speichere_webhook_daten(payload):
     if not os.path.exists(LOG_DATEI):
@@ -49,57 +92,6 @@ def speichere_webhook_daten(payload):
     daten.append(payload)
     with open(LOG_DATEI, "w") as f:
         json.dump(daten, f, indent=2)
-
-def lade_heatmap_template():
-    return """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Webhook Heatmap Dashboard</title>
-        <style>
-            body { font-family: Arial, sans-serif; background: #f7f7f7; padding: 20px; }
-            h1 { color: #333; }
-            .heatmap-table { border-collapse: collapse; width: 100%; }
-            .heatmap-table th, .heatmap-table td {
-                border: 1px solid #ccc;
-                text-align: center;
-                padding: 8px;
-            }
-            .heatmap-table th {
-                background-color: #f0f0f0;
-            }
-            .heatmap-table td {
-                background-color: #ffffff;
-            }
-        </style>
-        <script>
-            window.onload = function () {
-                const cells = document.querySelectorAll(".heatmap-table td");
-                let max = 0;
-                cells.forEach(cell => {
-                    const val = parseInt(cell.innerText);
-                    if (!isNaN(val) && val > max) max = val;
-                });
-                cells.forEach(cell => {
-                    const val = parseInt(cell.innerText);
-                    if (!isNaN(val)) {
-                        const intensity = val / max;
-                        const red = 255 - Math.round(255 * intensity);
-                        const green = 255 - Math.round(100 * intensity);
-                        const blue = 255 - Math.round(200 * intensity);
-                        cell.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
-                    }
-                });
-            }
-        </script>
-    </head>
-    <body>
-        <h1>Webhook Monatsanalyse (Heatmap)</h1>
-        {{ table_html|safe }}
-    </body>
-    </html>
-    """
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
