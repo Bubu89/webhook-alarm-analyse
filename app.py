@@ -1,6 +1,6 @@
 import os, json
 from datetime import datetime, timedelta
-from flask import Flask, request, jsonify, render_template, redirect, url_for, abort
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 from dotenv import load_dotenv
 import pandas as pd
 import random
@@ -14,20 +14,8 @@ SETTINGS_DATEI = "settings.json"
 EMAIL_ABSENDER = os.getenv("EMAIL_ABSENDER")
 EMAIL_PASSWORT = os.getenv("EMAIL_PASSWORT")
 EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
-ZULAE_SSIGE_IPS = set(os.getenv("ZULAE_SSIGE_IPS", "127.0.0.1,::1").split(","))
-ANGEMELDETE_IPS_DATEI = "whitelist_ips.json"
 
 app = Flask(__name__)
-
-def lade_angemeldete_ips():
-    if os.path.exists(ANGEMELDETE_IPS_DATEI):
-        with open(ANGEMELDETE_IPS_DATEI, "r") as f:
-            return set(json.load(f))
-    return set()
-
-def speichere_angemeldete_ips(ips):
-    with open(ANGEMELDETE_IPS_DATEI, "w") as f:
-        json.dump(list(ips), f)
 
 def sende_email(betreff, inhalt):
     try:
@@ -43,19 +31,6 @@ def sende_email(betreff, inhalt):
         server.quit()
     except Exception as e:
         print(f"E-Mail konnte nicht gesendet werden: {e}")
-
-@app.before_request
-def ip_whitelist():
-    if request.endpoint == "webhook":
-        remote_addr = request.remote_addr
-        bekannte_ips = lade_angemeldete_ips()
-        if remote_addr in bekannte_ips:
-            return
-        if len(bekannte_ips) < 4:
-            bekannte_ips.add(remote_addr)
-            speichere_angemeldete_ips(bekannte_ips)
-        else:
-            abort(403)
 
 @app.route("/")
 def home():
