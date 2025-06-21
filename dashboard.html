@@ -1,14 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Webhook Dashboard</title>
+    <meta charset="UTF-8">
+    <title>Alarm Heatmap</title>
     <style>
-        table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }
-        th { background-color: #f2f2f2; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: #fff;
+        }
+        h2 {
+            text-align: center;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+            width: 95%;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 6px;
+            text-align: center;
+        }
+        th {
+            background-color: #222;
+        }
+        td.low {
+            background-color: #1e3a5f;
+        }
+        td.medium {
+            background-color: #3b82f6;
+        }
+        td.high {
+            background-color: #60a5fa;
+        }
+        td.veryhigh {
+            background-color: #93c5fd;
+        }
     </style>
 </head>
 <body>
-    <h2>Alarm Heatmap</h2>
+    <h2>Alarm Heatmap (12 Monate)</h2>
     <table>
         <thead>
             <tr>
@@ -19,11 +51,15 @@
             </tr>
         </thead>
         <tbody>
-            {% for symbol, werte in matrix.items() %}
+            {% for symbol, monatsdaten in matrix.items() %}
                 <tr>
                     <td>{{ symbol }}</td>
-                    {% for wert in werte.values() %}
-                        <td>{{ wert }}</td>
+                    {% for count in monatsdaten.values() %}
+                        {% set klasse = "low" %}
+                        {% if count > 5 %} {% set klasse = "medium" %} {% endif %}
+                        {% if count > 15 %} {% set klasse = "high" %} {% endif %}
+                        {% if count > 30 %} {% set klasse = "veryhigh" %} {% endif %}
+                        <td class="{{ klasse }}">{{ count }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}
