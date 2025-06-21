@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from dotenv import load_dotenv
 import pandas as pd
-import random
 import smtplib
 from email.mime.text import MIMEText
 import pytz
@@ -56,22 +55,22 @@ def webhook():
     with open(LOG_DATEI, "w") as f:
         json.dump(daten, f, indent=2)
 
-    settings = {"default": {"interval_hours": 6, "max_alarms": 3}}  # Fallback-Standard
+    settings = {"default": {"interval_hours": 6, "max_alarms": 3}}  # Fallback
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
             settings = json.load(f)
+
+    config = settings.get("default", {"interval_hours": 6, "max_alarms": 3})
 
     df = pd.DataFrame(daten)
     df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
     df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
 
-    symbol = data.get("symbol")
-    config = settings.get(symbol, settings.get("default"))
-
-    zeitraum = datetime.now(MEZ) - timedelta(hours=config.get("interval_hours", 6))
+    symbol = data.get("symbol", "UNBEKANNT")
+    zeitraum = datetime.now(MEZ) - timedelta(hours=config["interval_hours"])
     symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
 
-    if len(symbol_df) >= config.get("max_alarms", 3):
+    if len(symbol_df) >= config["max_alarms"]:
         sende_email(f"Alarm: {symbol}", f"{len(symbol_df)} Alarme in {config['interval_hours']}h")
 
     return jsonify({"status": "ok"})
@@ -120,7 +119,6 @@ def dashboard():
 
 @app.route("/update-settings", methods=["POST"])
 def update_settings():
-    symbol = request.form.get("symbol", "default").strip().upper()
     dropdown_value = request.form.get("interval_hours_dropdown", "6")
     manual_value = request.form.get("interval_hours_manual", "").strip()
     try:
@@ -129,16 +127,17 @@ def update_settings():
         interval_hours = 6
 
     max_alarms = int(request.form.get("max_alarms", 3))
+    trend_richtung = request.form.get("trend_richtung", "neutral")
 
     settings = {}
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
             settings = json.load(f)
 
-    settings[symbol] = {
-        "symbol": symbol,
+    settings["default"] = {
         "interval_hours": interval_hours,
-        "max_alarms": max_alarms
+        "max_alarms": max_alarms,
+        "trend_richtung": trend_richtung
     }
     with open(SETTINGS_DATEI, "w") as f:
         json.dump(settings, f, indent=2)
