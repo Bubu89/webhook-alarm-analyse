@@ -99,17 +99,23 @@
     <div class="settings">
         <h2>Alarmeinstellungen</h2>
         <form action="/update-settings" method="post">
-            <label>Symbol-Filter</label>
-            <input type="text" name="symbol_filter" value="{{ einstellungen.get('symbol_filter', '') }}">
+            <label>Symbol</label>
+            <input type="text" name="symbol_filter" value="{{ einstellungen.get('symbol_filter', '') }}" required>
 
-            <label>Intervall in Stunden</label>
-            <input type="number" name="interval_hours" value="{{ einstellungen.get('interval_hours', 1) }}">
+            <label>Intervall in Stunden (Dropdown)</label>
+            <select name="interval_hours">
+                <option value="1">1 Stunde</option>
+                <option value="3">3 Stunden</option>
+                <option value="6">6 Stunden</option>
+                <option value="12">12 Stunden</option>
+                <option value="24">24 Stunden</option>
+            </select>
 
-            <label>Schwellenwert in %</label>
-            <input type="number" name="threshold_percent" value="{{ einstellungen.get('threshold_percent', 10) }}">
+            <label>oder manuell (z. B. 5 für 5 Stunden)</label>
+            <input type="number" name="interval_hours" placeholder="Manuelle Eingabe (überschreibt Dropdown)">
 
-            <label>Maximale Alarme</label>
-            <input type="number" name="max_alarms" value="{{ einstellungen.get('max_alarms', 3) }}">
+            <label>Maximale Alarme pro Intervall</label>
+            <input type="number" name="max_alarms" value="{{ einstellungen.get('max_alarms', 3) }}" required>
 
             <button type="submit">💾 Einstellungen speichern</button>
         </form>
