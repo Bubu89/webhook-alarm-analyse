@@ -71,23 +71,20 @@ def webhook():
 @app.route("/dashboard")
 def dashboard():
     year = request.args.get("year")
-    if not os.path.exists(LOG_DATEI):
-        return "Keine Daten vorhanden."
 
-    with open(LOG_DATEI, "r") as f:
-        daten = json.load(f)
+    daten = []
+    if os.path.exists(LOG_DATEI):
+        with open(LOG_DATEI, "r") as f:
+            daten = json.load(f)
 
-    if not daten:
-        return "Keine gespeicherten Alarme vorhanden."
-
-    df = pd.DataFrame(daten)
+    df = pd.DataFrame(daten) if daten else pd.DataFrame(columns=["timestamp", "symbol", "event", "price", "interval"])
     df["timestamp"] = pd.to_datetime(df["timestamp"])
     df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
     df["symbol"] = df["symbol"].astype(str)
     df["jahr"] = df["timestamp"].dt.year
     df["monat"] = df["timestamp"].dt.strftime("%b")
 
-    jahre = sorted(df["jahr"].unique())
+    jahre = sorted(df["jahr"].unique()) if not df.empty else [2025]
     aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
 
     df = df[df["jahr"] == aktuelles_jahr]
@@ -105,7 +102,7 @@ def dashboard():
             einstellungen = json.load(f)
 
     einstellungs_info = "<br>".join([
-        f"{symbol}: Intervall = {einstellungen[symbol]['interval_hours']} Std, Max. Alarme = {einstellungen[symbol]['max_alarms']}" 
+        f"{symbol}: Intervall = {einstellungen[symbol]['interval_hours']} Std, Max. Alarme = {einstellungen[symbol]['max_alarms']}, Trend = {einstellungen[symbol].get('trend_richtung', 'neutral')}"
         for symbol in sorted(einstellungen)]) if einstellungen else "Keine aktiven Einstellungen"
 
     return render_template("dashboard.html",
@@ -151,6 +148,7 @@ def update_settings():
         interval_hours = 1
 
     max_alarms = int(request.form.get("max_alarms", 3))
+    trend_richtung = request.form.get("trend_richtung", "neutral")
 
     einstellungen = {}
     if os.path.exists(SETTINGS_DATEI):
@@ -159,7 +157,8 @@ def update_settings():
 
     einstellungen[symbol] = {
         "interval_hours": interval_hours,
-        "max_alarms": max_alarms
+        "max_alarms": max_alarms,
+        "trend_richtung": trend_richtung
     }
 
     with open(SETTINGS_DATEI, "w") as f:
