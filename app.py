@@ -101,7 +101,7 @@ def dashboard():
 
     einstellungs_info = "<br>".join([
         f"{symbol}: Intervall = {einstellungen[symbol]['interval_hours']} Std, Max. Alarme = {einstellungen[symbol]['max_alarms']}" 
-        for symbol in einstellungen]) if einstellungen else "Keine aktiven Einstellungen"
+        for symbol in sorted(einstellungen)]) if einstellungen else "Keine aktiven Einstellungen"
 
     return render_template("dashboard.html",
         matrix=matrix,
@@ -124,7 +124,9 @@ def generate_testdata():
             daten.append({
                 "symbol": random.choice(symbols),
                 "timestamp": (now - timedelta(days=days_ago)).isoformat(),
-                "nachricht": random.choice(["Breakout", "Support", "New 52W High"])
+                "event": random.choice(["Breakout", "Support", "New 52W High"]),
+                "price": round(random.uniform(10, 100), 2),
+                "interval": "1h"
             })
     with open(LOG_DATEI, "w") as f:
         json.dump(daten, f, indent=2)
@@ -132,10 +134,17 @@ def generate_testdata():
 
 @app.route("/update-settings", methods=["POST"])
 def update_settings():
-    symbol = request.form.get("symbol_filter", "").strip().upper()
+    symbol = request.form.get("symbol", "").strip().upper()
     if not symbol:
         return redirect(url_for("dashboard"))
-    interval_hours = int(request.form.get("interval_hours", 1))
+
+    dropdown_value = request.form.get("interval_hours_dropdown", "1")
+    manual_value = request.form.get("interval_hours_manual", "").strip()
+    try:
+        interval_hours = int(manual_value) if manual_value else int(dropdown_value)
+    except ValueError:
+        interval_hours = 1
+
     max_alarms = int(request.form.get("max_alarms", 3))
 
     einstellungen = {}
