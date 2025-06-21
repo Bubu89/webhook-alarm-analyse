@@ -25,7 +25,8 @@ def sende_email(betreff, inhalt):
         msg["From"] = EMAIL_ABSENDER
         msg["To"] = EMAIL_EMPFANGER
 
-        server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+        server = smtplib.SMTP("mail.gmx.net", 587)
+        server.starttls()
         server.login(EMAIL_ABSENDER, EMAIL_PASSWORT)
         server.send_message(msg)
         server.quit()
@@ -140,6 +141,12 @@ def update_settings():
     with open(SETTINGS_DATEI, "w") as f:
         json.dump(einstellungen, f, indent=2)
     return redirect(url_for("dashboard"))
+
+
+@app.route("/test-email")
+def test_email():
+    sende_email("GMX-Testalarm", "Das ist eine Test-E-Mail vom GMX-Server.")
+    return "Test-E-Mail gesendet."
 
 
 if __name__ == "__main__":
