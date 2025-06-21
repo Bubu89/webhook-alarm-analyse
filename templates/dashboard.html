@@ -81,9 +81,8 @@
             btn.textContent = expanded ? "📋 Alle anzeigen" : "📋 Weniger anzeigen";
             btn.setAttribute("data-expanded", expanded ? "false" : "true");
         }
-        function ladeEinstellungen(symbol, interval, max, trend) {
+        function ladeEinstellungen(interval, max, trend) {
             if (!confirm("Diese Aktion überschreibt die aktuellen Eingaben. Fortfahren?")) return;
-            document.querySelector("input[name='symbol']").value = symbol;
             document.querySelector("select[name='interval_hours_dropdown']").value = interval;
             document.querySelector("input[name='max_alarms']").value = max;
             document.querySelector("select[name='trend_richtung']").value = trend;
@@ -94,10 +93,8 @@
     <h1>Webhook Alarm Dashboard</h1>
 
     <div class="section">
-        <h2>1. Alarmeinstellungen</h2>
+        <h2>1. Globale Alarmeinstellungen</h2>
         <form action="/update-settings" method="post">
-            <label>Symbol</label>
-            <input type="text" name="symbol" required>
             <label>Intervall in Stunden (Dropdown)</label>
             <select name="interval_hours_dropdown">
                 <option value="1">1 Stunde</option>
@@ -116,29 +113,24 @@
                 <option value="bullish">Positiver Trend (aufwärts)</option>
                 <option value="bearish">Negativer Trend (abwärts)</option>
             </select>
-            <input type="hidden" name="force_overwrite" value="false" id="overwriteFlag">
+            <input type="hidden" name="symbol" value="ALL">
+            <input type="hidden" name="force_overwrite" value="true" id="overwriteFlag">
             <button type="submit">💾 Einstellungen speichern</button>
         </form>
     </div>
 
     <div class="section">
-        <h2>2. Aktive Einstellungen</h2>
-        {% if einstellungen %}
-        <ul>
-            {% for key, config in einstellungen.items() %}
-                <li>
-                    <input type="radio" name="select_einstellung"
-                        onclick="ladeEinstellungen('{{ config.symbol }}', '{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}'); document.getElementById('overwriteFlag').value='true'">
-                    {{ config.symbol }} ({{ config.trend_richtung }}): Intervall = {{ config.interval_hours }} Std, Max. Alarme = {{ config.max_alarms }}
-                    <form action="/delete-setting" method="post" style="display:inline;">
-                        <input type="hidden" name="key" value="{{ key }}">
-                        <button type="submit">❌</button>
-                    </form>
-                </li>
-            {% endfor %}
-        </ul>
+        <h2>2. Aktuelle globale Einstellung</h2>
+        {% if einstellungen.default %}
+            {% set config = einstellungen.default %}
+            <p>
+                Intervall: {{ config.interval_hours }} Stunden |
+                Max. Alarme: {{ config.max_alarms }} |
+                Trend: {{ config.trend_richtung }}
+                <button onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">⟳ Laden</button>
+            </p>
         {% else %}
-        <p>Keine aktiven Einstellungen</p>
+            <p>Keine globale Einstellung gesetzt.</p>
         {% endif %}
     </div>
 
