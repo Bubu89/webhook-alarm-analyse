@@ -57,10 +57,9 @@ def webhook():
                 symbol_settings = json.load(f)
 
             df = pd.DataFrame(daten)
-            df["timestamp"] = pd.to_datetime(df["timestamp"])
-            if df["timestamp"].dt.tz is None:
-                df["timestamp"] = df["timestamp"].dt.tz_localize("UTC")
+            df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
             df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
+            df = df[df["timestamp"].notnull()]
 
             for symbol, settings in symbol_settings.items():
                 zeitraum = datetime.now(MEZ) - timedelta(hours=settings.get("interval_hours", 1))
@@ -80,10 +79,9 @@ def dashboard():
             daten = json.load(f)
 
     df = pd.DataFrame(daten) if daten else pd.DataFrame(columns=["timestamp", "symbol", "event", "price", "interval"])
-    df["timestamp"] = pd.to_datetime(df["timestamp"])
-    if df["timestamp"].dt.tz is None:
-        df["timestamp"] = df["timestamp"].dt.tz_localize("UTC")
+    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
     df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
+    df = df[df["timestamp"].notnull()]
 
     df["symbol"] = df["symbol"].astype(str)
     df["jahr"] = df["timestamp"].dt.year
@@ -99,7 +97,7 @@ def dashboard():
         for symbol in df["symbol"].unique()
     }
 
-    letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
+    letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(5).to_dict("records")
 
     einstellungen = {}
     if os.path.exists(SETTINGS_DATEI):
