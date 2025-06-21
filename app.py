@@ -136,6 +136,11 @@ def update_settings():
         json.dump(einstellungen, f, indent=2)
     return redirect(url_for("dashboard"))
 
+@app.route("/test-email")
+def test_email():
+    sende_email("Test-E-Mail vom Dashboard", "Dies ist eine Testnachricht, um die E-Mail-Funktion zu prüfen.")
+    return "Test-E-Mail gesendet."
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
