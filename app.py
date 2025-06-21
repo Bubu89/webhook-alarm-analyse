@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from dotenv import load_dotenv
 import pandas as pd
-import random
 import smtplib
 from email.mime.text import MIMEText
 import pytz
@@ -56,10 +55,7 @@ def webhook():
     with open(LOG_DATEI, "w") as f:
         json.dump(daten, f, indent=2)
 
-    settings = {
-        "default_bullish": {"interval_hours": 6, "max_alarms": 3},
-        "default_bearish": {"interval_hours": 6, "max_alarms": 3}
-    }
+    settings = {}
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
             settings.update(json.load(f))
@@ -70,9 +66,12 @@ def webhook():
 
     symbol = data.get("symbol")
     trend = data.get("trend", "neutral").lower()
-    key = f"default_{trend}" if trend in ["bullish", "bearish"] else "default"
+    key = f"global_{trend}"
 
-    config = settings.get(key, settings.get("default_bullish"))
+    config = settings.get(key)
+    if not config:
+        return jsonify({"status": "keine passenden Einstellungen gefunden"})
+
     zeitraum = datetime.now(MEZ) - timedelta(hours=config.get("interval_hours", 6))
     symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
 
@@ -129,7 +128,7 @@ def update_settings():
     if trend not in ["bullish", "bearish"]:
         trend = "neutral"
 
-    key = f"default_{trend}" if trend != "neutral" else "default"
+    key = f"global_{trend}"
 
     dropdown_value = request.form.get("interval_hours_dropdown", "6")
     manual_value = request.form.get("interval_hours_manual", "").strip()
@@ -143,13 +142,13 @@ def update_settings():
     except ValueError:
         max_alarms = 3
 
-    settings = {
-        "default_bullish": {"interval_hours": 6, "max_alarms": 3},
-        "default_bearish": {"interval_hours": 6, "max_alarms": 3}
-    }
+    settings = {}
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
             settings.update(json.load(f))
+
+    if key in settings:
+        return "Einstellung existiert bereits und wird nicht überschrieben", 400
 
     settings[key] = {
         "interval_hours": interval_hours,
