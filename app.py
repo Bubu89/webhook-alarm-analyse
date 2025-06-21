@@ -139,7 +139,7 @@ def update_settings():
 @app.route("/test-email")
 def test_email():
     sende_email("Test-E-Mail vom Dashboard", "Dies ist eine Testnachricht, um die E-Mail-Funktion zu prüfen.")
-    return "Test-E-Mail gesendet."
+    return redirect(url_for("dashboard"))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
