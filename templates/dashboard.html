@@ -109,6 +109,7 @@
         }
 
         function ladeEinstellungen(symbol, interval, max, trend) {
+            if (!confirm("Diese Aktion überschreibt die aktuellen Eingaben. Fortfahren?")) return;
             document.querySelector("input[name='symbol']").value = symbol;
             document.querySelector("select[name='interval_hours_dropdown']").value = interval;
             document.querySelector("input[name='max_alarms']").value = max;
