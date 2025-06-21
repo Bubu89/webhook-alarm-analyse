@@ -2,112 +2,178 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Alarm Dashboard</title>
+    <title>Webhook Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #111;
             color: #fff;
-            padding: 20px;
+            margin: 0;
+            padding: 0 10px;
         }
         h2, h3 {
             text-align: center;
-            margin-bottom: 10px;
+        }
+        .heatmap, .chart, .events, .settings {
+            margin: 30px auto;
+            max-width: 95%;
+            background-color: #1c1c1c;
+            padding: 20px;
+            border-radius: 10px;
         }
         table {
             border-collapse: collapse;
-            margin: 0 auto 40px;
-            width: 95%;
+            width: 100%;
+            text-align: center;
         }
         th, td {
-            border: 1px solid #444;
+            border: 1px solid #333;
             padding: 6px;
-            text-align: center;
         }
         th {
             background-color: #222;
         }
-        td.low {
-            background-color: #1e3a5f;
+        td.low    { background-color: #1e3a5f; }
+        td.medium { background-color: #3b82f6; }
+        td.high   { background-color: #60a5fa; }
+        td.veryhigh { background-color: #93c5fd; }
+
+        label, select, input {
+            display: block;
+            margin: 8px 0;
+            width: 100%;
         }
-        td.medium {
+
+        button {
+            padding: 10px;
             background-color: #3b82f6;
-        }
-        td.high {
-            background-color: #60a5fa;
-        }
-        td.veryhigh {
-            background-color: #93c5fd;
-        }
-        .box {
-            background: #1a1a1a;
-            padding: 15px;
-            margin: 20px auto;
-            width: 90%;
+            border: none;
             border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
         }
-        .button {
-            display: inline-block;
-            margin: 0 auto 20px;
-            background: #444;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
+        button:hover {
+            background-color: #2563eb;
         }
     </style>
 </head>
 <body>
 
-    <h2>Alarm Heatmap (letzte 12 Monate)</h2>
-    <div style="text-align:center;">
-        <a href="/generate-testdata" class="button">Testdaten generieren</a>
-    </div>
+    <h2>Webhook Alarm Dashboard</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Symbol</th>
-                {% for monat in matrix.values()|first %}
-                    <th>{{ monat }}</th>
+    <div class="heatmap">
+        <h3>Heatmap</h3>
+        <form method="get" action="/dashboard">
+            <label for="year">Jahr wählen:</label>
+            <select id="year" name="year" onchange="this.form.submit()">
+                {% for jahr in verfuegbare_jahre %}
+                    <option value="{{ jahr }}" {% if jahr == aktuelles_jahr %}selected{% endif %}>{{ jahr }}</option>
                 {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for symbol, monatsdaten in matrix.items() %}
+            </select>
+        </form>
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ symbol }}</td>
-                    {% for count in monatsdaten.values() %}
-                        {% set klasse = "low" %}
-                        {% if count > 5 %} {% set klasse = "medium" %} {% endif %}
-                        {% if count > 15 %} {% set klasse = "high" %} {% endif %}
-                        {% if count > 30 %} {% set klasse = "veryhigh" %} {% endif %}
-                        <td class="{{ klasse }}">{{ count }}</td>
+                    <th>Symbol</th>
+                    {% for monat in monate %}
+                        <th>{{ monat }}</th>
                     {% endfor %}
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <h3>Letzte 10 Alarme</h3>
-    <div class="box">
-        {% for eintrag in letzte %}
-            <p><strong>{{ eintrag.symbol }}</strong> – {{ eintrag.timestamp }} – {{ eintrag.details }}</p>
-        {% endfor %}
-    </div>
-
-    <h3>Gesendete Intervall-Alarme</h3>
-    <div class="box">
-        {% if intervalle %}
-            <ul>
-                {% for i in intervalle %}
-                    <li><strong>{{ i.symbol }}</strong>: {{ i.zeitraum }} – {{ i.anzahl }} Alarme</li>
+            </thead>
+            <tbody>
+                {% for symbol, daten in matrix.items() %}
+                    <tr>
+                        <td>{{ symbol }}</td>
+                        {% for count in daten %}
+                            {% set klasse = "low" %}
+                            {% if count > 5 %} {% set klasse = "medium" %}{% endif %}
+                            {% if count > 15 %} {% set klasse = "high" %}{% endif %}
+                            {% if count > 30 %} {% set klasse = "veryhigh" %}{% endif %}
+                            <td class="{{ klasse }}">{{ count }}</td>
+                        {% endfor %}
+                    </tr>
                 {% endfor %}
-            </ul>
-        {% else %}
-            <p>Keine Intervalle erkannt.</p>
-        {% endif %}
+            </tbody>
+        </table>
     </div>
+
+    <div class="chart">
+        <h3>Jahresvergleich</h3>
+        <canvas id="lineChart" height="150"></canvas>
+    </div>
+
+    <div class="events">
+        <h3>Letzte 10 Ereignisse</h3>
+        <ul>
+            {% for eintrag in letzte_ereignisse %}
+                <li>{{ eintrag.timestamp }} – <strong>{{ eintrag.symbol }}</strong> – {{ eintrag.nachricht or "Alarm" }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="settings">
+        <h3>Alarmeinstellungen</h3>
+        <form method="post" action="/update-settings">
+            <label for="symbolFilter">Symbol-Filter:</label>
+            <input type="text" id="symbolFilter" name="symbol_filter" placeholder="z. B. BTCUSDT">
+
+            <label for="interval">Intervall (in Stunden):</label>
+            <input type="number" id="interval" name="interval_hours" value="1" min="1">
+
+            <label for="threshold">Schwellwert für Signifikanz (%):</label>
+            <input type="number" id="threshold" name="threshold_percent" value="10" min="0">
+
+            <label for="max_alarms">Max. Alarme pro Zeitintervall:</label>
+            <input type="number" id="max_alarms" name="max_alarms" value="3" min="1">
+
+            <button type="submit">Speichern</button>
+        </form>
+
+        <form method="post" action="/generate-testdata" style="margin-top:20px;">
+            <button type="submit">Testdaten generieren</button>
+        </form>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('lineChart').getContext('2d');
+        const lineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ monate_js }},
+                datasets: [
+                    {% for symbol, daten in matrix.items() %}
+                    {
+                        label: '{{ symbol }}',
+                        data: {{ daten }},
+                        borderColor: 'hsl({{ loop.index * 70 }}, 70%, 50%)',
+                        backgroundColor: 'transparent',
+                        tension: 0.3
+                    },
+                    {% endfor %}
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#333' },
+                        ticks: { color: '#fff' }
+                    },
+                    x: {
+                        grid: { color: '#333' },
+                        ticks: { color: '#fff' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: '#fff' }
+                    }
+                }
+            }
+        });
+    </script>
 
 </body>
 </html>
