@@ -56,11 +56,13 @@ def webhook():
     with open(LOG_DATEI, "w") as f:
         json.dump(daten, f, indent=2)
 
-    settings = {"default_bullish": {"interval_hours": 6, "max_alarms": 3},
-                "default_bearish": {"interval_hours": 6, "max_alarms": 3}}
+    settings = {
+        "default_bullish": {"interval_hours": 6, "max_alarms": 3},
+        "default_bearish": {"interval_hours": 6, "max_alarms": 3}
+    }
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
-            settings = json.load(f)
+            settings.update(json.load(f))
 
     df = pd.DataFrame(daten)
     df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
@@ -70,7 +72,7 @@ def webhook():
     trend = data.get("trend", "neutral").lower()
     key = f"default_{trend}" if trend in ["bullish", "bearish"] else "default"
 
-    config = settings.get(key, settings.get("default"))
+    config = settings.get(key, settings.get("default_bullish"))
     zeitraum = datetime.now(MEZ) - timedelta(hours=config.get("interval_hours", 6))
     symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
 
@@ -136,12 +138,18 @@ def update_settings():
     except ValueError:
         interval_hours = 6
 
-    max_alarms = int(request.form.get("max_alarms", 3))
+    try:
+        max_alarms = int(request.form.get("max_alarms", 3))
+    except ValueError:
+        max_alarms = 3
 
-    settings = {}
+    settings = {
+        "default_bullish": {"interval_hours": 6, "max_alarms": 3},
+        "default_bearish": {"interval_hours": 6, "max_alarms": 3}
+    }
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
-            settings = json.load(f)
+            settings.update(json.load(f))
 
     settings[key] = {
         "interval_hours": interval_hours,
