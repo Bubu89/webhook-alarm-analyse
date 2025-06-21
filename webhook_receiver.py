@@ -6,10 +6,10 @@ from datetime import datetime, timedelta
 from flask import Flask, request, jsonify
 from threading import Timer
 
-# === SICHER: Lade Konfiguration aus Umgebungsvariablen ===
+# === Sichere Konfiguration aus Environment ===
 EMAIL_ABSENDER = os.environ.get("EMAIL_ABSENDER")
 EMAIL_PASSWORT = os.environ.get("EMAIL_PASSWORT")
-EMAIL_EMPFAENGER = os.environ.get("EMAIL_EMPFÄNGER")
+EMAIL_EMPFAENGER = os.environ.get("EMAIL_EMPAENGER")  # <-- KEIN Umlaut!
 LOG_DATEI = "webhook_logs.json"
 
 app = Flask(__name__)
@@ -18,12 +18,9 @@ def speichere_webhook_daten(payload):
     if not os.path.exists(LOG_DATEI):
         with open(LOG_DATEI, "w") as f:
             json.dump([], f)
-
     with open(LOG_DATEI, "r") as f:
         daten = json.load(f)
-
     daten.append(payload)
-
     with open(LOG_DATEI, "w") as f:
         json.dump(daten, f, indent=2)
 
@@ -32,14 +29,12 @@ def sende_email(symbol, zeiten):
         msg = EmailMessage()
         msg["Subject"] = f"🚨 Trend-Alarm: {symbol} mit 3 Alarme"
         msg["From"] = EMAIL_ABSENDER
-        msg["To"] = EMAIL_EMPFÄNGER
+        msg["To"] = EMAIL_EMPFAENGER
         msg.set_content("Alarme innerhalb 12h in niederen Zeitintervallen:\n" + '\n'.join(str(t) for t in zeiten))
-
         with smtplib.SMTP("mail.gmx.net", 587) as server:
             server.starttls()
             server.login(EMAIL_ABSENDER, EMAIL_PASSWORT)
             server.send_message(msg)
-
         print(f"E-Mail gesendet für {symbol}")
     except Exception as e:
         print("Fehler beim Mailversand:", e)
@@ -47,10 +42,8 @@ def sende_email(symbol, zeiten):
 def analysiere_und_benachrichtige():
     if not os.path.exists(LOG_DATEI):
         return
-
     with open(LOG_DATEI, "r") as f:
         daten = json.load(f)
-
     jetzt = datetime.now()
     niedere_zeitfenster = ["30min", "1h", "2h"]
     intervall = timedelta(hours=12)
@@ -66,13 +59,10 @@ def analysiere_und_benachrichtige():
                 gruppiert.setdefault(symbol, []).append(zeit)
             except:
                 continue
-
     for symbol, zeiten in gruppiert.items():
         zeiten = [z for z in zeiten if jetzt - z <= intervall]
         if len(zeiten) >= 3:
             sende_email(symbol, zeiten)
-
-    # Wiederholung in 10 Minuten
     Timer(600, analysiere_und_benachrichtige).start()
 
 @app.route("/webhook", methods=["POST"])
