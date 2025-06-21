@@ -1,132 +1,112 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Alarm Dashboard</title>
+    <title>Webhook Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #0d1117;
-            color: #f0f0f0;
-            margin: 0;
-            padding: 0;
+            background: #111;
+            color: #eee;
+            font-family: sans-serif;
+            margin: 20px;
         }
-
-        header {
+        h2 {
             text-align: center;
-            padding: 20px;
-            background-color: #161b22;
-            border-bottom: 1px solid #30363d;
         }
-
-        h1 {
-            margin: 0;
+        .select-wrapper {
+            text-align: center;
+            margin-bottom: 20px;
         }
-
-        section {
-            padding: 20px;
-        }
-
         table {
-            width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin: 0 auto;
+            width: 95%;
         }
-
         th, td {
-            border: 1px solid #2d3748;
+            border: 1px solid #444;
             padding: 6px;
             text-align: center;
         }
-
         th {
-            background-color: #1f2937;
+            background-color: #222;
         }
-
-        td.low {
-            background-color: #1e3a5f;
-        }
-
-        td.medium {
-            background-color: #3b82f6;
-        }
-
-        td.high {
-            background-color: #60a5fa;
-        }
-
-        td.veryhigh {
-            background-color: #93c5fd;
-        }
-
-        .statistik {
-            background-color: #1f2937;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-
-        .highlight {
-            color: #22c55e;
-            font-weight: bold;
+        td.low { background-color: #1e3a5f; }
+        td.medium { background-color: #3b82f6; }
+        td.high { background-color: #60a5fa; }
+        td.veryhigh { background-color: #93c5fd; }
+        canvas {
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Alarm Heatmap Dashboard</h1>
-        <p>Analyse der Webhook-Alarme der letzten 12 Monate</p>
-    </header>
+    <h2>Webhook-Alarm Dashboard</h2>
 
-    <section>
-        <h2>Übersicht nach Monat & Symbol</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Symbol</th>
-                    {% for monat in matrix.values()|first %}
-                        <th>{{ monat }}</th>
-                    {% endfor %}
-                    <th>Gesamt</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for symbol, monatsdaten in matrix.items() %}
-                    <tr>
-                        <td>{{ symbol }}</td>
-                        {% set summe = 0 %}
-                        {% for count in monatsdaten.values() %}
-                            {% set klasse = "low" %}
-                            {% if count > 5 %} {% set klasse = "medium" %} {% endif %}
-                            {% if count > 15 %} {% set klasse = "high" %} {% endif %}
-                            {% if count > 30 %} {% set klasse = "veryhigh" %} {% endif %}
-                            {% set summe = summe + count %}
-                            <td class="{{ klasse }}">{{ count }}</td>
-                        {% endfor %}
-                        <td class="highlight">{{ summe }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="select-wrapper">
+        <label for="yearSelect">Jahr auswählen:</label>
+        <select id="yearSelect" onchange="filterByYear()">
+            <option value="all">Alle Jahre</option>
+            {% for jahr in jahre %}
+            <option value="{{ jahr }}">{{ jahr }}</option>
+            {% endfor %}
+        </select>
+    </div>
 
-        <div class="statistik">
-            <h3>Statistik (letzte 12 Monate)</h3>
-            <ul>
-                <li><strong>Insgesamt erkannte Symbole:</strong> {{ matrix|length }}</li>
-                <li><strong>Monate dargestellt:</strong> {{ matrix.values()|first|length }}</li>
-                <li><strong>Gesamtanzahl aller Alarme:</strong> 
-                    {{
-                        matrix.values() | sum(attribute='values') | sum
-                    }}
-                </li>
-                <li><strong>Symbol mit den meisten Alarmen:</strong>
-                    {{
-                        matrix | map(attribute='items') | sum(start=[]) |
-                        sort(attribute='1', reverse=true) | first | first
-                    }}
-                </li>
-            </ul>
-        </div>
-    </section>
+    <div id="heatmap-container">
+        {{ heatmap_table|safe }}
+    </div>
+
+    <canvas id="lineChart" width="900" height="400"></canvas>
+
+    <script>
+        const yearSelect = document.getElementById("yearSelect");
+        const fullTableHTML = document.getElementById("heatmap-container").innerHTML;
+
+        function filterByYear() {
+            const year = yearSelect.value;
+            const rows = document.querySelectorAll("tbody tr");
+            const headerCells = document.querySelectorAll("thead th");
+            headerCells.forEach((th, i) => {
+                if (i === 0) return;
+                const colYear = th.innerText.split("-")[0];
+                th.style.display = (year === "all" || year === colYear) ? "" : "none";
+                rows.forEach(row => {
+                    const td = row.children[i];
+                    if (td) td.style.display = (year === "all" || year === colYear) ? "" : "none";
+                });
+            });
+        }
+
+        const chartData = {{ chart_data | safe }};
+        const ctx = document.getElementById('lineChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: chartData.datasets
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Alarm-Verlauf pro Symbol'
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                scales: {
+                    x: { display: true, title: { display: true, text: 'Monat' }},
+                    y: { display: true, title: { display: true, text: 'Anzahl Alarme' }}
+                }
+            }
+        });
+    </script>
 </body>
 </html>
