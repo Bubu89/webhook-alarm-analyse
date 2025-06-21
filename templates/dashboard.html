@@ -54,7 +54,7 @@
     <!-- Testdaten erzeugen -->
     <div class="testdaten">
         <form action="/generate-testdata" method="post">
-            <button type="submit">Testdaten erzeugen</button>
+            <button type="submit">🔁 Testdaten erzeugen</button>
         </form>
     </div>
 
@@ -74,7 +74,7 @@
             <label>Maximale Alarme</label>
             <input type="number" name="max_alarms" value="{{ einstellungen.get('max_alarms', 3) }}">
 
-            <button type="submit">Einstellungen speichern</button>
+            <button type="submit">💾 Einstellungen speichern</button>
         </form>
     </div>
 
@@ -91,7 +91,7 @@
     </div>
 
     <!-- Heatmap Matrix -->
-    <h2>Monatliche Alarmverteilung ({{ aktuelles_jahr }})</h2>
+    <h2>📊 Monatliche Alarmverteilung ({{ aktuelles_jahr }})</h2>
     <div class="matrix">
         <div><strong>Symbol</strong></div>
         {% for monat in monate %}
@@ -106,7 +106,7 @@
     </div>
 
     <!-- Letzte Alarme -->
-    <h2>Letzte Alarme</h2>
+    <h2>📋 Letzte Alarme</h2>
     <ul>
         {% for eintrag in letzte_ereignisse %}
             <li>{{ eintrag.timestamp }} | {{ eintrag.symbol }}: {{ eintrag.nachricht }}</li>
