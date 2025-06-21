@@ -40,18 +40,24 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    if not request.is_json:
-        return jsonify({"error": "Content-Type muss application/json sein"}), 415
+    try:
+        data = request.get_json(force=True)
+    except Exception as e:
+        return jsonify({"error": "Ungültige oder nicht lesbare JSON-Daten", "details": str(e)}), 400
 
-    data = request.get_json()
     if not data:
         return jsonify({"error": "Keine gültigen JSON-Daten erhalten"}), 400
 
     data["timestamp"] = datetime.now(MEZ).isoformat()
+
     daten = []
     if os.path.exists(LOG_DATEI):
-        with open(LOG_DATEI, "r") as f:
-            daten = json.load(f)
+        try:
+            with open(LOG_DATEI, "r") as f:
+                daten = json.load(f)
+        except json.JSONDecodeError:
+            daten = []
+
     daten.append(data)
     with open(LOG_DATEI, "w") as f:
         json.dump(daten, f, indent=2)
@@ -65,11 +71,18 @@ def webhook():
         df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
 
         for key, settings in symbol_settings.items():
-            symbol, interval_key = key.rsplit("_", 1)
+            try:
+                symbol, interval_key = key.rsplit("_", 1)
+            except ValueError:
+                continue
+
             zeitraum = datetime.now(MEZ) - timedelta(hours=settings.get("interval_hours", 1))
             symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
             if len(symbol_df) >= settings.get("max_alarms", 3):
-                sende_email("Alarm: Häufung erkannt", f"Symbol: {symbol} – {len(symbol_df)} Alarme innerhalb der letzten {settings.get('interval_hours', 1)} Stunden.")
+                sende_email(
+                    "Alarm: Häufung erkannt",
+                    f"Symbol: {symbol} – {len(symbol_df)} Alarme innerhalb der letzten {settings.get('interval_hours', 1)} Stunden."
+                )
 
     return jsonify({"status": "ok"})
 
@@ -78,8 +91,11 @@ def dashboard():
     year = request.args.get("year")
     daten = []
     if os.path.exists(LOG_DATEI):
-        with open(LOG_DATEI, "r") as f:
-            daten = json.load(f)
+        try:
+            with open(LOG_DATEI, "r") as f:
+                daten = json.load(f)
+        except json.JSONDecodeError:
+            daten = []
 
     df = pd.DataFrame(daten) if daten else pd.DataFrame(columns=["timestamp", "symbol", "event", "price", "interval"])
     df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
