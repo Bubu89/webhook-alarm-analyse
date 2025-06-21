@@ -66,7 +66,7 @@ def webhook():
 
     symbol = data.get("symbol")
     trend = data.get("trend", "neutral").lower()
-    key = f"global_{trend}"
+    key = f"global_{trend}_{symbol}" if f"global_{trend}_{symbol}" in settings else f"global_{trend}"
 
     config = settings.get(key)
     if not config:
@@ -128,7 +128,8 @@ def update_settings():
     if trend not in ["bullish", "bearish"]:
         trend = "neutral"
 
-    key = f"global_{trend}"
+    symbol = request.form.get("symbol", "global").strip().upper()
+    key = f"global_{trend}_{symbol}" if symbol != "GLOBAL" else f"global_{trend}"
 
     dropdown_value = request.form.get("interval_hours_dropdown", "6")
     manual_value = request.form.get("interval_hours_manual", "").strip()
@@ -146,9 +147,6 @@ def update_settings():
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
             settings.update(json.load(f))
-
-    if key in settings:
-        return "Einstellung existiert bereits und wird nicht überschrieben", 400
 
     settings[key] = {
         "interval_hours": interval_hours,
