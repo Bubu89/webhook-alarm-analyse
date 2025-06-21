@@ -17,7 +17,6 @@ EMAIL_PASSWORT = os.getenv("EMAIL_PASSWORT")
 EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
 
 MEZ = pytz.timezone("Europe/Vienna")
-
 app = Flask(__name__)
 
 def sende_email(betreff, inhalt):
@@ -65,7 +64,8 @@ def webhook():
         df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
         df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
 
-        for symbol, settings in symbol_settings.items():
+        for key, settings in symbol_settings.items():
+            symbol, interval_key = key.rsplit("_", 1)
             zeitraum = datetime.now(MEZ) - timedelta(hours=settings.get("interval_hours", 1))
             symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
             if len(symbol_df) >= settings.get("max_alarms", 3):
@@ -76,7 +76,6 @@ def webhook():
 @app.route("/dashboard")
 def dashboard():
     year = request.args.get("year")
-
     daten = []
     if os.path.exists(LOG_DATEI):
         with open(LOG_DATEI, "r") as f:
@@ -85,14 +84,12 @@ def dashboard():
     df = pd.DataFrame(daten) if daten else pd.DataFrame(columns=["timestamp", "symbol", "event", "price", "interval"])
     df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
     df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
-
     df["symbol"] = df["symbol"].astype(str)
     df["jahr"] = df["timestamp"].dt.year
     df["monat"] = df["timestamp"].dt.strftime("%b")
 
     jahre = sorted(df["jahr"].unique()) if not df.empty else [2025]
     aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
-
     df = df[df["jahr"] == aktuelles_jahr]
     monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
     matrix = {
@@ -107,10 +104,6 @@ def dashboard():
         with open(SETTINGS_DATEI, "r") as f:
             einstellungen = json.load(f)
 
-    einstellungs_info = "<br>".join([
-        f"{symbol}: Intervall = {einstellungen[symbol]['interval_hours']} Std, Max. Alarme = {einstellungen[symbol]['max_alarms']}, Trend = {einstellungen[symbol].get('trend_richtung', 'neutral')}"
-        for symbol in sorted(einstellungen)]) if einstellungen else "Keine aktiven Einstellungen"
-
     return render_template("dashboard.html",
         matrix=matrix,
         monate=monate,
@@ -119,8 +112,44 @@ def dashboard():
         aktuelles_jahr=aktuelles_jahr,
         letzte_ereignisse=letzte_ereignisse,
         einstellungen=einstellungen,
-        einstellungs_info=einstellungs_info
+        einstellungs_info=""
     )
+
+@app.route("/update-settings", methods=["POST"])
+def update_settings():
+    symbol = request.form.get("symbol", "").strip().upper()
+    if not symbol:
+        return redirect(url_for("dashboard"))
+
+    dropdown_value = request.form.get("interval_hours_dropdown", "1")
+    manual_value = request.form.get("interval_hours_manual", "").strip()
+    try:
+        interval_hours = int(manual_value) if manual_value else int(dropdown_value)
+    except ValueError:
+        interval_hours = 1
+
+    max_alarms = int(request.form.get("max_alarms", 3))
+    trend_richtung = request.form.get("trend_richtung", "neutral")
+    overwrite = request.form.get("force_overwrite") == "true"
+
+    key = f"{symbol}_{interval_hours}"
+
+    einstellungen = {}
+    if os.path.exists(SETTINGS_DATEI):
+        with open(SETTINGS_DATEI, "r") as f:
+            einstellungen = json.load(f)
+
+    if key not in einstellungen or overwrite:
+        einstellungen[key] = {
+            "symbol": symbol,
+            "interval_hours": interval_hours,
+            "max_alarms": max_alarms,
+            "trend_richtung": trend_richtung
+        }
+        with open(SETTINGS_DATEI, "w") as f:
+            json.dump(einstellungen, f, indent=2)
+
+    return redirect(url_for("dashboard"))
 
 @app.route("/generate-testdata", methods=["GET", "POST"])
 def generate_testdata():
@@ -138,37 +167,6 @@ def generate_testdata():
             })
     with open(LOG_DATEI, "w") as f:
         json.dump(daten, f, indent=2)
-    return redirect(url_for("dashboard"))
-
-@app.route("/update-settings", methods=["POST"])
-def update_settings():
-    symbol = request.form.get("symbol", "").strip().upper()
-    if not symbol:
-        return redirect(url_for("dashboard"))
-
-    dropdown_value = request.form.get("interval_hours_dropdown", "1")
-    manual_value = request.form.get("interval_hours_manual", "").strip()
-    try:
-        interval_hours = int(manual_value) if manual_value else int(dropdown_value)
-    except ValueError:
-        interval_hours = 1
-
-    max_alarms = int(request.form.get("max_alarms", 3))
-    trend_richtung = request.form.get("trend_richtung", "neutral")
-
-    einstellungen = {}
-    if os.path.exists(SETTINGS_DATEI):
-        with open(SETTINGS_DATEI, "r") as f:
-            einstellungen = json.load(f)
-
-    einstellungen[symbol] = {
-        "interval_hours": interval_hours,
-        "max_alarms": max_alarms,
-        "trend_richtung": trend_richtung
-    }
-
-    with open(SETTINGS_DATEI, "w") as f:
-        json.dump(einstellungen, f, indent=2)
     return redirect(url_for("dashboard"))
 
 @app.route("/test-email")
