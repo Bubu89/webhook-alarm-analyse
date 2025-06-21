@@ -1,69 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Alarm Heatmap</title>
+    <title>Alarm Dashboard</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #111;
-            color: #fff;
+            background-color: #0d1117;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 0;
         }
-        h2 {
+
+        header {
             text-align: center;
+            padding: 20px;
+            background-color: #161b22;
+            border-bottom: 1px solid #30363d;
         }
+
+        h1 {
+            margin: 0;
+        }
+
+        section {
+            padding: 20px;
+        }
+
         table {
+            width: 100%;
             border-collapse: collapse;
-            margin: 0 auto;
-            width: 95%;
+            margin-top: 10px;
         }
+
         th, td {
-            border: 1px solid #444;
+            border: 1px solid #2d3748;
             padding: 6px;
             text-align: center;
         }
+
         th {
-            background-color: #222;
+            background-color: #1f2937;
         }
+
         td.low {
             background-color: #1e3a5f;
         }
+
         td.medium {
             background-color: #3b82f6;
         }
+
         td.high {
             background-color: #60a5fa;
         }
+
         td.veryhigh {
             background-color: #93c5fd;
+        }
+
+        .statistik {
+            background-color: #1f2937;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .highlight {
+            color: #22c55e;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h2>Alarm Heatmap (12 Monate)</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Symbol</th>
-                {% for monat in matrix.values()|first %}
-                    <th>{{ monat }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for symbol, monatsdaten in matrix.items() %}
+    <header>
+        <h1>Alarm Heatmap Dashboard</h1>
+        <p>Analyse der Webhook-Alarme der letzten 12 Monate</p>
+    </header>
+
+    <section>
+        <h2>Übersicht nach Monat & Symbol</h2>
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ symbol }}</td>
-                    {% for count in monatsdaten.values() %}
-                        {% set klasse = "low" %}
-                        {% if count > 5 %} {% set klasse = "medium" %} {% endif %}
-                        {% if count > 15 %} {% set klasse = "high" %} {% endif %}
-                        {% if count > 30 %} {% set klasse = "veryhigh" %} {% endif %}
-                        <td class="{{ klasse }}">{{ count }}</td>
+                    <th>Symbol</th>
+                    {% for monat in matrix.values()|first %}
+                        <th>{{ monat }}</th>
                     {% endfor %}
+                    <th>Gesamt</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for symbol, monatsdaten in matrix.items() %}
+                    <tr>
+                        <td>{{ symbol }}</td>
+                        {% set summe = 0 %}
+                        {% for count in monatsdaten.values() %}
+                            {% set klasse = "low" %}
+                            {% if count > 5 %} {% set klasse = "medium" %} {% endif %}
+                            {% if count > 15 %} {% set klasse = "high" %} {% endif %}
+                            {% if count > 30 %} {% set klasse = "veryhigh" %} {% endif %}
+                            {% set summe = summe + count %}
+                            <td class="{{ klasse }}">{{ count }}</td>
+                        {% endfor %}
+                        <td class="highlight">{{ summe }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="statistik">
+            <h3>Statistik (letzte 12 Monate)</h3>
+            <ul>
+                <li><strong>Insgesamt erkannte Symbole:</strong> {{ matrix|length }}</li>
+                <li><strong>Monate dargestellt:</strong> {{ matrix.values()|first|length }}</li>
+                <li><strong>Gesamtanzahl aller Alarme:</strong> 
+                    {{
+                        matrix.values() | sum(attribute='values') | sum
+                    }}
+                </li>
+                <li><strong>Symbol mit den meisten Alarmen:</strong>
+                    {{
+                        matrix | map(attribute='items') | sum(start=[]) |
+                        sort(attribute='1', reverse=true) | first | first
+                    }}
+                </li>
+            </ul>
+        </div>
+    </section>
 </body>
 </html>
