@@ -93,17 +93,17 @@
     </div>
 
     <form action="/test-email" method="get" style="margin-bottom: 20px;">
-        <button class="btn btn-warning" type="submit">📧 Test-E-Mail senden</button>
+        <button type="submit">📧 Test-E-Mail senden</button>
     </form>
 
     <div class="settings">
         <h2>Alarmeinstellungen</h2>
         <form action="/update-settings" method="post">
             <label>Symbol</label>
-            <input type="text" name="symbol_filter" value="{{ einstellungen.get('symbol_filter', '') }}" required>
+            <input type="text" name="symbol" placeholder="z. B. BTCUSDT" required>
 
             <label>Intervall in Stunden (Dropdown)</label>
-            <select name="interval_hours">
+            <select name="interval_hours_dropdown">
                 <option value="1">1 Stunde</option>
                 <option value="3">3 Stunden</option>
                 <option value="6">6 Stunden</option>
@@ -112,10 +112,10 @@
             </select>
 
             <label>oder manuell (z. B. 5 für 5 Stunden)</label>
-            <input type="number" name="interval_hours" placeholder="Manuelle Eingabe (überschreibt Dropdown)">
+            <input type="number" name="interval_hours_manual" placeholder="Manuelle Eingabe (überschreibt Dropdown)">
 
             <label>Maximale Alarme pro Intervall</label>
-            <input type="number" name="max_alarms" value="{{ einstellungen.get('max_alarms', 3) }}" required>
+            <input type="number" name="max_alarms" min="1" required>
 
             <button type="submit">💾 Einstellungen speichern</button>
         </form>
@@ -149,10 +149,15 @@
     <h2>📋 Letzte Alarme</h2>
     <ul>
         {% for eintrag in letzte_ereignisse %}
-            <li>{{ eintrag.timestamp }} | {{ eintrag.symbol }}: {{ eintrag.nachricht }}</li>
+            <li>{{ eintrag.timestamp }} | {{ eintrag.symbol }}: {{ eintrag.event }}</li>
         {% endfor %}
     </ul>
 
-    <p><strong>{{ einstellungs_info }}</strong></p>
+    <h2>⚙️ Aktive Einstellungen</h2>
+    <ul>
+        {% for zeile in einstellungs_info.split("<br>") %}
+            <li>{{ zeile }}</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
