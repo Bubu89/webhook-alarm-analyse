@@ -132,7 +132,7 @@ def update_settings():
     trend_richtung = request.form.get("trend_richtung", "neutral")
     overwrite = request.form.get("force_overwrite") == "true"
 
-    key = f"{symbol}_{interval_hours}"
+    key = f"{symbol}_{interval_hours}_{trend_richtung}"
 
     einstellungen = {}
     if os.path.exists(SETTINGS_DATEI):
@@ -150,6 +150,25 @@ def update_settings():
             json.dump(einstellungen, f, indent=2)
 
     return redirect(url_for("dashboard"))
+
+@app.route("/delete-setting", methods=["POST"])
+def delete_setting():
+    key = request.form.get("key")
+    if not key:
+        return redirect("/dashboard")
+
+    try:
+        with open(SETTINGS_DATEI, "r", encoding="utf-8") as f:
+            einstellungen = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        einstellungen = {}
+
+    if key in einstellungen:
+        del einstellungen[key]
+        with open(SETTINGS_DATEI, "w", encoding="utf-8") as f:
+            json.dump(einstellungen, f, indent=4)
+
+    return redirect("/dashboard")
 
 @app.route("/generate-testdata", methods=["GET", "POST"])
 def generate_testdata():
