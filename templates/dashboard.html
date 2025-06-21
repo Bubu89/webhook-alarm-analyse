@@ -69,6 +69,10 @@
             display: none;
         }
 
+        #alarmListe li.hidden {
+            display: none;
+        }
+
         @media (max-width: 600px) {
             body {
                 font-size: 14px;
@@ -92,6 +96,21 @@
         function toggleVerteilung() {
             const container = document.getElementById("verteilungContainer");
             container.style.display = container.style.display === "none" ? "block" : "none";
+        }
+
+        function toggleAlarme() {
+            const btn = document.getElementById("toggleAlarmeBtn");
+            const liste = document.querySelectorAll("#alarmListe li");
+            const expanded = btn.getAttribute("data-expanded") === "true";
+
+            liste.forEach((el, idx) => {
+                if (idx >= 5) {
+                    el.classList.toggle("hidden", !expanded);
+                }
+            });
+
+            btn.textContent = expanded ? "📋 Alle anzeigen" : "📋 Weniger anzeigen";
+            btn.setAttribute("data-expanded", expanded ? "false" : "true");
         }
     </script>
 </head>
@@ -137,15 +156,20 @@
 
     <div class="section">
         <h2>3. Letzte Alarme</h2>
-        <ul>
+        <ul id="alarmListe">
             {% if letzte_ereignisse %}
                 {% for eintrag in letzte_ereignisse %}
-                    <li>{{ eintrag.timestamp }} | {{ eintrag.symbol }}: {{ eintrag.nachricht }}</li>
+                    <li class="{% if loop.index > 5 %}hidden{% endif %}">
+                        {{ eintrag.timestamp }} | {{ eintrag.symbol }}: {{ eintrag.nachricht }}
+                    </li>
                 {% endfor %}
             {% else %}
                 <li>Keine Alarme registriert.</li>
             {% endif %}
         </ul>
+        {% if letzte_ereignisse|length > 5 %}
+            <button id="toggleAlarmeBtn" onclick="toggleAlarme()" data-expanded="false">📋 Alle anzeigen</button>
+        {% endif %}
     </div>
 
     <div class="section">
@@ -175,7 +199,6 @@
                         {% endfor %}
                     {% endfor %}
                 {% else %}
-                    <!-- Kunstgerüst: leeres Dummy-Raster -->
                     {% set dummy_symbole = ['BTC', 'ETH', 'XRP'] %}
                     {% for symbol in dummy_symbole %}
                         <div><strong>{{ symbol }}</strong></div>
