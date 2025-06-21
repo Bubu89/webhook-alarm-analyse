@@ -128,26 +128,24 @@
 
     <div class="section">
         <h2>2. Aktuelle globale Einstellungen</h2>
-        {% set globale_keys = ['global_bullish', 'global_bearish', 'global_neutral'] %}
-        {% set count = 0 %}
-        {% for key in globale_keys %}
-            {% if einstellungen[key] is defined %}
-                {% set config = einstellungen[key] %}
-                <p>
-                    <strong>{{ key.replace('global_', '')|capitalize }}</strong> |
+        {% if einstellungen %}
+            <ul>
+            {% for key, config in einstellungen.items() %}
+                <li>
+                    <strong>{{ key }}</strong>:
                     Intervall: {{ config.interval_hours }}h |
-                    Max. Alarme: {{ config.max_alarms }}
-                    <form class="inline" method="post" action="/delete-setting">
+                    Max. Alarme: {{ config.max_alarms }} |
+                    Trend: {% if "bullish" in key %}🔼 bullisch{% elif "bearish" in key %}🔽 bärisch{% else %}⚪ neutral{% endif %}
+                    <form method="post" action="/delete-setting" style="display:inline;">
                         <input type="hidden" name="key" value="{{ key }}">
-                        <button type="submit" class="delete-btn">❌ Löschen</button>
+                        <button type="submit" title="Löschen">🗑️</button>
                     </form>
-                    <button onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ key.replace('global_', '') }}')">⟳ Laden</button>
-                </p>
-                {% set count = count + 1 %}
-            {% endif %}
-        {% endfor %}
-        {% if count == 0 %}
-            <p>Keine globalen Einstellungen vorhanden.</p>
+                    <button onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ key.split('_')[1] if '_' in key else 'neutral' }}')">⟳ Laden</button>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>Keine globalen Einstellungen gesetzt.</p>
         {% endif %}
     </div>
 
