@@ -81,6 +81,32 @@
 <body>
     <h1>Webhook Alarm Dashboard</h1>
 
+    <div class="section">
+        <h2>1. Globale Alarmeinstellungen</h2>
+        <form action="/update-settings" method="post">
+            <label>Intervall in Stunden (Dropdown)</label>
+            <select name="interval_hours_dropdown">
+                <option value="1">1 Stunde</option>
+                <option value="3">3 Stunden</option>
+                <option value="6">6 Stunden</option>
+                <option value="12">12 Stunden</option>
+                <option value="24">24 Stunden</option>
+            </select>
+            <label>Oder manuell</label>
+            <input type="number" name="interval_hours_manual" placeholder="Manuelle Eingabe (hat Vorrang)">
+            <label>Maximale Alarme pro Intervall</label>
+            <input type="number" name="max_alarms" value="3" required>
+            <label>Trendrichtung</label>
+            <select name="trend_richtung">
+                <option value="neutral">Keine Trendvorgabe</option>
+                <option value="bullish">Positiver Trend (aufwärts)</option>
+                <option value="bearish">Negativer Trend (abwärts)</option>
+            </select>
+            <input type="hidden" name="symbol" value="ALL">
+            <button type="submit">📂 Einstellungen speichern</button>
+        </form>
+    </div>
+
     <!-- Tagesverlauf -->
     <div class="section">
         <h2>
@@ -92,27 +118,24 @@
         </div>
     </div>
 
-    <!-- Der restliche HTML-Code bleibt unverändert -->
+    <!-- Monatsverteilung -->
+    <div class="section">
+        <h2>
+            📅 Monatliche Verteilung
+            <button onclick="toggleVisibility('monatsVerteilungContainer')" style="float: right;">Anzeigen / Verstecken</button>
+        </h2>
+        <div id="monatsVerteilungContainer" class="hidden">
+            <div class="matrix" id="monatsMatrix"></div>
+        </div>
+    </div>
+
+    <!-- CSV Export -->
+    <div class="section">
+        <h2>📥 Export</h2>
+        <button onclick="downloadCSV()">📄 CSV herunterladen</button>
+    </div>
 
     <script>
-        function toggleAlarme() {
-            const btn = document.getElementById("toggleAlarmeBtn");
-            const liste = document.querySelectorAll("#alarmListe li");
-            const expanded = btn.getAttribute("data-expanded") === "true";
-            liste.forEach((el, idx) => {
-                if (idx >= 5) el.classList.toggle("hidden", !expanded);
-            });
-            btn.textContent = expanded ? "📋 Alle anzeigen" : "📋 Weniger anzeigen";
-            btn.setAttribute("data-expanded", expanded ? "false" : "true");
-        }
-
-        function ladeEinstellungen(interval, max, trend) {
-            if (!confirm("Diese Aktion überschreibt die aktuellen Eingaben. Fortfahren?")) return;
-            document.querySelector("select[name='interval_hours_dropdown']").value = interval;
-            document.querySelector("input[name='max_alarms']").value = max;
-            document.querySelector("select[name='trend_richtung']").value = trend;
-        }
-
         function toggleVisibility(id) {
             document.getElementById(id).classList.toggle('hidden');
         }
@@ -150,6 +173,25 @@
                 }
             }
         });
+
+        function downloadCSV() {
+            const rows = ["Datum;" + tagesDatasets.map(d => d.label).join(";")];
+            for (let i = 0; i < tagesLabels.length; i++) {
+                const row = [tagesLabels[i]];
+                tagesDatasets.forEach(dataset => {
+                    row.push(dataset.data[i] ?? 0);
+                });
+                rows.push(row.join(";"));
+            }
+            const blob = new Blob([rows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.setAttribute("href", URL.createObjectURL(blob));
+            link.setAttribute("download", "tagesalarme.csv");
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 </body>
 </html>
