@@ -57,6 +57,11 @@
         ul {
             font-size: 14px;
         }
+        .delete-btn {
+            background: #cc0000;
+            color: white;
+            margin-left: 10px;
+        }
         #verteilungContainer {
             display: block;
         }
@@ -65,11 +70,6 @@
         }
         form.inline {
             display: inline;
-        }
-        .delete-btn {
-            background: #cc0000;
-            color: white;
-            margin-left: 10px;
         }
         @media (max-width: 600px) {
             body { font-size: 14px; }
@@ -89,6 +89,7 @@
             btn.textContent = expanded ? "📋 Alle anzeigen" : "📋 Weniger anzeigen";
             btn.setAttribute("data-expanded", expanded ? "false" : "true");
         }
+
         function ladeEinstellungen(interval, max, trend) {
             if (!confirm("Diese Aktion überschreibt die aktuellen Eingaben. Fortfahren?")) return;
             document.querySelector("select[name='interval_hours_dropdown']").value = interval;
@@ -135,12 +136,16 @@
                     <strong>{{ key }}</strong>:
                     Intervall: {{ config.interval_hours }}h |
                     Max. Alarme: {{ config.max_alarms }} |
-                    Trend: {% if "bullish" in key %}🔼 bullisch{% elif "bearish" in key %}🔽 bärisch{% else %}⚪ neutral{% endif %}
-                    <form method="post" action="/delete-setting" style="display:inline;">
+                    Trend:
+                    {% if config.trend_richtung == "bullish" %}🟢 bullisch
+                    {% elif config.trend_richtung == "bearish" %}🔴 bärisch
+                    {% else %}⚪ neutral
+                    {% endif %}
+                    <form method="post" action="/delete-setting" class="inline">
                         <input type="hidden" name="key" value="{{ key }}">
-                        <button type="submit" title="Löschen">🗑️</button>
+                        <button type="submit" class="delete-btn" title="Löschen">🗑️</button>
                     </form>
-                    <button onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ key.split('_')[1] if '_' in key else 'neutral' }}')">⟳ Laden</button>
+                    <button onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">⟳ Laden</button>
                 </li>
             {% endfor %}
             </ul>
