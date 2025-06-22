@@ -194,17 +194,13 @@ def update_settings():
         with open(SETTINGS_DATEI, "r") as f:
             einstellungen = json.load(f)
 
-    eintrag = {
+    key = f"global_{trend_richtung}_{symbol}"
+    einstellungen[key] = {
         "symbol": symbol,
         "interval_hours": interval_hours,
         "max_alarms": max_alarms,
         "trend_richtung": trend_richtung
     }
-
-    key = f"{symbol}_{interval_hours}_{trend_richtung}"
-
-    if force_overwrite or key not in einstellungen:
-        einstellungen[key] = eintrag
 
     with open(SETTINGS_DATEI, "w") as f:
         json.dump(einstellungen, f, indent=2)
