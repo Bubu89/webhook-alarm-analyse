@@ -46,7 +46,9 @@ def webhook():
     if not data:
         return jsonify({"error": "Keine gültigen JSON-Daten erhalten"}), 400
 
-    data["timestamp"] = datetime.now(MEZ).isoformat()
+    if "timestamp" not in data:
+        data["timestamp"] = datetime.now(MEZ).isoformat()
+
     daten = []
     if os.path.exists(LOG_DATEI):
         with open(LOG_DATEI, "r") as f:
@@ -61,8 +63,7 @@ def webhook():
             settings.update(json.load(f))
 
     df = pd.DataFrame(daten)
-    df["timestamp"] = pd.to_datetime(df["timestamp"], format='mixed', errors='coerce')
-    df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
 
     symbol = data.get("symbol")
     trend = data.get("trend", "neutral").lower()
@@ -89,8 +90,7 @@ def dashboard():
             daten = json.load(f)
 
     df = pd.DataFrame(daten) if daten else pd.DataFrame(columns=["timestamp", "symbol", "event", "price", "interval"])
-    df["timestamp"] = pd.to_datetime(df["timestamp"], format='mixed', errors='coerce')
-    df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
     df["symbol"] = df["symbol"].astype(str)
     df["jahr"] = df["timestamp"].dt.year
     df["monat"] = df["timestamp"].dt.strftime("%b")
