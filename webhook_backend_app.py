@@ -30,6 +30,7 @@ def sende_email(betreff, inhalt):
         server.login(EMAIL_ABSENDER, EMAIL_PASSWORT)
         server.send_message(msg)
         server.quit()
+        print("E-Mail erfolgreich gesendet")
     except Exception as e:
         print(f"E-Mail konnte nicht gesendet werden: {e}")
 
@@ -83,16 +84,18 @@ def webhook():
 
     symbol = data.get("symbol")
     trend = data.get("trend", "neutral").lower()
-    key = f"global_{trend}_{symbol}" if f"global_{trend}_{symbol}" in settings else f"global_{trend}"
 
-    config = settings.get(key)
+    key_symbol = f"global_{trend}_{symbol}"
+    key_all = f"global_{trend}"
+    config = settings.get(key_symbol) or settings.get(key_all)
+
     if not config:
         return jsonify({"status": "keine passenden Einstellungen gefunden"})
 
     zeitraum = datetime.now(MEZ) - timedelta(hours=config.get("interval_hours", 6))
     symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
 
-    if config and len(symbol_df[symbol_df["timestamp"] >= zeitraum]) >= config.get("max_alarms", 3):
+    if len(symbol_df) >= config.get("max_alarms", 3):
         sende_email(f"Alarm: {symbol}", f"{len(symbol_df)} Alarme in {config['interval_hours']}h ({trend})")
 
     return jsonify({"status": "ok"})
@@ -187,14 +190,13 @@ def update_settings():
 
     max_alarms = int(request.form.get("max_alarms", 3))
     trend_richtung = request.form.get("trend_richtung", "neutral")
-    force_overwrite = request.form.get("force_overwrite", "false") == "true"
 
     einstellungen = {}
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
             einstellungen = json.load(f)
 
-    key = f"global_{trend_richtung}_{symbol}"
+    key = f"global_{trend_richtung}_{symbol}" if symbol != "ALL" else f"global_{trend_richtung}"
     einstellungen[key] = {
         "symbol": symbol,
         "interval_hours": interval_hours,
