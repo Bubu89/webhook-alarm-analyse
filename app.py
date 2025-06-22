@@ -40,11 +40,15 @@ def home():
 @app.route("/webhook", methods=["POST"])
 def webhook():
     if not request.is_json:
+        sende_email("Webhook-Fehler", "Kein JSON empfangen oder falscher Content-Type")
         return jsonify({"error": "Content-Type muss application/json sein"}), 415
 
     data = request.get_json()
     if not data:
+        sende_email("Webhook-Fehler", "Leere JSON-Nachricht empfangen")
         return jsonify({"error": "Keine gültigen JSON-Daten erhalten"}), 400
+
+    sende_email("Webhook-Daten erhalten", json.dumps(data, indent=2))
 
     if "timestamp" not in data:
         data["timestamp"] = datetime.now(MEZ).isoformat()
