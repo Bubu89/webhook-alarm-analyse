@@ -108,12 +108,40 @@
     </div>
 
     <div class="section">
-        <h2>2. Letzte Alarme</h2>
+        <h2>2. Aktuelle globale Einstellungen</h2>
+        {% if einstellungen %}
+        <form method="post" action="/delete-multiple-settings">
+            <ul>
+            {% for key, config in einstellungen.items() %}
+                <li>
+                    <input type="checkbox" name="delete_keys" value="{{ key }}" class="checkbox">
+                    <strong>{{ key }}</strong>:
+                    Intervall: {{ config.interval_hours }}h |
+                    Max. Alarme: {{ config.max_alarms }} |
+                    Trend:
+                    {% if config.trend_richtung == "bullish" %}🟢 bullisch
+                    {% elif config.trend_richtung == "bearish" %}🔴 bärisch
+                    {% else %}⚪ neutral
+                    {% endif %}
+                    <button type="button" onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">⟳ Laden</button>
+                </li>
+            {% endfor %}
+            </ul>
+            <button type="submit">🗑️ Ausgewählte löschen</button>
+        </form>
+        {% else %}
+            <p>Keine globalen Einstellungen gesetzt.</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>3. Letzte Alarme</h2>
         <ul id="alarmListe">
             {% if letzte_ereignisse %}
                 {% for eintrag in letzte_ereignisse %}
                     <li class="{% if loop.index > 5 %}hidden{% endif %}">
-                        {{ eintrag.timestamp }} | {{ eintrag.symbol }} | {{ eintrag.event }} | {{ eintrag.trend }}
+                        {{ eintrag["timestamp"].strftime('%Y-%m-%d %H:%M:%S') }} | {{ eintrag["symbol"] }}:
+                        {{ eintrag["nachricht"] if eintrag.get("nachricht") else eintrag.get("event", "-") }}
                     </li>
                 {% endfor %}
             {% else %}
@@ -124,39 +152,70 @@
             <button id="toggleAlarmeBtn" onclick="toggleAlarme()" data-expanded="false">📋 Alle anzeigen</button>
         {% endif %}
     </div>
+<!-- Nach dem Block mit "3. Letzte Alarme" -->
+<div style="margin: 10px 0;">
+    <a href="/export_csv" class="btn btn-success">⬇ CSV Export</a>
+</div>
 
     <div class="section">
-        <h2>📅 Monatliche Verteilung <button onclick="toggleVisibility('monatsVerteilungContainer')" style="float: right;">Anzeigen / Verstecken</button></h2>
-        <div id="monatsVerteilungContainer" class="hidden">
-            <div class="matrix" id="monatsMatrix">
-                {% for symbol, zeile in matrix.items() %}
-                    <div><strong>{{ symbol }}</strong></div>
-                    {% for wert in zeile %}
-                        <div>{{ wert }}</div>
+        <h2>
+            📊 Tagesverlauf
+            <button onclick="toggleVisibility('chartContainer')" style="float: right;">Anzeigen / Verstecken</button>
+        </h2>
+        <div id="chartContainer" class="hidden">
+            <canvas id="dailyChart"></canvas>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>
+            🕒 Stundenverlauf (Trendrichtung & Symbol)
+            <button onclick="toggleVisibility('hourlyChartContainer')" style="float: right;">Anzeigen / Verstecken</button>
+        </h2>
+        <div id="hourlyChartContainer" class="hidden">
+            <canvas id="hourlyChart"></canvas>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>
+            📅 Monatliche Verteilung
+            <button onclick="toggleVisibility('verteilungContainer')" style="float: right;">Anzeigen / Verstecken</button>
+        </h2>
+        <div id="verteilungContainer" class="hidden">
+            <form method="get" action="/dashboard">
+                <label>Jahr wählen:</label>
+                <select name="year" onchange="this.form.submit()">
+                    {% for jahr in verfuegbare_jahre %}
+                        <option value="{{ jahr }}" {% if jahr == aktuelles_jahr %}selected{% endif %}>{{ jahr }}</option>
                     {% endfor %}
+                </select>
+            </form>
+            <div class="matrix">
+                <div><strong>Symbol</strong></div>
+                {% for monat in monate %}
+                    <div><strong>{{ monat }}</strong></div>
                 {% endfor %}
+                {% if matrix %}
+                    {% for symbol, werte in matrix.items() %}
+                        <div><strong>{{ symbol }}</strong></div>
+                        {% for wert in werte %}
+                            <div>{{ wert }}</div>
+                        {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    {% for symbol in ['BTC', 'ETH', 'XRP'] %}
+                        <div><strong>{{ symbol }}</strong></div>
+                        {% for _ in range(12) %}
+                            <div>-</div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>
 
-    <div class="section">
-        <h2>📊 Tagesverlauf <button onclick="toggleVisibility('tagesChartContainer')" style="float: right;">Anzeigen / Verstecken</button></h2>
-        <div id="tagesChartContainer" class="hidden">
-            <canvas id="tagesChart"></canvas>
-        </div>
-    </div>
-
-    <div class="section">
-        <h2>📥 Export</h2>
-        <button onclick="downloadCSV()">📄 CSV herunterladen</button>
-    </div>
-
     <script>
-        function toggleVisibility(id) {
-            const el = document.getElementById(id);
-            el.classList.toggle('hidden');
-        }
-
         function toggleAlarme() {
             const btn = document.getElementById("toggleAlarmeBtn");
             const liste = document.querySelectorAll("#alarmListe li");
@@ -168,32 +227,42 @@
             btn.setAttribute("data-expanded", expanded ? "false" : "true");
         }
 
-        const tagesDaten = {{ tages_daten | tojson }};
-        const tagesLabels = tagesDaten.map(e => e.tag);
-        const tagesDatasets = [];
-        if (tagesDaten.length > 0) {
-            const schluessel = Object.keys(tagesDaten[0]).filter(k => k !== "tag");
-            schluessel.forEach(key => {
-                tagesDatasets.push({
-                    label: key,
-                    data: tagesDaten.map(e => e[key] || 0),
-                    backgroundColor: key.includes("bullish") ? "#00ff00" : "#ff4444"
-                });
-            });
+        function ladeEinstellungen(interval, max, trend) {
+            if (!confirm("Diese Aktion überschreibt die aktuellen Eingaben. Fortfahren?")) return;
+            document.querySelector("select[name='interval_hours_dropdown']").value = interval;
+            document.querySelector("input[name='max_alarms']").value = max;
+            document.querySelector("select[name='trend_richtung']").value = trend;
         }
 
-        new Chart(document.getElementById("tagesChart").getContext("2d"), {
+        function toggleVisibility(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
+
+        // Tagesverlauf (bestehender Chart)
+        const tagesDaten = {{ tages_daten | tojson }};
+        const labels = tagesDaten.map(row => row.tag);
+        const datasets = [];
+        const keys = Object.keys(tagesDaten[0] || {}).filter(k => k !== "tag");
+        keys.forEach(key => {
+            datasets.push({
+                label: key,
+                data: tagesDaten.map(row => row[key] || 0),
+                backgroundColor: key === "BTC" ? "#f2a900" : key === "ETH" ? "#3c3c3d" : "#666",
+            });
+        });
+
+        new Chart(document.getElementById("dailyChart").getContext("2d"), {
             type: "bar",
             data: {
-                labels: tagesLabels,
-                datasets: tagesDatasets
+                labels: labels,
+                datasets: datasets
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { position: 'top' },
-                    title: { display: true, text: 'Tägliche Alarme nach Symbol/Trend' }
+                    title: { display: true, text: 'Tägliche Alarmverteilung nach Symbol' }
                 },
                 scales: {
                     x: { stacked: true },
@@ -202,24 +271,56 @@
             }
         });
 
-        function downloadCSV() {
-            const rows = ["Datum;" + tagesDatasets.map(d => d.label).join(";")];
-            for (let i = 0; i < tagesLabels.length; i++) {
-                const row = [tagesLabels[i]];
-                tagesDatasets.forEach(dataset => {
-                    row.push(dataset.data[i] ?? 0);
+        // Stundenverlauf (neu)
+        const stundenDaten = {{ stunden_daten | tojson }};
+        const stundenLabels = stundenDaten.map(row => row.stunde);
+        const stundenDatasets = [];
+        const farben = { bullish: "#00ff88", bearish: "#ff4466" };
+        const stundenKeys = Object.keys(stundenDaten[0] || {}).filter(k => k !== "stunde");
+        const symboleSet = new Set();
+        stundenKeys.forEach(k => {
+            const parts = k.split("_");
+            if (parts.length === 2) symboleSet.add(parts[0]);
+        });
+        const symbole = Array.from(symboleSet);
+        symbole.forEach(symbol => {
+            ["bullish", "bearish"].forEach(richtung => {
+                const key = ${symbol}_${richtung};
+                stundenDatasets.push({
+                    label: ${symbol} ${richtung},
+                    data: stundenDaten.map(row => row[key] || 0),
+                    backgroundColor: farben[richtung],
+                    stack: symbol
                 });
-                rows.push(row.join(";"));
+            });
+        });
+
+        new Chart(document.getElementById("hourlyChart").getContext("2d"), {
+            type: "bar",
+            data: {
+                labels: stundenLabels,
+                datasets: stundenDatasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    title: { display: true, text: 'Stündliche Alarmverteilung je Symbol & Trendrichtung' }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        title: { display: true, text: 'Stunde (UTC)' }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        title: { display: true, text: 'Anzahl Alarme' }
+                    }
+                }
             }
-            const blob = new Blob([rows.join("\n")], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.setAttribute("href", URL.createObjectURL(blob));
-            link.setAttribute("download", "tagesalarme.csv");
-            link.style.display = "none";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+        });
     </script>
 </body>
 </html>
