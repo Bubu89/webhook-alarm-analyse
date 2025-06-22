@@ -46,18 +46,16 @@ def webhook():
     if not data:
         return jsonify({"error": "Keine gültigen JSON-Daten erhalten"}), 400
 
-    # Fallbacks setzen
     if "timestamp" not in data:
         data["timestamp"] = datetime.now(MEZ).isoformat()
-    if "event" not in data or not data["event"]:
-        data["event"] = "Kein Event angegeben"
-    if "nachricht" not in data or not data["nachricht"]:
-        data["nachricht"] = data["event"]
 
     daten = []
     if os.path.exists(LOG_DATEI):
         with open(LOG_DATEI, "r") as f:
-            daten = json.load(f)
+            try:
+                daten = json.load(f)
+            except json.JSONDecodeError:
+                daten = []
     daten.append(data)
     with open(LOG_DATEI, "w") as f:
         json.dump(daten, f, indent=2)
@@ -92,26 +90,30 @@ def dashboard():
     daten = []
     if os.path.exists(LOG_DATEI):
         with open(LOG_DATEI, "r") as f:
-            daten = json.load(f)
+            try:
+                daten = json.load(f)
+            except json.JSONDecodeError:
+                daten = []
 
     df = pd.DataFrame(daten)
-    for spalte in ["timestamp", "symbol", "event", "price", "interval", "nachricht"]:
+
+    # Spalten-Fallbacks
+    for spalte in ["timestamp", "symbol", "event", "price", "interval", "trend", "nachricht"]:
         if spalte not in df.columns:
             df[spalte] = None
 
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
     df["symbol"] = df["symbol"].astype(str)
-    df["nachricht"] = df["nachricht"].fillna("")  # Fallback sicherstellen
     df["jahr"] = df["timestamp"].dt.year
     df["monat"] = df["timestamp"].dt.strftime("%b")
 
-    jahre = sorted(df["jahr"].unique()) if not df.empty else [2025]
+    jahre = sorted(df["jahr"].dropna().unique()) if not df.empty else [2025]
     aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
     df = df[df["jahr"] == aktuelles_jahr]
     monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
     matrix = {
         symbol: [df[(df["symbol"] == symbol) & (df["monat"] == monat)].shape[0] for monat in monate]
-        for symbol in df["symbol"].unique()
+        for symbol in df["symbol"].dropna().unique()
     }
 
     letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
@@ -120,6 +122,11 @@ def dashboard():
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
             einstellungen = json.load(f)
+
+    # Debug-Ausgaben
+    print("Anzahl Zeilen im DataFrame:", df.shape[0])
+    print("Symbole:", df["symbol"].unique())
+    print("Monate:", df["monat"].unique())
 
     return render_template("dashboard.html",
         matrix=matrix,
