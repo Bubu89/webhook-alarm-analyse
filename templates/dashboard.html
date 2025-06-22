@@ -152,10 +152,6 @@
             <button id="toggleAlarmeBtn" onclick="toggleAlarme()" data-expanded="false">📋 Alle anzeigen</button>
         {% endif %}
     </div>
-<!-- Nach dem Block mit "3. Letzte Alarme" -->
-<div style="margin: 10px 0;">
-    <a href="/export_csv" class="btn btn-success">⬇ CSV Export</a>
-</div>
 
     <div class="section">
         <h2>
@@ -164,16 +160,6 @@
         </h2>
         <div id="chartContainer" class="hidden">
             <canvas id="dailyChart"></canvas>
-        </div>
-    </div>
-
-    <div class="section">
-        <h2>
-            🕒 Stundenverlauf (Trendrichtung & Symbol)
-            <button onclick="toggleVisibility('hourlyChartContainer')" style="float: right;">Anzeigen / Verstecken</button>
-        </h2>
-        <div id="hourlyChartContainer" class="hidden">
-            <canvas id="hourlyChart"></canvas>
         </div>
     </div>
 
@@ -238,7 +224,6 @@
             document.getElementById(id).classList.toggle('hidden');
         }
 
-        // Tagesverlauf (bestehender Chart)
         const tagesDaten = {{ tages_daten | tojson }};
         const labels = tagesDaten.map(row => row.tag);
         const datasets = [];
@@ -267,57 +252,6 @@
                 scales: {
                     x: { stacked: true },
                     y: { stacked: true, beginAtZero: true }
-                }
-            }
-        });
-
-        // Stundenverlauf (neu)
-        const stundenDaten = {{ stunden_daten | tojson }};
-        const stundenLabels = stundenDaten.map(row => row.stunde);
-        const stundenDatasets = [];
-        const farben = { bullish: "#00ff88", bearish: "#ff4466" };
-        const stundenKeys = Object.keys(stundenDaten[0] || {}).filter(k => k !== "stunde");
-        const symboleSet = new Set();
-        stundenKeys.forEach(k => {
-            const parts = k.split("_");
-            if (parts.length === 2) symboleSet.add(parts[0]);
-        });
-        const symbole = Array.from(symboleSet);
-        symbole.forEach(symbol => {
-            ["bullish", "bearish"].forEach(richtung => {
-                const key = `${symbol}_${richtung}`;
-                stundenDatasets.push({
-                    label: `${symbol} ${richtung}`,
-                    data: stundenDaten.map(row => row[key] || 0),
-                    backgroundColor: farben[richtung],
-                    stack: symbol
-                });
-            });
-        });
-
-        new Chart(document.getElementById("hourlyChart").getContext("2d"), {
-            type: "bar",
-            data: {
-                labels: stundenLabels,
-                datasets: stundenDatasets
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'top' },
-                    title: { display: true, text: 'Stündliche Alarmverteilung je Symbol & Trendrichtung' }
-                },
-                scales: {
-                    x: {
-                        stacked: true,
-                        title: { display: true, text: 'Stunde (UTC)' }
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true,
-                        title: { display: true, text: 'Anzahl Alarme' }
-                    }
                 }
             }
         });
