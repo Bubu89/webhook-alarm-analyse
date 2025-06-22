@@ -172,6 +172,45 @@ def dashboard():
         fehlerhafte_eintraege=fehlerhafte_eintraege
     )
 
+@app.route("/update-settings", methods=["POST"])
+def update_settings():
+    symbol = request.form.get("symbol", "").strip().upper()
+    if not symbol:
+        return redirect(url_for("dashboard"))
+
+    dropdown_value = request.form.get("interval_hours_dropdown", "1")
+    manual_value = request.form.get("interval_hours_manual", "").strip()
+    try:
+        interval_hours = int(manual_value) if manual_value else int(dropdown_value)
+    except ValueError:
+        interval_hours = 1
+
+    max_alarms = int(request.form.get("max_alarms", 3))
+    trend_richtung = request.form.get("trend_richtung", "neutral")
+    force_overwrite = request.form.get("force_overwrite", "false") == "true"
+
+    einstellungen = {}
+    if os.path.exists(SETTINGS_DATEI):
+        with open(SETTINGS_DATEI, "r") as f:
+            einstellungen = json.load(f)
+
+    eintrag = {
+        "symbol": symbol,
+        "interval_hours": interval_hours,
+        "max_alarms": max_alarms,
+        "trend_richtung": trend_richtung
+    }
+
+    key = f"{symbol}_{interval_hours}_{trend_richtung}"
+
+    if force_overwrite or key not in einstellungen:
+        einstellungen[key] = eintrag
+
+    with open(SETTINGS_DATEI, "w") as f:
+        json.dump(einstellungen, f, indent=2)
+
+    return redirect(url_for("dashboard"))
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
