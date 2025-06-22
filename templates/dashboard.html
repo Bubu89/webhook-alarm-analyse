@@ -57,8 +57,8 @@
         ul {
             font-size: 14px;
         }
-        #verteilungContainer {
-            display: block;
+        #verteilungContainer, #chartContainer {
+            display: none;
         }
         #alarmListe li.hidden {
             display: none;
@@ -74,7 +74,7 @@
             margin-right: 10px;
         }
         canvas {
-            max-height: 400px;
+            max-height: 250px;
         }
         @media (max-width: 600px) {
             body { font-size: 14px; }
@@ -160,13 +160,16 @@
     </div>
 
     <div class="section">
-        <h2>🔢 Tagesbasierte Alarmverteilung (Top-Symbole zuerst)</h2>
-        <canvas id="dailyChart"></canvas>
+        <button onclick="document.getElementById('chartContainer').classList.toggle('hidden')">📊 Tagesverlauf anzeigen/verstecken</button>
+        <div id="chartContainer" class="hidden">
+            <h2>🔢 Tagesbasierte Alarmverteilung (Top-Symbole zuerst)</h2>
+            <canvas id="dailyChart"></canvas>
+        </div>
     </div>
 
     <div class="section">
         <button onclick="document.getElementById('verteilungContainer').classList.toggle('hidden')">📅 Monatliche Verteilung anzeigen/verstecken</button>
-        <div id="verteilungContainer">
+        <div id="verteilungContainer" class="hidden">
             <h2>4. Monatliche Alarmverteilung</h2>
             <form method="get" action="/dashboard">
                 <label>Jahr wählen:</label>
