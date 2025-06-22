@@ -42,12 +42,20 @@ def webhook():
     if not request.is_json:
         return jsonify({"error": "Content-Type muss application/json sein"}), 415
 
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Keine g\u00fcltigen JSON-Daten erhalten"}), 400
+    raw_data = request.get_json()
+    now = datetime.now(MEZ)
 
-    if "timestamp" not in data:
-        data["timestamp"] = datetime.now(MEZ).isoformat()
+    data = {
+        "timestamp": raw_data.get("timestamp", now.isoformat()),
+        "symbol": str(raw_data.get("symbol", "UNKNOWN")),
+        "event": raw_data.get("event", "unspecified"),
+        "price": raw_data.get("price", 0),
+        "interval": raw_data.get("interval", "unspecified"),
+        "trend": raw_data.get("trend", "neutral"),
+        "nachricht": raw_data.get("nachricht", None)
+    }
+
+    data["valid"] = data["symbol"] != "UNKNOWN" and data["price"] > 0
 
     daten = []
     if os.path.exists(LOG_DATEI):
@@ -97,8 +105,7 @@ def dashboard():
 
     df = pd.DataFrame(daten)
 
-    # Spalten-Fallbacks
-    for spalte in ["timestamp", "symbol", "event", "price", "interval", "trend", "nachricht"]:
+    for spalte in ["timestamp", "symbol", "event", "price", "interval", "trend", "nachricht", "valid"]:
         if spalte not in df.columns:
             df[spalte] = None
 
@@ -109,21 +116,22 @@ def dashboard():
 
     jahre = sorted(df["jahr"].dropna().unique()) if not df.empty else [2025]
     aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
-    df = df[df["jahr"] == aktuelles_jahr]
+    df_jahr = df[df["jahr"] == aktuelles_jahr]
+
     monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
     matrix = {
-        symbol: [df[(df["symbol"] == symbol) & (df["monat"] == monat)].shape[0] for monat in monate]
-        for symbol in df["symbol"].dropna().unique()
+        symbol: [df_jahr[(df_jahr["symbol"] == symbol) & (df_jahr["monat"] == monat)].shape[0] for monat in monate]
+        for symbol in df_jahr["symbol"].dropna().unique()
     }
 
     letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
+    fehlerhafte_eintraege = df[df["valid"] != True].sort_values("timestamp", ascending=False).head(10).to_dict("records")
 
     einstellungen = {}
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
             einstellungen = json.load(f)
 
-    # Debug-Ausgaben
     print("Anzahl Zeilen im DataFrame:", df.shape[0])
     print("Symbole:", df["symbol"].unique())
     print("Monate:", df["monat"].unique())
@@ -136,65 +144,6 @@ def dashboard():
         aktuelles_jahr=aktuelles_jahr,
         letzte_ereignisse=letzte_ereignisse,
         einstellungen=einstellungen,
-        einstellungs_info=""
+        einstellungs_info="",
+        fehlerhafte_eintraege=fehlerhafte_eintraege
     )
-
-@app.route("/update-settings", methods=["POST"])
-def update_settings():
-    trend = request.form.get("trend_richtung", "neutral").lower()
-    if trend not in ["bullish", "bearish"]:
-        trend = "neutral"
-
-    symbol = request.form.get("symbol", "global").strip().upper()
-    key = f"global_{trend}_{symbol}" if symbol != "GLOBAL" else f"global_{trend}"
-
-    dropdown_value = request.form.get("interval_hours_dropdown", "6")
-    manual_value = request.form.get("interval_hours_manual", "").strip()
-    try:
-        interval_hours = int(manual_value) if manual_value else int(dropdown_value)
-    except ValueError:
-        interval_hours = 6
-
-    try:
-        max_alarms = int(request.form.get("max_alarms", 3))
-    except ValueError:
-        max_alarms = 3
-
-    settings = {}
-    if os.path.exists(SETTINGS_DATEI):
-        with open(SETTINGS_DATEI, "r") as f:
-            settings.update(json.load(f))
-
-    settings[key] = {
-        "interval_hours": interval_hours,
-        "max_alarms": max_alarms,
-        "trend": trend
-    }
-
-    with open(SETTINGS_DATEI, "w") as f:
-        json.dump(settings, f, indent=2)
-
-    return redirect(url_for("dashboard"))
-
-@app.route("/delete-setting", methods=["POST"])
-def delete_setting():
-    key = request.form.get("key")
-    if not key:
-        return redirect("/dashboard")
-
-    try:
-        with open(SETTINGS_DATEI, "r", encoding="utf-8") as f:
-            einstellungen = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        einstellungen = {}
-
-    if key in einstellungen:
-        del einstellungen[key]
-        with open(SETTINGS_DATEI, "w", encoding="utf-8") as f:
-            json.dump(einstellungen, f, indent=4)
-
-    return redirect("/dashboard")
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
