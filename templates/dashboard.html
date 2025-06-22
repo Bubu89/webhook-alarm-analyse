@@ -155,7 +155,7 @@
             {% if letzte_ereignisse %}
                 {% for eintrag in letzte_ereignisse %}
                     <li class="{% if loop.index > 5 %}hidden{% endif %}">
-                        {{ eintrag["timestamp"][:19] }} | {{ eintrag["symbol"] }}:
+                        {{ eintrag["timestamp"].strftime('%Y-%m-%d %H:%M:%S') }} | {{ eintrag["symbol"] }}:
                         {{ eintrag["nachricht"] if eintrag.get("nachricht") else eintrag.get("event", "-") }}
                     </li>
                 {% endfor %}
