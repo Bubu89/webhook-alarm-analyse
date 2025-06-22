@@ -64,6 +64,11 @@ def webhook():
                 daten = json.load(f)
             except json.JSONDecodeError:
                 daten = []
+    if isinstance(daten, dict):
+        daten = [daten]
+    elif not isinstance(daten, list):
+        daten = []
+
     daten.append(data)
     with open(LOG_DATEI, "w") as f:
         json.dump(daten, f, indent=2)
@@ -102,6 +107,11 @@ def dashboard():
                 daten = json.load(f)
             except json.JSONDecodeError:
                 daten = []
+
+    if isinstance(daten, dict):
+        daten = [daten]
+    elif not isinstance(daten, list):
+        daten = []
 
     df = pd.DataFrame(daten)
 
