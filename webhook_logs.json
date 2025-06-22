@@ -1,8 +1,10 @@
-{
-  "symbol": "BTCUSDT",
-  "timestamp": "2024-06-20T14:56:18",
-  "event": "52w_high",
-  "price": 64532.15,
-  "interval": "1h",
-  "trend": "bullish"
-}
+[
+  {
+    "symbol": "BTCUSDT",
+    "timestamp": "2024-06-20T14:56:18",
+    "event": "52w_high",
+    "price": 64532.15,
+    "interval": "1h",
+    "trend": "bullish"
+  }
+]
