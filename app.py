@@ -61,7 +61,7 @@ def webhook():
             settings.update(json.load(f))
 
     df = pd.DataFrame(daten)
-    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
+    df["timestamp"] = pd.to_datetime(df["timestamp"], format='mixed', errors='coerce')
     df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
 
     symbol = data.get("symbol")
@@ -89,7 +89,7 @@ def dashboard():
             daten = json.load(f)
 
     df = pd.DataFrame(daten) if daten else pd.DataFrame(columns=["timestamp", "symbol", "event", "price", "interval"])
-    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
+    df["timestamp"] = pd.to_datetime(df["timestamp"], format='mixed', errors='coerce')
     df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
     df["symbol"] = df["symbol"].astype(str)
     df["jahr"] = df["timestamp"].dt.year
