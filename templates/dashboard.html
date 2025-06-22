@@ -73,6 +73,9 @@
             transform: scale(1.3);
             margin-right: 10px;
         }
+        canvas {
+            max-height: 400px;
+        }
         @media (max-width: 600px) {
             body { font-size: 14px; }
             .matrix { font-size: 12px; grid-template-columns: repeat(13, minmax(20px, 1fr)); }
@@ -83,6 +86,78 @@
 </head>
 <body>
     <h1>Webhook Alarm Dashboard</h1>
+
+    <div class="section">
+        <h2>1. Globale Alarmeinstellungen</h2>
+        <form action="/update-settings" method="post">
+            <label>Intervall in Stunden (Dropdown)</label>
+            <select name="interval_hours_dropdown">
+                <option value="1">1 Stunde</option>
+                <option value="3">3 Stunden</option>
+                <option value="6">6 Stunden</option>
+                <option value="12">12 Stunden</option>
+                <option value="24">24 Stunden</option>
+            </select>
+            <label>Oder manuell</label>
+            <input type="number" name="interval_hours_manual" placeholder="Manuelle Eingabe (hat Vorrang)">
+            <label>Maximale Alarme pro Intervall</label>
+            <input type="number" name="max_alarms" value="3" required>
+            <label>Trendrichtung</label>
+            <select name="trend_richtung">
+                <option value="neutral">Keine Trendvorgabe</option>
+                <option value="bullish">Positiver Trend (aufwärts)</option>
+                <option value="bearish">Negativer Trend (abwärts)</option>
+            </select>
+            <input type="hidden" name="symbol" value="ALL">
+            <button type="submit">📂 Einstellungen speichern</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h2>2. Aktuelle globale Einstellungen</h2>
+        {% if einstellungen %}
+        <form method="post" action="/delete-multiple-settings">
+            <ul>
+            {% for key, config in einstellungen.items() %}
+                <li>
+                    <input type="checkbox" name="delete_keys" value="{{ key }}" class="checkbox">
+                    <strong>{{ key }}</strong>:
+                    Intervall: {{ config.interval_hours }}h |
+                    Max. Alarme: {{ config.max_alarms }} |
+                    Trend:
+                    {% if config.trend_richtung == "bullish" %}🟢 bullisch
+                    {% elif config.trend_richtung == "bearish" %}🔴 bärisch
+                    {% else %}⚪ neutral
+                    {% endif %}
+                    <button type="button" onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">⟳ Laden</button>
+                </li>
+            {% endfor %}
+            </ul>
+            <button type="submit">🗑️ Ausgewählte löschen</button>
+        </form>
+        {% else %}
+            <p>Keine globalen Einstellungen gesetzt.</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>3. Letzte Alarme</h2>
+        <ul id="alarmListe">
+            {% if letzte_ereignisse %}
+                {% for eintrag in letzte_ereignisse %}
+                    <li class="{% if loop.index > 5 %}hidden{% endif %}">
+                        {{ eintrag["timestamp"].strftime('%Y-%m-%d %H:%M:%S') }} | {{ eintrag["symbol"] }}:
+                        {{ eintrag["nachricht"] if eintrag.get("nachricht") else eintrag.get("event", "-") }}
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li>Keine Alarme registriert.</li>
+            {% endif %}
+        </ul>
+        {% if letzte_ereignisse|length > 5 %}
+            <button id="toggleAlarmeBtn" onclick="toggleAlarme()" data-expanded="false">📋 Alle anzeigen</button>
+        {% endif %}
+    </div>
 
     <div class="section">
         <h2>🔢 Tagesbasierte Alarmverteilung (Top-Symbole zuerst)</h2>
@@ -126,6 +201,24 @@
     </div>
 
     <script>
+        function toggleAlarme() {
+            const btn = document.getElementById("toggleAlarmeBtn");
+            const liste = document.querySelectorAll("#alarmListe li");
+            const expanded = btn.getAttribute("data-expanded") === "true";
+            liste.forEach((el, idx) => {
+                if (idx >= 5) el.classList.toggle("hidden", !expanded);
+            });
+            btn.textContent = expanded ? "📋 Alle anzeigen" : "📋 Weniger anzeigen";
+            btn.setAttribute("data-expanded", expanded ? "false" : "true");
+        }
+
+        function ladeEinstellungen(interval, max, trend) {
+            if (!confirm("Diese Aktion überschreibt die aktuellen Eingaben. Fortfahren?")) return;
+            document.querySelector("select[name='interval_hours_dropdown']").value = interval;
+            document.querySelector("input[name='max_alarms']").value = max;
+            document.querySelector("select[name='trend_richtung']").value = trend;
+        }
+
         const tagesDaten = {{ tages_daten | tojson }};
         const labels = tagesDaten.map(row => row.tag);
         const datasets = [];
@@ -146,6 +239,7 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: { position: 'top' },
                     title: { display: true, text: 'Tägliche Alarmverteilung nach Symbol' }
