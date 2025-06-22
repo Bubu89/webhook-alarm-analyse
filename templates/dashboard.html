@@ -234,7 +234,6 @@
             document.getElementById(id).classList.toggle('hidden');
         }
 
-        // Tagesverlauf (bestehender Chart)
         const tagesDaten = {{ tages_daten | tojson }};
         const labels = tagesDaten.map(row => row.tag);
         const datasets = [];
@@ -267,7 +266,6 @@
             }
         });
 
-        // Stundenverlauf (neu)
         const stundenDaten = {{ stunden_daten | tojson }};
         const stundenLabels = stundenDaten.map(row => row.stunde);
         const stundenDatasets = [];
@@ -281,9 +279,9 @@
         const symbole = Array.from(symboleSet);
         symbole.forEach(symbol => {
             ["bullish", "bearish"].forEach(richtung => {
-                const key = ${symbol}_${richtung};
+                const key = symbol + "_" + richtung;
                 stundenDatasets.push({
-                    label: ${symbol} ${richtung},
+                    label: symbol + " " + richtung,
                     data: stundenDaten.map(row => row[key] || 0),
                     backgroundColor: farben[richtung],
                     stack: symbol
