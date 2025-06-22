@@ -92,7 +92,7 @@ def webhook():
     zeitraum = datetime.now(MEZ) - timedelta(hours=config.get("interval_hours", 6))
     symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
 
-    if len(symbol_df) >= config.get("max_alarms", 3):
+    if config and len(symbol_df[symbol_df["timestamp"] >= zeitraum]) >= config.get("max_alarms", 3):
         sende_email(f"Alarm: {symbol}", f"{len(symbol_df)} Alarme in {config['interval_hours']}h ({trend})")
 
     return jsonify({"status": "ok"})
