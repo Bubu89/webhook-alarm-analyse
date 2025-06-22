@@ -148,13 +148,11 @@ def update_settings():
         with open(SETTINGS_DATEI, "r") as f:
             settings.update(json.load(f))
 
-    if key not in settings:
-        settings[key] = {}
-
-    settings[key].update({
+    settings[key] = {
         "interval_hours": interval_hours,
-        "max_alarms": max_alarms
-    })
+        "max_alarms": max_alarms,
+        "trend": trend
+    }
 
     with open(SETTINGS_DATEI, "w") as f:
         json.dump(settings, f, indent=2)
