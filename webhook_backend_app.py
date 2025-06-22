@@ -6,6 +6,7 @@ import pandas as pd
 import smtplib
 from email.mime.text import MIMEText
 import pytz
+from collections import defaultdict  # NEU für Stunden-Daten
 
 load_dotenv()
 
@@ -17,6 +18,28 @@ EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
 
 MEZ = pytz.timezone("Europe/Vienna")
 app = Flask(__name__)
+
+# NEU: Funktion für stündliche Verteilung
+def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
+    df = df[df["trend"].isin(["bullish", "bearish"])].copy()
+    df["stunde"] = df["timestamp"].dt.strftime("%H")
+    gruppiert = df.groupby(["stunde", "symbol", "trend"]).size().reset_index(name="anzahl")
+
+    struktur = defaultdict(dict)
+    for _, row in gruppiert.iterrows():
+        stunde = row["stunde"]
+        key = f"{row['symbol']}_{row['trend']}"
+        struktur[stunde][key] = row["anzahl"]
+
+    result = []
+    for h in range(24):
+        stunde = f"{h:02d}"
+        eintrag = {"stunde": stunde}
+        if stunde in struktur:
+            eintrag.update(struktur[stunde])
+        result.append(eintrag)
+
+    return result
 
 def sende_email(betreff, inhalt):
     try:
@@ -136,6 +159,7 @@ def dashboard():
         letzte_ereignisse = []
         fehlerhafte_eintraege = []
         tages_daten = []
+        stunden_daten = []
     else:
         df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
         df["symbol"] = df["symbol"].astype(str)
@@ -161,6 +185,9 @@ def dashboard():
         df["symbol"] = pd.Categorical(df["symbol"], categories=sortierte_paare, ordered=True)
         tages_daten = df.groupby(["tag", "symbol"]).size().unstack(fill_value=0).sort_index().reset_index()
 
+        # NEU: Stunden-Daten generieren
+        stunden_daten = erzeuge_stunden_daten(df)
+
     einstellungen = {}
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
@@ -180,8 +207,8 @@ def dashboard():
         einstellungen=einstellungen,
         einstellungs_info="",
         fehlerhafte_eintraege=fehlerhafte_eintraege,
-        tages_daten=tages_daten.to_dict(orient="records") if isinstance(tages_daten, pd.DataFrame) else tages_daten
-  # ← hier korrigiert
+        tages_daten=tages_daten.to_dict(orient="records") if isinstance(tages_daten, pd.DataFrame) else tages_daten,
+        stunden_daten=stunden_daten  # NEU
     )
 
 @app.route("/update-settings", methods=["POST"])
