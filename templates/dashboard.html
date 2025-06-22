@@ -104,7 +104,7 @@
             </select>
             <input type="hidden" name="symbol" value="ALL">
             <input type="hidden" name="entry_id" value="{{ entry_id }}">
-            <input type="hidden" name="timestamp" value="{{ timestamp | default(("now" | tojson)[1:20]) }}">
+            <input type="hidden" name="timestamp" value="{{ timestamp }}">
             <button type="submit">📂 Einstellungen speichern</button>
         </form>
     </div>
