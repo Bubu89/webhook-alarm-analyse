@@ -44,7 +44,7 @@ def webhook():
 
     data = request.get_json()
     if not data:
-        return jsonify({"error": "Keine gültigen JSON-Daten erhalten"}), 400
+        return jsonify({"error": "Keine g\u00fcltigen JSON-Daten erhalten"}), 400
 
     if "timestamp" not in data:
         data["timestamp"] = datetime.now(MEZ).isoformat()
