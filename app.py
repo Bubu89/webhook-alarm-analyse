@@ -46,8 +46,13 @@ def webhook():
     if not data:
         return jsonify({"error": "Keine gültigen JSON-Daten erhalten"}), 400
 
+    # Fallbacks setzen
     if "timestamp" not in data:
         data["timestamp"] = datetime.now(MEZ).isoformat()
+    if "event" not in data or not data["event"]:
+        data["event"] = "Kein Event angegeben"
+    if "nachricht" not in data or not data["nachricht"]:
+        data["nachricht"] = data["event"]
 
     daten = []
     if os.path.exists(LOG_DATEI):
@@ -96,6 +101,7 @@ def dashboard():
 
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
     df["symbol"] = df["symbol"].astype(str)
+    df["nachricht"] = df["nachricht"].fillna("")  # Fallback sicherstellen
     df["jahr"] = df["timestamp"].dt.year
     df["monat"] = df["timestamp"].dt.strftime("%b")
 
