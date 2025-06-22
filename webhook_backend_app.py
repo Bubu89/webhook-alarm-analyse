@@ -95,7 +95,7 @@ def webhook():
     zeitraum = datetime.now(MEZ) - timedelta(hours=config.get("interval_hours", 6))
     symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
 
-    if len(symbol_df) >= config.get("max_alarms", 3):
+    if config.get("max_alarms", 3) == 1 or len(symbol_df) >= config.get("max_alarms", 3):
         sende_email(f"Alarm: {symbol}", f"{len(symbol_df)} Alarme in {config['interval_hours']}h ({trend})")
 
     return jsonify({"status": "ok"})
@@ -203,6 +203,30 @@ def update_settings():
         "max_alarms": max_alarms,
         "trend_richtung": trend_richtung
     }
+
+    with open(SETTINGS_DATEI, "w") as f:
+        json.dump(einstellungen, f, indent=2)
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/delete-multiple-settings", methods=["POST"])
+def delete_multiple_settings():
+    keys_to_delete = request.form.getlist("delete_keys")
+
+    if not keys_to_delete:
+        return redirect(url_for("dashboard"))
+
+    einstellungen = {}
+    if os.path.exists(SETTINGS_DATEI):
+        with open(SETTINGS_DATEI, "r") as f:
+            try:
+                einstellungen = json.load(f)
+            except json.JSONDecodeError:
+                einstellungen = {}
+
+    for key in keys_to_delete:
+        if key in einstellungen:
+            del einstellungen[key]
 
     with open(SETTINGS_DATEI, "w") as f:
         json.dump(einstellungen, f, indent=2)
