@@ -12,6 +12,19 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from collections import defaultdict
 
+from flask import send_file
+from pathlib import Path
+
+@app.route("/export_csv")
+def export_csv():
+    conn = engine.connect()
+    df = pd.read_sql("SELECT * FROM webhook_alarme", conn)
+    conn.close()
+    Path("static").mkdir(exist_ok=True)
+    export_path = "static/webhook_export.csv"
+    df.to_csv(export_path, index=False)
+    return send_file(export_path, as_attachment=True, download_name="webhook_export.csv")
+
 # === SETUP ===
 load_dotenv()
 MEZ = pytz.timezone("Europe/Vienna")
