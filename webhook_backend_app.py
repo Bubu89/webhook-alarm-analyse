@@ -160,6 +160,7 @@ def dashboard():
         fehlerhafte_eintraege = []
         tages_daten = []
         stunden_daten = []
+        stunden_strahl_daten = []
     else:
         df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
         df["symbol"] = df["symbol"].astype(str)
@@ -185,8 +186,8 @@ def dashboard():
         df["symbol"] = pd.Categorical(df["symbol"], categories=sortierte_paare, ordered=True)
         tages_daten = df.groupby(["tag", "symbol"]).size().unstack(fill_value=0).sort_index().reset_index()
 
-        # NEU: Stunden-Daten generieren
         stunden_daten = erzeuge_stunden_daten(df)
+        stunden_strahl_daten = stunden_daten  # fallback, kann durch andere Logik ersetzt werden
 
     einstellungen = {}
     if os.path.exists(SETTINGS_DATEI):
@@ -208,7 +209,8 @@ def dashboard():
         einstellungs_info="",
         fehlerhafte_eintraege=fehlerhafte_eintraege,
         tages_daten=tages_daten.to_dict(orient="records") if isinstance(tages_daten, pd.DataFrame) else tages_daten,
-        stunden_daten=stunden_daten  # NEU
+        stunden_daten=stunden_daten,
+        stunden_strahl_daten=stunden_strahl_daten
     )
 
 @app.route("/update-settings", methods=["POST"])
