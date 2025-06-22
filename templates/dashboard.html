@@ -126,47 +126,23 @@
     </div>
 
     <div class="section">
-        <h2>3. Aktuelle gespeicherte Alarme</h2>
-        {% if gespeicherte_alarme %}
-        <form method="post" action="/delete-alarms">
-            <ul>
-            {% for eintrag in gespeicherte_alarme %}
-                <li>
-                    <input type="checkbox" name="delete_ids" value="{{ eintrag.id }}" class="checkbox">
-                    {{ eintrag.timestamp }} | {{ eintrag.symbol }} | {{ eintrag.event }} | {{ eintrag.trend }}
-                </li>
-            {% endfor %}
-            </ul>
-            <button type="submit">🗑️ Ausgewählte löschen</button>
-        </form>
-        {% else %}
-            <p>Keine gespeicherten Alarme.</p>
-        {% endif %}
-    </div>
-
-    <div class="section">
-        <h2>
-            📊 Tagesverlauf
-            <button onclick="toggleVisibility('tagesChartContainer')" style="float: right;">Anzeigen / Verstecken</button>
-        </h2>
-        <div id="tagesChartContainer" class="hidden">
-            <canvas id="tagesChart"></canvas>
+        <h2>📅 Monatliche Verteilung <button onclick="toggleVisibility('monatsVerteilungContainer')" style="float: right;">Anzeigen / Verstecken</button></h2>
+        <div id="monatsVerteilungContainer" class="hidden">
+            <div class="matrix" id="monatsMatrix">
+                {% for symbol, zeile in matrix.items() %}
+                    <div><strong>{{ symbol }}</strong></div>
+                    {% for wert in zeile %}
+                        <div>{{ wert }}</div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
         </div>
     </div>
 
     <div class="section">
-        <h2>
-            📅 Monatliche Verteilung
-            <button onclick="toggleVisibility('monatsVerteilungContainer')" style="float: right;">Anzeigen / Verstecken</button>
-        </h2>
-        <div id="monatsVerteilungContainer" class="hidden">
-            <div class="matrix" id="monatsMatrix">
-                {% for zeile in monats_matrix %}
-                    {% for zelle in zeile %}
-                        <div>{{ zelle }}</div>
-                    {% endfor %}
-                {% endfor %}
-            </div>
+        <h2>📊 Tagesverlauf <button onclick="toggleVisibility('tagesChartContainer')" style="float: right;">Anzeigen / Verstecken</button></h2>
+        <div id="tagesChartContainer" class="hidden">
+            <canvas id="tagesChart"></canvas>
         </div>
     </div>
 
