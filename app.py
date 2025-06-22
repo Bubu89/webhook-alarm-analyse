@@ -113,38 +113,52 @@ def dashboard():
     elif not isinstance(daten, list):
         daten = []
 
-    df = pd.DataFrame(daten)
+    daten = [eintrag for eintrag in daten if isinstance(eintrag, dict)]
+
+    try:
+        df = pd.DataFrame(daten)
+    except Exception as e:
+        print("Fehler beim Erstellen des DataFrames:", e)
+        df = pd.DataFrame([])
 
     for spalte in ["timestamp", "symbol", "event", "price", "interval", "trend", "nachricht", "valid"]:
         if spalte not in df.columns:
             df[spalte] = None
 
-    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
-    df["symbol"] = df["symbol"].astype(str)
-    df["jahr"] = df["timestamp"].dt.year
-    df["monat"] = df["timestamp"].dt.strftime("%b")
+    if df.empty:
+        jahre = [2025]
+        aktuelles_jahr = int(year) if year and year.isdigit() else 2025
+        monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
+        matrix = {}
+        letzte_ereignisse = []
+        fehlerhafte_eintraege = []
+    else:
+        df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
+        df["symbol"] = df["symbol"].astype(str)
+        df["jahr"] = df["timestamp"].dt.year
+        df["monat"] = df["timestamp"].dt.strftime("%b")
 
-    jahre = sorted(df["jahr"].dropna().unique()) if not df.empty else [2025]
-    aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
-    df_jahr = df[df["jahr"] == aktuelles_jahr]
+        jahre = sorted(df["jahr"].dropna().unique())
+        aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
+        df_jahr = df[df["jahr"] == aktuelles_jahr]
 
-    monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
-    matrix = {
-        symbol: [df_jahr[(df_jahr["symbol"] == symbol) & (df_jahr["monat"] == monat)].shape[0] for monat in monate]
-        for symbol in df_jahr["symbol"].dropna().unique()
-    }
+        monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
+        matrix = {
+            symbol: [df_jahr[(df_jahr["symbol"] == symbol) & (df_jahr["monat"] == monat)].shape[0] for monat in monate]
+            for symbol in df_jahr["symbol"].dropna().unique()
+        }
 
-    letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
-    fehlerhafte_eintraege = df[df["valid"] != True].sort_values("timestamp", ascending=False).head(10).to_dict("records")
+        letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
+        fehlerhafte_eintraege = df[df["valid"] != True].sort_values("timestamp", ascending=False).head(10).to_dict("records")
 
     einstellungen = {}
     if os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "r") as f:
-            einstellungen = json.load(f)
-
-    print("Anzahl Zeilen im DataFrame:", df.shape[0])
-    print("Symbole:", df["symbol"].unique())
-    print("Monate:", df["monat"].unique())
+            try:
+                einstellungen = json.load(f)
+            except Exception as e:
+                print("Fehler beim Laden der Einstellungen:", e)
+                einstellungen = {}
 
     return render_template("dashboard.html",
         matrix=matrix,
