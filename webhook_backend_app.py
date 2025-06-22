@@ -135,11 +135,14 @@ def dashboard():
         matrix = {}
         letzte_ereignisse = []
         fehlerhafte_eintraege = []
+        tages_daten = []
     else:
         df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
         df["symbol"] = df["symbol"].astype(str)
         df["jahr"] = df["timestamp"].dt.year
         df["monat"] = df["timestamp"].dt.strftime("%b")
+        df["tag"] = df["timestamp"].dt.date
+        df["uhrzeit"] = df["timestamp"].dt.strftime("%H:%M")
 
         jahre = sorted(df["jahr"].dropna().unique())
         aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
@@ -153,6 +156,10 @@ def dashboard():
 
         letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
         fehlerhafte_eintraege = df[df["valid"] != True].sort_values("timestamp", ascending=False).head(10).to_dict("records")
+
+        sortierte_paare = ["BTC", "ETH"] + sorted([s for s in df["symbol"].unique() if s not in ["BTC", "ETH"]])
+        df["symbol"] = pd.Categorical(df["symbol"], categories=sortierte_paare, ordered=True)
+        tages_daten = df.groupby(["tag", "symbol"]).size().unstack(fill_value=0).sort_index().reset_index()
 
     einstellungen = {}
     if os.path.exists(SETTINGS_DATEI):
@@ -172,7 +179,8 @@ def dashboard():
         letzte_ereignisse=letzte_ereignisse,
         einstellungen=einstellungen,
         einstellungs_info="",
-        fehlerhafte_eintraege=fehlerhafte_eintraege
+        fehlerhafte_eintraege=fehlerhafte_eintraege,
+        tages_daten=tages_daten
     )
 
 @app.route("/update-settings", methods=["POST"])
