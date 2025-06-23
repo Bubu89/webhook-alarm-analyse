@@ -257,84 +257,84 @@ def dashboard():
         if spalte not in df.columns:
             df[spalte] = None
 
-  if df.empty:
-    jahre = [2025]
-    aktuelles_jahr = int(year) if year and year.isdigit() else 2025
-    monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
-    matrix = {}
-    letzte_ereignisse = []
-    fehlerhafte_eintraege = []
-    tages_daten = []
-    stunden_daten = []
-    stunden_strahl_daten = []
+    if df.empty:
+        jahre = [2025]
+        aktuelles_jahr = int(year) if year and year.isdigit() else 2025
+        monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
+        matrix = {}
+        letzte_ereignisse = []
+        fehlerhafte_eintraege = []
+        tages_daten = []
+        stunden_daten = []
+        stunden_strahl_daten = []
 
-    trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
-    zielbalkenLabels = [f"{e['stunde']}h ({e['symbol'][:6]}…)" if len(e['symbol']) > 6 else f"{e['stunde']}h ({e['symbol']})" for e in trend_aggregat_roh]
-    zielbalkenDaten = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
-    zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
-    trend_aggregat_view = {
-        "labels": zielbalkenLabels,
-        "werte": zielbalkenDaten,
-        "farben": zielbalkenFarben
-    }
-else:
-    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
-    df["symbol"] = df["symbol"].astype(str)
-    df["jahr"] = df["timestamp"].dt.year
-    df["monat"] = df["timestamp"].dt.strftime("%b")
-    df["tag"] = df["timestamp"].dt.date
-    df["uhrzeit"] = df["timestamp"].dt.strftime("%H:%M")
+        trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
+        zielbalkenLabels = [f"{e['stunde']}h ({e['symbol'][:6]}…)" if len(e['symbol']) > 6 else f"{e['stunde']}h ({e['symbol']})" for e in trend_aggregat_roh]
+        zielbalkenDaten = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
+        zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
+        trend_aggregat_view = {
+            "labels": zielbalkenLabels,
+            "werte": zielbalkenDaten,
+            "farben": zielbalkenFarben
+        }
 
-    jahre = sorted(df["jahr"].dropna().unique())
-    aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
-    df_jahr = df[df["jahr"] == aktuelles_jahr]
+    else:
+        df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
+        df["symbol"] = df["symbol"].astype(str)
+        df["jahr"] = df["timestamp"].dt.year
+        df["monat"] = df["timestamp"].dt.strftime("%b")
+        df["tag"] = df["timestamp"].dt.date
+        df["uhrzeit"] = df["timestamp"].dt.strftime("%H:%M")
 
-    monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
-    matrix = {}
+        jahre = sorted(df["jahr"].dropna().unique())
+        aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
+        df_jahr = df[df["jahr"] == aktuelles_jahr]
 
-    for symbol in df_jahr["symbol"].dropna().unique():
-        monatliche_werte = []
-        for monat in monate:
-            df_monat = df_jahr[(df_jahr["symbol"] == symbol) & (df_jahr["monat"] == monat)]
-            bullish = df_monat[df_monat["trend"] == "bullish"].shape[0]
-            bearish = df_monat[df_monat["trend"] == "bearish"].shape[0]
-            wert = bullish - bearish
-            monatliche_werte.append(wert)
-        matrix[symbol] = monatliche_werte
+        monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
+        matrix = {}
 
-
+        for symbol in df_jahr["symbol"].dropna().unique():
+            monatliche_werte = []
+            for monat in monate:
+                df_monat = df_jahr[(df_jahr["symbol"] == symbol) & (df_jahr["monat"] == monat)]
+                bullish = df_monat[df_monat["trend"] == "bullish"].shape[0]
+                bearish = df_monat[df_monat["trend"] == "bearish"].shape[0]
+                wert = bullish - bearish
+                monatliche_werte.append(wert)
+            matrix[symbol] = monatliche_werte
 
         letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
         fehlerhafte_eintraege = df[df["valid"] != True].sort_values("timestamp", ascending=False).head(10).to_dict("records")
 
         sortierte_paare = ["BTC", "ETH"] + sorted([s for s in df["symbol"].unique() if s not in ["BTC", "ETH"]])
         df["symbol"] = pd.Categorical(df["symbol"], categories=sortierte_paare, ordered=True)
-    
-    stunden_daten = erzeuge_stunden_daten(df)
 
-    gruppen_trends = []
-    farben_mapping = {
-        "Dominance_bullish": "lightgreen",
-        "Dominance_bearish": "lightcoral",
-        "Others_bullish": "#7CFC00",
-        "Others_bearish": "#FF4500",
-        "Total_bullish": "#00CED1",
-        "Total_bearish": "#DC143C"
-    }
+        stunden_daten = erzeuge_stunden_daten(df)
 
-    for eintrag in stunden_daten:
-        stunde = eintrag["stunde"]
-        for key, wert in eintrag.items():
-            if key == "stunde":
-                continue
-            gruppe, richtung = key.split("_")
-            gruppen_trends.append({
-                "stunde": stunde,
-                "gruppe": gruppe,
-                "richtung": richtung,
-                "wert": wert,
-                "farbe": farben_mapping.get(key, "#888")
-            })
+        gruppen_trends = []
+        farben_mapping = {
+            "Dominance_bullish": "lightgreen",
+            "Dominance_bearish": "lightcoral",
+            "Others_bullish": "#7CFC00",
+            "Others_bearish": "#FF4500",
+            "Total_bullish": "#00CED1",
+            "Total_bearish": "#DC143C"
+        }
+
+        for eintrag in stunden_daten:
+            stunde = eintrag["stunde"]
+            for key, wert in eintrag.items():
+                if key == "stunde":
+                    continue
+                gruppe, richtung = key.split("_")
+                gruppen_trends.append({
+                    "stunde": stunde,
+                    "gruppe": gruppe,
+                    "richtung": richtung,
+                    "wert": wert,
+                    "farbe": farben_mapping.get(key, "#888")
+                })
+
 
     stunden_strahl_daten = stunden_daten
 
