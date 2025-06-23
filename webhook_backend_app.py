@@ -302,63 +302,71 @@ def dashboard():
         df["symbol"] = pd.Categorical(df["symbol"], categories=sortierte_paare, ordered=True)
        
 
-        stunden_daten = erzeuge_stunden_daten(df)
+@app.route("/dashboard")
+def dashboard():
+    ...
+    df["symbol"] = pd.Categorical(df["symbol"], categories=sortierte_paare, ordered=True)
+    
+    stunden_daten = erzeuge_stunden_daten(df)
 
-gruppen_trends = []
-farben_mapping = {
-    "Dominance_bullish": "lightgreen",
-    "Dominance_bearish": "lightcoral",
-    "Others_bullish": "#7CFC00",     # grünlicher Farbton
-    "Others_bearish": "#FF4500",     # orangerot
-    "Total_bullish": "#00CED1",      # türkis
-    "Total_bearish": "#DC143C"       # karmesinrot
-}
+    gruppen_trends = []
+    farben_mapping = {
+        "Dominance_bullish": "lightgreen",
+        "Dominance_bearish": "lightcoral",
+        "Others_bullish": "#7CFC00",
+        "Others_bearish": "#FF4500",
+        "Total_bullish": "#00CED1",
+        "Total_bearish": "#DC143C"
+    }
 
-for eintrag in stunden_daten:
-    stunde = eintrag["stunde"]
-    for key, wert in eintrag.items():
-        if key == "stunde":
-            continue
-        gruppe, richtung = key.split("_")
-        gruppen_trends.append({
-            "stunde": stunde,
-            "gruppe": gruppe,
-            "richtung": richtung,
-            "wert": wert,
-            "farbe": farben_mapping.get(key, "#888")
-        })
+    for eintrag in stunden_daten:
+        stunde = eintrag["stunde"]
+        for key, wert in eintrag.items():
+            if key == "stunde":
+                continue
+            gruppe, richtung = key.split("_")
+            gruppen_trends.append({
+                "stunde": stunde,
+                "gruppe": gruppe,
+                "richtung": richtung,
+                "wert": wert,
+                "farbe": farben_mapping.get(key, "#888")
+            })
 
-stunden_strahl_daten = stunden_daten
+    stunden_strahl_daten = stunden_daten
 
-trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
-# ... hier erfolgt die Verarbeitung zu zielbalkenLabels, zielbalkenDaten, zielbalkenFarben
+    trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
+    zielbalkenLabels = [f"{e['stunde']}h ({e['symbol'][:6]}…)" if len(e['symbol']) > 6 else f"{e['stunde']}h ({e['symbol']})" for e in trend_aggregat_roh]
+    zielbalkenDaten = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
+    zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
 
-trend_aggregat_view = {
-    "labels": zielbalkenLabels,
-    "werte": zielbalkenDaten,
-    "farben": zielbalkenFarben
-}
+    trend_aggregat_view = {
+        "labels": zielbalkenLabels,
+        "werte": zielbalkenDaten,
+        "farben": zielbalkenFarben
+    }
 
-einstellungen = {}
-if os.path.exists(SETTINGS_DATEI):
-    with open(SETTINGS_DATEI, "r") as f:
-        try:
-            einstellungen = json.load(f)
-        except Exception as e:
-            print("Fehler beim Laden der Einstellungen:", e)
-            einstellungen = {}
+    einstellungen = {}
+    if os.path.exists(SETTINGS_DATEI):
+        with open(SETTINGS_DATEI, "r") as f:
+            try:
+                einstellungen = json.load(f)
+            except Exception as e:
+                print("Fehler beim Laden der Einstellungen:", e)
+                einstellungen = {}
 
-return render_template("dashboard.html",
-    einstellungen=einstellungen,
-    letzte_ereignisse=letzte_ereignisse,
-    stunden_daten=stunden_daten,
-    gruppen_trends=gruppen_trends,
-    trend_aggregat_daten=trend_aggregat_view,
-    matrix=matrix,
-    monate=monate,
-    aktuelles_jahr=aktuelles_jahr,
-    verfuegbare_jahre=jahre
-)
+    return render_template("dashboard.html",
+        einstellungen=einstellungen,
+        letzte_ereignisse=letzte_ereignisse,
+        stunden_daten=stunden_daten,
+        gruppen_trends=gruppen_trends,
+        trend_aggregat_daten=trend_aggregat_view,
+        matrix=matrix,
+        monate=monate,
+        aktuelles_jahr=aktuelles_jahr,
+        verfuegbare_jahre=jahre
+    )
+
 
 
 @app.route("/update-settings", methods=["POST"])
