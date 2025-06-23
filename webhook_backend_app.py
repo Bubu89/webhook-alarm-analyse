@@ -293,7 +293,7 @@ def dashboard():
         monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
         matrix = {}
 
-        for symbol in df_jahr["symbol"].dropna().unique():
+        for symbol in sorted(df_jahr["symbol"].dropna().unique()):
             monatliche_werte = []
             for monat in monate:
                 df_monat = df_jahr[(df_jahr["symbol"] == symbol) & (df_jahr["monat"] == monat)]
