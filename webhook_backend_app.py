@@ -88,10 +88,6 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
 
         aggregation[key][trend] += anzahl
 
-    result = []
-    for (stunde, symbol), werte in aggregation.items():
-        score = werte["bullish"] - werte["bearish"]
-        farbe = "green" if score > 0 else "red" if score < 0 else "#888"
 
         result.append({
             "stunde": stunde,
@@ -345,17 +341,15 @@ for eintrag in stunden_daten:
             "farbe": farben_mapping.get(key, "#888")
         })
 
-        stunden_strahl_daten = stunden_daten
+stunden_strahl_daten = stunden_daten
 
-        trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
-        zielbalkenLabels = [f"{e['stunde']}h ({e['symbol']})" for e in trend_aggregat_roh]
-        zielbalkenDaten = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
-        zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
-        trend_aggregat_view = {
-            "labels": zielbalkenLabels,
-            "werte": zielbalkenDaten,
-            "farben": zielbalkenFarben
-        }
+trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
+...
+trend_aggregat_view = {
+    "labels": zielbalkenLabels,
+    "werte": zielbalkenDaten,
+    "farben": zielbalkenFarben
+}
 
     einstellungen = {}
     if os.path.exists(SETTINGS_DATEI):
@@ -366,18 +360,18 @@ for eintrag in stunden_daten:
                 print("Fehler beim Laden der Einstellungen:", e)
                 einstellungen = {}
 
-  @app.route("/dashboard")
-
-def dashboard():
     return render_template("dashboard.html",
         einstellungen=einstellungen,
         letzte_ereignisse=letzte_ereignisse,
         stunden_daten=stunden_daten,
+        gruppen_trends=gruppen_trends,
         trend_aggregat_daten=trend_aggregat_view,
         matrix=matrix,
         monate=monate,
         aktuelles_jahr=aktuelles_jahr,
         verfuegbare_jahre=jahre
+    )
+
     )
 
 
