@@ -41,6 +41,13 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
     return result
 
 def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
+    if "timestamp" not in df.columns:
+        df["timestamp"] = pd.NaT
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True)
+
+    if df["timestamp"].isnull().all():
+        return []
+
     df["stunde"] = df["timestamp"].dt.strftime("%H")
     df_trend = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
     gruppiert = df_trend.groupby("stunde")["trend"].value_counts().unstack(fill_value=0).reset_index()
@@ -64,7 +71,11 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
             "farbe": trendfarbe
         })
 
+    if result:
+        result = [max(result, key=lambda x: x["stunde"])]
+
     return result
+
 
 def sende_email(betreff, inhalt):
     try:
