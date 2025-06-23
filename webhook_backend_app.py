@@ -104,6 +104,7 @@ def webhook():
 
     df = pd.DataFrame(daten)
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
+    df_signal = df.copy()
 
     symbol = data.get("symbol")
     trend = data.get("trend", "neutral").lower()
@@ -117,6 +118,8 @@ def webhook():
 
     zeitraum = datetime.now(MEZ) - timedelta(hours=config.get("interval_hours", 6))
     symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
+    symbol_df = symbol_df[symbol_df["timestamp"] < data["timestamp"]]  # ⛔ aktuelles nicht mitrechnen
+
 
     if config.get("max_alarms", 3) == 1 or len(symbol_df) >= config.get("max_alarms", 3):
         sende_email(f"Alarm: {symbol}", f"{len(symbol_df)} Alarme in {config['interval_hours']}h ({trend})")
@@ -162,6 +165,31 @@ def dashboard():
         stunden_daten = []
         stunden_strahl_daten = []
         trend_aggregat_daten = erzeuge_trend_aggregat_daten(df)
+def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
+    df["stunde"] = df["timestamp"].dt.strftime("%H")
+    df_trend = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
+    gruppiert = df_trend.groupby("stunde")["trend"].value_counts().unstack(fill_value=0).reset_index()
+
+    result = []
+    for _, row in gruppiert.iterrows():
+        bullish = row.get("bullish", 0)
+        bearish = row.get("bearish", 0)
+        neutral = row.get("neutral", 0)
+        trendfarbe = "white"
+        if bullish > bearish and bullish > neutral:
+            trendfarbe = "green"
+        elif bearish > bullish and bearish > neutral:
+            trendfarbe = "red"
+
+        result.append({
+            "stunde": row["stunde"],
+            "bullish": bullish,
+            "bearish": bearish,
+            "neutral": neutral,
+            "farbe": trendfarbe
+        })
+    return result
+
 
     else:
         df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
