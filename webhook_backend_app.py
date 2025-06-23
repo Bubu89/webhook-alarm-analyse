@@ -347,17 +347,18 @@ if os.path.exists(SETTINGS_DATEI):
                     print("Fehler beim Laden der Einstellungen:", e)
                     einstellungen = {}
 
-        return render_template("dashboard.html",
-            einstellungen=einstellungen,
-            letzte_ereignisse=letzte_ereignisse,
-            stunden_daten=stunden_daten,
-            gruppen_trends=gruppen_trends,
-            trend_aggregat_daten=trend_aggregat_view,
-            matrix=matrix,
-            monate=monate,
-            aktuelles_jahr=aktuelles_jahr,
-            verfuegbare_jahre=jahre
-        )
+    return render_template("dashboard.html",
+        einstellungen=einstellungen,
+        letzte_ereignisse=letzte_ereignisse,
+        stunden_daten=stunden_daten,
+        gruppen_trends=gruppen_trends,
+        trend_aggregat_daten=trend_aggregat_view,
+        matrix=matrix,
+        monate=monate,
+        aktuelles_jahr=aktuelles_jahr,
+        verfuegbare_jahre=jahre
+    )
+
 
 
 @app.route("/update-settings", methods=["POST"])
