@@ -245,7 +245,7 @@ def dashboard():
 
         sortierte_paare = ["BTC", "ETH"] + sorted([s for s in df["symbol"].unique() if s not in ["BTC", "ETH"]])
         df["symbol"] = pd.Categorical(df["symbol"], categories=sortierte_paare, ordered=True)
-        tages_daten = df.groupby(["tag", "symbol"]).size().unstack(fill_value=0).sort_index().reset_index()
+       
 
         stunden_daten = erzeuge_stunden_daten(df)
         stunden_strahl_daten = stunden_daten
