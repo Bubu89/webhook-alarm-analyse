@@ -1,14 +1,4 @@
 {
-  "global_bullish_ALL": {
-    "interval_hours": 6,
-    "max_alarms": 4,
-    "trend": "bullisch"
-  },
-  "global_bearish_ALL": {
-    "interval_hours": 6,
-    "max_alarms": 4,
-    "trend": "b\u00e4risch"
-  },
   "global_neutral": {
     "symbol": "ALL",
     "interval_hours": 1,
