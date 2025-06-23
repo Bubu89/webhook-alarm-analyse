@@ -62,25 +62,19 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
         return []
 
     MEZ = pytz.timezone("Europe/Vienna")
-
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce')
 
-    # Wenn keine Zeitzone vorhanden ist, nehme UTC an
     if df["timestamp"].dt.tz is None:
         df["timestamp"] = df["timestamp"].dt.tz_localize("UTC")
 
-    # In MEZ umwandeln
     df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
-
     df = df[df["timestamp"].notna()]
     df["stunde"] = df["timestamp"].dt.strftime("%H")
 
     df = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
     gruppiert = df.groupby(["stunde", "symbol", "trend"], observed=False).size().reset_index(name="anzahl")
 
-    # Hilfsstruktur zur Aggregation
     aggregation = {}
-
     for _, row in gruppiert.iterrows():
         stunde = int(row["stunde"])
         symbol = row["symbol"]
@@ -92,6 +86,24 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
             aggregation[key] = {"bullish": 0, "bearish": 0, "neutral": 0}
 
         aggregation[key][trend] += anzahl
+
+    result = []
+    for (stunde, symbol), werte in aggregation.items():
+        score = werte["bullish"] - werte["bearish"]
+        farbe = "green" if score > 0 else "red" if score < 0 else "#888"
+
+        result.append({
+            "stunde": stunde,
+            "symbol": symbol,
+            "bullish": werte["bullish"],
+            "bearish": werte["bearish"],
+            "neutral": werte["neutral"],
+            "score": score,
+            "farbe": farbe
+        })
+
+    return result
+
 
 def erzeuge_trend_score_daten(df: pd.DataFrame) -> list[dict]:
     gruppe_1 = ["BTC.D", "ETH.D", "USDT.D", "USDC.D"]
