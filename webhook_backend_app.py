@@ -41,37 +41,44 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
     return result
 
 def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
-    if "timestamp" not in df.columns:
-        df["timestamp"] = pd.NaT
-    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True)
-
-    if df["timestamp"].isnull().all():
+    if "timestamp" not in df.columns or "symbol" not in df.columns:
         return []
 
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True)
+    df = df[df["timestamp"].notna()]
     df["stunde"] = df["timestamp"].dt.strftime("%H")
+
     df_trend = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
-    gruppiert = df_trend.groupby("stunde")["trend"].value_counts().unstack(fill_value=0).reset_index()
+    gruppiert = df_trend.groupby(["stunde", "symbol", "trend"]).size().unstack(fill_value=0).reset_index()
 
     result = []
     for _, row in gruppiert.iterrows():
+        stunde = row["stunde"]
+        symbol = row["symbol"]
         bullish = row.get("bullish", 0)
         bearish = row.get("bearish", 0)
         neutral = row.get("neutral", 0)
-        trendfarbe = "white"
-        if bullish > bearish and bullish > neutral:
-            trendfarbe = "green"
-        elif bearish > bullish and bearish > neutral:
-            trendfarbe = "red"
+
+        score = bullish - bearish
+        if score > 0:
+            farbe = "green"
+        elif score < 0:
+            farbe = "red"
+        else:
+            farbe = "#888"
 
         result.append({
-            "stunde": int(row["stunde"]),
+            "stunde": int(stunde),
+            "symbol": symbol,
             "bullish": bullish,
             "bearish": bearish,
             "neutral": neutral,
-            "farbe": trendfarbe
+            "score": score,
+            "farbe": farbe
         })
 
-    if result:
+    return result
+
         result = [max(result, key=lambda x: x["stunde"])]
 
     return result
