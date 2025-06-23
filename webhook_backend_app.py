@@ -6,7 +6,7 @@ import pandas as pd
 import smtplib
 from email.mime.text import MIMEText
 import pytz
-from collections import defaultdict  # NEU für Stunden-Daten
+from collections import defaultdict
 
 load_dotenv()
 
@@ -19,7 +19,6 @@ EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
 MEZ = pytz.timezone("Europe/Vienna")
 app = Flask(__name__)
 
-# NEU: Funktion für stündliche Verteilung
 def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
     df["stunde"] = df["timestamp"].dt.strftime("%H")
@@ -38,6 +37,32 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
         if stunde in struktur:
             eintrag.update(struktur[stunde])
         result.append(eintrag)
+
+    return result
+
+def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
+    df["stunde"] = df["timestamp"].dt.strftime("%H")
+    df_trend = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
+    gruppiert = df_trend.groupby("stunde")["trend"].value_counts().unstack(fill_value=0).reset_index()
+
+    result = []
+    for _, row in gruppiert.iterrows():
+        bullish = row.get("bullish", 0)
+        bearish = row.get("bearish", 0)
+        neutral = row.get("neutral", 0)
+        trendfarbe = "white"
+        if bullish > bearish and bullish > neutral:
+            trendfarbe = "green"
+        elif bearish > bullish and bearish > neutral:
+            trendfarbe = "red"
+
+        result.append({
+            "stunde": int(row["stunde"]),
+            "bullish": bullish,
+            "bearish": bearish,
+            "neutral": neutral,
+            "farbe": trendfarbe
+        })
 
     return result
 
@@ -120,7 +145,6 @@ def webhook():
     symbol_df = df[(df["symbol"] == symbol) & (df["timestamp"] >= zeitraum)]
     symbol_df = symbol_df[symbol_df["timestamp"] < data["timestamp"]]  # ⛔ aktuelles nicht mitrechnen
 
-
     if config.get("max_alarms", 3) == 1 or len(symbol_df) >= config.get("max_alarms", 3):
         sende_email(f"Alarm: {symbol}", f"{len(symbol_df)} Alarme in {config['interval_hours']}h ({trend})")
 
@@ -154,57 +178,26 @@ def dashboard():
         if spalte not in df.columns:
             df[spalte] = None
 
-if df.empty:
-    jahre = [2025]
-    aktuelles_jahr = int(year) if year and year.isdigit() else 2025
-    monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
-    matrix = {}
-    letzte_ereignisse = []
-    fehlerhafte_eintraege = []
-    tages_daten = []
-    stunden_daten = []
-    stunden_strahl_daten = []
+    if df.empty:
+        jahre = [2025]
+        aktuelles_jahr = int(year) if year and year.isdigit() else 2025
+        monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
+        matrix = {}
+        letzte_ereignisse = []
+        fehlerhafte_eintraege = []
+        tages_daten = []
+        stunden_daten = []
+        stunden_strahl_daten = []
 
-    trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
-    zielbalkenLabels = [e["stunde"] for e in trend_aggregat_roh]
-    zielbalkenDaten = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
-    zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
-    trend_aggregat_view = {
-        "labels": zielbalkenLabels,
-        "werte": zielbalkenDaten,
-        "farben": zielbalkenFarben
-    }
-
-def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
-    df["stunde"] = df["timestamp"].dt.strftime("%H")
-    df_trend = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
-    gruppiert = df_trend.groupby("stunde")["trend"].value_counts().unstack(fill_value=0).reset_index()
-
-    result = []
-    for _, row in gruppiert.iterrows():
-        bullish = row.get("bullish", 0)
-        bearish = row.get("bearish", 0)
-        neutral = row.get("neutral", 0)
-        trendfarbe = "white"
-        if bullish > bearish and bullish > neutral:
-            trendfarbe = "green"
-        elif bearish > bullish and bearish > neutral:
-            trendfarbe = "red"
-
-        result.append({
-            "stunde": int(row["stunde"]),
-            "bullish": bullish,
-            "bearish": bearish,
-            "neutral": neutral,
-            "farbe": trendfarbe
-        })
-
-    # ✅ Nur den aktuellsten Stundeneintrag behalten
-    if result:
-        result = [max(result, key=lambda x: x["stunde"])]
-
-    return result
-
+        trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
+        zielbalkenLabels = [e["stunde"] for e in trend_aggregat_roh]
+        zielbalkenDaten = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
+        zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
+        trend_aggregat_view = {
+            "labels": zielbalkenLabels,
+            "werte": zielbalkenDaten,
+            "farben": zielbalkenFarben
+        }
     else:
         df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
         df["symbol"] = df["symbol"].astype(str)
@@ -231,7 +224,17 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
         tages_daten = df.groupby(["tag", "symbol"]).size().unstack(fill_value=0).sort_index().reset_index()
 
         stunden_daten = erzeuge_stunden_daten(df)
-        stunden_strahl_daten = stunden_daten  # fallback, kann durch andere Logik ersetzt werden
+        stunden_strahl_daten = stunden_daten
+
+        trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
+        zielbalkenLabels = [e["stunde"] for e in trend_aggregat_roh]
+        zielbalkenDaten = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
+        zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
+        trend_aggregat_view = {
+            "labels": zielbalkenLabels,
+            "werte": zielbalkenDaten,
+            "farben": zielbalkenFarben
+        }
 
     einstellungen = {}
     if os.path.exists(SETTINGS_DATEI):
@@ -257,7 +260,6 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
         stunden_strahl_daten=stunden_strahl_daten,
         trend_aggregat_daten=trend_aggregat_view
     )
-
 
 @app.route("/update-settings", methods=["POST"])
 def update_settings():
@@ -320,3 +322,4 @@ def delete_multiple_settings():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+
