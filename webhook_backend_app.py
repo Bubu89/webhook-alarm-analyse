@@ -270,6 +270,7 @@ def dashboard():
                 einstellungen = {}
 
     return render_template("dashboard.html",
+        stunden_daten=stunden_daten,
         matrix=matrix,
         monate=monate,
         monate_js=json.dumps(monate),
