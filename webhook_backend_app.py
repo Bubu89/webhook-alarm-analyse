@@ -79,10 +79,6 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
 
     return result
 
-        result = [max(result, key=lambda x: x["stunde"])]
-
-    return result
-
 
 def sende_email(betreff, inhalt):
     try:
