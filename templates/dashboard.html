@@ -198,9 +198,10 @@
                 {% for symbol, werte in matrix.items() %}
                     <div onclick="this.textContent = this.dataset.full || this.textContent" data-full="{{ symbol }}"><strong>{{ symbol[:6] }}</strong></div>
                     {% for wert in werte %}
-                        <div>
-                            <span style="color: #ff4444;">{{ wert[0] }}</span> /
-                            <span style="color: #00cc66;">{{ wert[1] }}</span>
+                        <div style="
+                            color: {% if wert > 0 %}#00cc66{% elif wert < 0 %}#ff4444{% else %}#aaa{% endif %};
+                            font-weight: bold;">
+                            {{ wert }}
                         </div>
                     {% endfor %}
                 {% endfor %}
@@ -208,13 +209,14 @@
                 {% for symbol in ['BTC', 'ETH', 'XRP'] %}
                     <div onclick="this.textContent = this.dataset.full || this.textContent" data-full="{{ symbol }}"><strong>{{ symbol[:6] }}</strong></div>
                     {% for _ in range(12) %}
-                        <div><span style="color: #ff4444;">0</span> / <span style="color: #00cc66;">0</span></div>
+                        <div style="color: #aaa; font-weight: bold;">0</div>
                     {% endfor %}
                 {% endfor %}
             {% endif %}
         </div>
     </div>
 </div>
+
 
 
    <script>
