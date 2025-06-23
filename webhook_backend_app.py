@@ -322,6 +322,31 @@ def dashboard():
        
 
         stunden_daten = erzeuge_stunden_daten(df)
+
+gruppen_trends = []
+farben_mapping = {
+    "Dominance_bullish": "lightgreen",
+    "Dominance_bearish": "lightcoral",
+    "Others_bullish": "#7CFC00",     # grünlicher Farbton
+    "Others_bearish": "#FF4500",     # orangerot
+    "Total_bullish": "#00CED1",      # türkis
+    "Total_bearish": "#DC143C"       # karmesinrot
+}
+
+for eintrag in stunden_daten:
+    stunde = eintrag["stunde"]
+    for key, wert in eintrag.items():
+        if key == "stunde":
+            continue
+        gruppe, richtung = key.split("_")
+        gruppen_trends.append({
+            "stunde": stunde,
+            "gruppe": gruppe,
+            "richtung": richtung,
+            "wert": wert,
+            "farbe": farben_mapping.get(key, "#888")
+        })
+
         stunden_strahl_daten = stunden_daten
 
         trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
