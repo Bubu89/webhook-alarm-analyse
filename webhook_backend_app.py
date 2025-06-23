@@ -154,22 +154,26 @@ def dashboard():
         if spalte not in df.columns:
             df[spalte] = None
 
-    if df.empty:
-        jahre = [2025]
-        aktuelles_jahr = int(year) if year and year.isdigit() else 2025
-        monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
-        matrix = {}
-        letzte_ereignisse = []
-        fehlerhafte_eintraege = []
-        tages_daten = []
-        stunden_daten = []
-        stunden_strahl_daten = []
-        trend_aggregat_daten = erzeuge_trend_aggregat_daten(df)
-        zielbalkenLabels = [e["stunde"] for e in trend_aggregat_daten]
-zielbalkenDaten = [
-    e["bullish"] - e["bearish"] for e in trend_aggregat_daten
-]
-zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_daten]
+if df.empty:
+    jahre = [2025]
+    aktuelles_jahr = int(year) if year and year.isdigit() else 2025
+    monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
+    matrix = {}
+    letzte_ereignisse = []
+    fehlerhafte_eintraege = []
+    tages_daten = []
+    stunden_daten = []
+    stunden_strahl_daten = []
+
+    trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
+    zielbalkenLabels = [e["stunde"] for e in trend_aggregat_roh]
+    zielbalkenDaten = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
+    zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
+    trend_aggregat_view = {
+        "labels": zielbalkenLabels,
+        "werte": zielbalkenDaten,
+        "farben": zielbalkenFarben
+    }
 
 def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
     df["stunde"] = df["timestamp"].dt.strftime("%H")
@@ -250,14 +254,10 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
         fehlerhafte_eintraege=fehlerhafte_eintraege,
         tages_daten=tages_daten.to_dict(orient="records") if isinstance(tages_daten, pd.DataFrame) else tages_daten,
         stunden_daten=stunden_daten,
-        stunden_strahl_daten=stunden_strahl_daten
-        trend_aggregat_daten=trend_aggregat_daten
-        trend_aggregat_daten={
-        "labels": zielbalkenLabels,
-        "werte": zielbalkenDaten,
-        "farben": zielbalkenFarben
-    },
+        stunden_strahl_daten=stunden_strahl_daten,
+        trend_aggregat_daten=trend_aggregat_view
     )
+
 
 @app.route("/update-settings", methods=["POST"])
 def update_settings():
