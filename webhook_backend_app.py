@@ -300,12 +300,6 @@ def dashboard():
 
         sortierte_paare = ["BTC", "ETH"] + sorted([s for s in df["symbol"].unique() if s not in ["BTC", "ETH"]])
         df["symbol"] = pd.Categorical(df["symbol"], categories=sortierte_paare, ordered=True)
-       
-
-@app.route("/dashboard")
-def dashboard():
-    ...
-    df["symbol"] = pd.Categorical(df["symbol"], categories=sortierte_paare, ordered=True)
     
     stunden_daten = erzeuge_stunden_daten(df)
 
@@ -366,7 +360,6 @@ def dashboard():
         aktuelles_jahr=aktuelles_jahr,
         verfuegbare_jahre=jahre
     )
-
 
 
 @app.route("/update-settings", methods=["POST"])
