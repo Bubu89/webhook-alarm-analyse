@@ -257,26 +257,26 @@ def dashboard():
         if spalte not in df.columns:
             df[spalte] = None
 
-    if df.empty:
-        jahre = [2025]
-        aktuelles_jahr = int(year) if year and year.isdigit() else 2025
-        monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
-        matrix = {}
-        letzte_ereignisse = []
-        fehlerhafte_eintraege = []
-        tages_daten = []
-        stunden_daten = []
-        stunden_strahl_daten = []
+  if df.empty:
+    jahre = [2025]
+    aktuelles_jahr = int(year) if year and year.isdigit() else 2025
+    monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
+    matrix = {}
+    letzte_ereignisse = []
+    fehlerhafte_eintraege = []
+    tages_daten = []
+    stunden_daten = []
+    stunden_strahl_daten = []
 
-        trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
-        zielbalkenLabels = [f"{e['stunde']}h ({e['symbol'][:6]}…)" if len(e['symbol']) > 6 else f"{e['stunde']}h ({e['symbol']})" for e in trend_aggregat_roh]
-        zielbalkenDaten = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
-        zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
-        trend_aggregat_view = {
-            "labels": zielbalkenLabels,
-            "werte": zielbalkenDaten,
-            "farben": zielbalkenFarben
-        }
+    trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
+    zielbalkenLabels = [f"{e['stunde']}h ({e['symbol'][:6]}…)" if len(e['symbol']) > 6 else f"{e['stunde']}h ({e['symbol']})" for e in trend_aggregat_roh]
+    zielbalkenDaten = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
+    zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
+    trend_aggregat_view = {
+        "labels": zielbalkenLabels,
+        "werte": zielbalkenDaten,
+        "farben": zielbalkenFarben
+    }
 else:
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
     df["symbol"] = df["symbol"].astype(str)
@@ -301,6 +301,7 @@ else:
             wert = bullish - bearish
             monatliche_werte.append(wert)
         matrix[symbol] = monatliche_werte
+
 
 
         letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
