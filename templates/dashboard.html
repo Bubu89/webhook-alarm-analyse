@@ -281,11 +281,12 @@ x: {
         minRotation: 30,
         font: { size: 13 },
         color: '#ccc',
-        callback: function(label) {
-            return label.length > 6 ? label.slice(0, 6) + "…" : label;
+        callback: function(value, index, ticks) {
+            return this.getLabelForValue(index);
         }
     }
 }
+
 
         }
     }
