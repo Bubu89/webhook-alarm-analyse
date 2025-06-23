@@ -368,21 +368,20 @@ for eintrag in stunden_daten:
                 print("Fehler beim Laden der Einstellungen:", e)
                 einstellungen = {}
 
+  @app.route("/dashboard")
+
+def dashboard():
     return render_template("dashboard.html",
+        einstellungen=einstellungen,
+        letzte_ereignisse=ereignisse[-20:],
+        stunden_daten=stunden_daten,
+        trend_aggregat_daten=trend_aggregat_daten,
         matrix=matrix,
         monate=monate,
-        monate_js=json.dumps(monate),
-        verfuegbare_jahre=jahre,
-        aktuelles_jahr=aktuelles_jahr,
-        letzte_ereignisse=letzte_ereignisse,
-        einstellungen=einstellungen,
-        einstellungs_info="",
-        fehlerhafte_eintraege=fehlerhafte_eintraege,
-        tages_daten=[],
-        stunden_daten=stunden_daten,
-        stunden_strahl_daten=stunden_strahl_daten,
-        trend_aggregat_daten=trend_aggregat_view
+        aktuelles_jahr=jahr,
+        verfuegbare_jahre=alle_jahre
     )
+
 
 @app.route("/update-settings", methods=["POST"])
 def update_settings():
