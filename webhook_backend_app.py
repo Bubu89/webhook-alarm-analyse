@@ -7,6 +7,7 @@ import smtplib
 from email.mime.text import MIMEText
 import pytz
 from collections import defaultdict
+from uploader import git_upload
 
 load_dotenv()
 
@@ -171,7 +172,10 @@ def webhook():
     if config.get("max_alarms", 3) == 1 or len(symbol_df) >= config.get("max_alarms", 3):
         sende_email(f"Alarm: {symbol}", f"{len(symbol_df)} Alarme in {config['interval_hours']}h ({trend})")
 
+    git_upload(LOG_DATEI, ".")
     return jsonify({"status": "ok"})
+
+
 
 
 @app.route("/dashboard")
