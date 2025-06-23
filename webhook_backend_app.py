@@ -277,22 +277,30 @@ def dashboard():
             "werte": zielbalkenDaten,
             "farben": zielbalkenFarben
         }
-    else:
-        df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
-        df["symbol"] = df["symbol"].astype(str)
-        df["jahr"] = df["timestamp"].dt.year
-        df["monat"] = df["timestamp"].dt.strftime("%b")
-        df["tag"] = df["timestamp"].dt.date
-        df["uhrzeit"] = df["timestamp"].dt.strftime("%H:%M")
+else:
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
+    df["symbol"] = df["symbol"].astype(str)
+    df["jahr"] = df["timestamp"].dt.year
+    df["monat"] = df["timestamp"].dt.strftime("%b")
+    df["tag"] = df["timestamp"].dt.date
+    df["uhrzeit"] = df["timestamp"].dt.strftime("%H:%M")
 
-        jahre = sorted(df["jahr"].dropna().unique())
-        aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
-        df_jahr = df[df["jahr"] == aktuelles_jahr]
+    jahre = sorted(df["jahr"].dropna().unique())
+    aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
+    df_jahr = df[df["jahr"] == aktuelles_jahr]
 
-        monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
-        matrix = {
-            symbol: [df_jahr[(df_jahr["symbol"] == symbol) & (df_jahr["monat"] == monat)].shape[0] for monat in monate]
-            for symbol in df_jahr["symbol"].dropna().unique()
+    monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
+    matrix = {}
+
+    for symbol in df_jahr["symbol"].dropna().unique():
+        monatliche_werte = []
+        for monat in monate:
+            df_monat = df_jahr[(df_jahr["symbol"] == symbol) & (df_jahr["monat"] == monat)]
+            bullish = df_monat[df_monat["trend"] == "bullish"].shape[0]
+            bearish = df_monat[df_monat["trend"] == "bearish"].shape[0]
+            wert = bullish - bearish
+            monatliche_werte.append(wert)
+        matrix[symbol] = monatliche_werte
         }
 
         letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
