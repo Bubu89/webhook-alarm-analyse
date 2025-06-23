@@ -51,28 +51,39 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
     gruppiert = df.groupby(["stunde", "symbol", "trend"], observed=False).size().reset_index(name="anzahl")
 
-    result = []
-    for _, row in pivot.iterrows():
-        stunde = row["stunde"]
-        symbol = row["symbol"]
-        bullish = row.get("bullish", 0)
-        bearish = row.get("bearish", 0)
-        neutral = row.get("neutral", 0)
+    # Hilfsstruktur zur Aggregation
+    aggregation = {}
 
-        score = bullish - bearish
+    for _, row in gruppiert.iterrows():
+        stunde = int(row["stunde"])
+        symbol = row["symbol"]
+        trend = row["trend"]
+        anzahl = row["anzahl"]
+
+        key = (stunde, symbol)
+        if key not in aggregation:
+            aggregation[key] = {"bullish": 0, "bearish": 0, "neutral": 0}
+
+        aggregation[key][trend] += anzahl
+
+    # Ergebnisstruktur
+    result = []
+    for (stunde, symbol), werte in aggregation.items():
+        score = werte["bullish"] - werte["bearish"]
         farbe = "green" if score > 0 else "red" if score < 0 else "#888"
 
         result.append({
-            "stunde": int(stunde),
+            "stunde": stunde,
             "symbol": symbol,
-            "bullish": bullish,
-            "bearish": bearish,
-            "neutral": neutral,
+            "bullish": werte["bullish"],
+            "bearish": werte["bearish"],
+            "neutral": werte["neutral"],
             "score": score,
             "farbe": farbe
         })
 
     return result
+
 
 
 def sende_email(betreff, inhalt):
