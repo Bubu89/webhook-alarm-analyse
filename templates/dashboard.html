@@ -299,15 +299,17 @@ x: {
         const stundenDatasets = [];
         const farben = {
 const farben = {
-    "Dominance_bullish": "#00ff88",    // unverändert (hellgrün)
-    "Dominance_bearish": "#ff3333",    // kräftiges, dunkleres Rot
+    // GRÜNTÖNE – gut unterscheidbar:
+    "Dominance_bullish": "#00cc44",   // sattes Grün (Basis)
+    "Others_bullish":    "#66ff99",   // mintgrün (hell & weich)
+    "Total_bullish":     "#006633",   // sehr dunkles Tannengrün
 
-    "Others_bullish": "#66ffcc",       // unverändert (hellgrün-türkis)
-    "Others_bearish": "#ff6666",       // weich, aber klar von oben abgesetzt
-
-    "Total_bullish": "#33cc99",        // etwas dunkler
-    "Total_bearish": "#cc0000"         // sehr dunkles, fast blutrotes Rot
+    // ROTTÖNE – klar getrennt:
+    "Dominance_bearish": "#ff3333",   // leuchtendes Signalrot
+    "Others_bearish":    "#ff9999",   // rosiges Altrosa
+    "Total_bearish":     "#990000"    // blutrot, tiefdunkel
 };
+
 
 
         const stundenKeys = Object.keys(stundenDaten[0] || {}).filter(k => k !== "stunde");
