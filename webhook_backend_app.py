@@ -51,8 +51,6 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
     gruppiert = df.groupby(["stunde", "symbol", "trend"], observed=False).size().reset_index(name="anzahl")
 
-    pivot = gruppiert.pivot_table(index=["stunde", "symbol"], columns="trend", values="anzahl", fill_value=0).reset_index()
-
     result = []
     for _, row in pivot.iterrows():
         stunde = row["stunde"]
