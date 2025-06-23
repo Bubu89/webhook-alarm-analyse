@@ -57,11 +57,17 @@
         ul {
             font-size: 14px;
         }
-        .hidden {
+        #verteilungContainer, #chartContainer {
+            display: none;
+        }
+        #alarmListe li.hidden {
             display: none;
         }
         form.inline {
             display: inline;
+        }
+        .checkbox-label {
+            margin-right: 10px;
         }
         .checkbox {
             transform: scale(1.3);
@@ -154,31 +160,17 @@
     </div>
 
     <div class="section">
-        <h2>
-            📊 Tagesverlauf
-            <button onclick="toggleVisibility('chartContainer')" style="float: right;">Anzeigen / Verstecken</button>
-        </h2>
+        <button onclick="document.getElementById('chartContainer').classList.toggle('hidden')">📊 Tagesverlauf anzeigen/verstecken</button>
         <div id="chartContainer" class="hidden">
+            <h2>🔢 Tagesbasierte Alarmverteilung (Top-Symbole zuerst)</h2>
             <canvas id="dailyChart"></canvas>
         </div>
     </div>
 
     <div class="section">
-        <h2>
-            🕒 Stundenverlauf (Trendrichtung & Symbol)
-            <button onclick="toggleVisibility('hourlyChartContainer')" style="float: right;">Anzeigen / Verstecken</button>
-        </h2>
-        <div id="hourlyChartContainer" class="hidden">
-            <canvas id="hourlyChart"></canvas>
-        </div>
-    </div>
-
-    <div class="section">
-        <h2>
-            📅 Monatliche Verteilung
-            <button onclick="toggleVisibility('verteilungContainer')" style="float: right;">Anzeigen / Verstecken</button>
-        </h2>
+        <button onclick="document.getElementById('verteilungContainer').classList.toggle('hidden')">📅 Monatliche Verteilung anzeigen/verstecken</button>
         <div id="verteilungContainer" class="hidden">
+            <h2>4. Monatliche Alarmverteilung</h2>
             <form method="get" action="/dashboard">
                 <label>Jahr wählen:</label>
                 <select name="year" onchange="this.form.submit()">
@@ -230,10 +222,6 @@
             document.querySelector("select[name='trend_richtung']").value = trend;
         }
 
-        function toggleVisibility(id) {
-            document.getElementById(id).classList.toggle('hidden');
-        }
-
         const tagesDaten = {{ tages_daten | tojson }};
         const labels = tagesDaten.map(row => row.tag);
         const datasets = [];
@@ -262,56 +250,6 @@
                 scales: {
                     x: { stacked: true },
                     y: { stacked: true, beginAtZero: true }
-                }
-            }
-        });
-
-        const stundenDaten = {{ stunden_daten | tojson }};
-        const stundenLabels = stundenDaten.map(row => row.stunde);
-        const stundenDatasets = [];
-        const farben = { bullish: "#00ff88", bearish: "#ff4466" };
-        const stundenKeys = Object.keys(stundenDaten[0] || {}).filter(k => k !== "stunde");
-        const symboleSet = new Set();
-        stundenKeys.forEach(k => {
-            const parts = k.split("_");
-            if (parts.length === 2) symboleSet.add(parts[0]);
-        });
-        const symbole = Array.from(symboleSet);
-        symbole.forEach(symbol => {
-            ["bullish", "bearish"].forEach(richtung => {
-                const key = symbol + "_" + richtung;
-                stundenDatasets.push({
-                    label: symbol + " " + richtung,
-                    data: stundenDaten.map(row => row[key] || 0),
-                    backgroundColor: farben[richtung],
-                    stack: symbol
-                });
-            });
-        });
-
-        new Chart(document.getElementById("hourlyChart").getContext("2d"), {
-            type: "bar",
-            data: {
-                labels: stundenLabels,
-                datasets: stundenDatasets
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'top' },
-                    title: { display: true, text: 'Stündliche Alarmverteilung je Symbol & Trendrichtung' }
-                },
-                scales: {
-                    x: {
-                        stacked: true,
-                        title: { display: true, text: 'Stunde (UTC)' }
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true,
-                        title: { display: true, text: 'Anzahl Alarme' }
-                    }
                 }
             }
         });
