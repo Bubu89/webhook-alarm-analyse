@@ -161,6 +161,8 @@ def dashboard():
         tages_daten = []
         stunden_daten = []
         stunden_strahl_daten = []
+        trend_aggregat_daten = erzeuge_trend_aggregat_daten(df)
+
     else:
         df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
         df["symbol"] = df["symbol"].astype(str)
