@@ -274,9 +274,19 @@ new Chart(document.getElementById("trendzielChart").getContext("2d"), {
                 beginAtZero: true,
                 title: { display: true, text: 'Trendwert (bullish - bearish)' }
             },
-            x: {
-                title: { display: true, text: 'Stunde (UTC)' }
-            }
+x: {
+    title: { display: true, text: 'Stunde (UTC)' },
+    ticks: {
+        maxRotation: 45,
+        minRotation: 30,
+        font: { size: 13 },
+        color: '#ccc',
+        callback: function(label) {
+            return label.length > 6 ? label.slice(0, 6) + "…" : label;
+        }
+    }
+}
+
         }
     }
 });
