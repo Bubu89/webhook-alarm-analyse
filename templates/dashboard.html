@@ -243,18 +243,6 @@ const zielbalkenFarben = {{ trend_aggregat_daten.farben | tojson }};
             document.getElementById(id).classList.toggle('hidden');
         }
 
-        // Tagesverlauf (bestehender Chart)
-        const tagesDaten = {{ tages_daten | tojson }};
-        const labels = tagesDaten.map(row => row.tag);
-        const datasets = [];
-        const keys = Object.keys(tagesDaten[0] || {}).filter(k => k !== "tag");
-        keys.forEach(key => {
-            datasets.push({
-                label: key,
-                data: tagesDaten.map(row => row[key] || 0),
-                backgroundColor: key === "BTC" ? "#f2a900" : key === "ETH" ? "#3c3c3d" : "#666",
-            });
-        });
 
 new Chart(document.getElementById("trendzielChart").getContext("2d"), {
     type: 'bar',
