@@ -165,6 +165,12 @@ def dashboard():
         stunden_daten = []
         stunden_strahl_daten = []
         trend_aggregat_daten = erzeuge_trend_aggregat_daten(df)
+        zielbalkenLabels = [e["stunde"] for e in trend_aggregat_daten]
+zielbalkenDaten = [
+    e["bullish"] - e["bearish"] for e in trend_aggregat_daten
+]
+zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_daten]
+
 def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
     df["stunde"] = df["timestamp"].dt.strftime("%H")
     df_trend = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
@@ -242,6 +248,11 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
         stunden_daten=stunden_daten,
         stunden_strahl_daten=stunden_strahl_daten
         trend_aggregat_daten=trend_aggregat_daten
+        trend_aggregat_daten={
+        "labels": zielbalkenLabels,
+        "werte": zielbalkenDaten,
+        "farben": zielbalkenFarben
+    },
     )
 
 @app.route("/update-settings", methods=["POST"])
