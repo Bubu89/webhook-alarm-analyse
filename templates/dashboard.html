@@ -298,13 +298,17 @@ x: {
         const stundenLabels = stundenDaten.map(row => row.stunde);
         const stundenDatasets = [];
         const farben = {
-    "Dominance_bullish": "#00ff88",
-    "Dominance_bearish": "#ff4466",
-    "Others_bullish": "#66ffcc",
-    "Others_bearish": "#ff99aa",
-    "Total_bullish": "#33cc99",
-    "Total_bearish": "#ff6666"
+const farben = {
+    "Dominance_bullish": "#00ff88",    // unverändert (hellgrün)
+    "Dominance_bearish": "#ff3333",    // kräftiges, dunkleres Rot
+
+    "Others_bullish": "#66ffcc",       // unverändert (hellgrün-türkis)
+    "Others_bearish": "#ff6666",       // weich, aber klar von oben abgesetzt
+
+    "Total_bullish": "#33cc99",        // etwas dunkler
+    "Total_bearish": "#cc0000"         // sehr dunkles, fast blutrotes Rot
 };
+
 
         const stundenKeys = Object.keys(stundenDaten[0] || {}).filter(k => k !== "stunde");
         const symbole = ["Dominance", "Others", "Total"];
