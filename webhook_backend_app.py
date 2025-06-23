@@ -283,7 +283,7 @@ def dashboard():
         einstellungen=einstellungen,
         einstellungs_info="",
         fehlerhafte_eintraege=fehlerhafte_eintraege,
-        tages_daten=tages_daten.to_dict(orient="records") if isinstance(tages_daten, pd.DataFrame) else tages_daten,
+        tages_daten=[],
         stunden_daten=stunden_daten,
         stunden_strahl_daten=stunden_strahl_daten,
         trend_aggregat_daten=trend_aggregat_view
