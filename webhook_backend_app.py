@@ -49,10 +49,19 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
     df["stunde"] = df["timestamp"].dt.strftime("%H")
 
     df_trend = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
-    gruppiert = df_trend.groupby(["stunde", "symbol", "trend"]).size().unstack(fill_value=0).reset_index()
+    
+    # Gruppiere nach Stunde, Symbol und Trend – für Balkendiagramm geeignet
+    gruppiert = df_trend.groupby(["stunde", "symbol", "trend"], observed=True).size().reset_index(name="anzahl")
+    gruppiert["symbol_trend"] = gruppiert["symbol"] + " - " + gruppiert["trend"]
+
+    # Erstelle Pivot-Tabelle für Chart (nicht zwingend notwendig, falls nicht extern genutzt)
+    df_balken = gruppiert.pivot_table(index="stunde", columns="symbol_trend", values="anzahl", fill_value=0)
+
+    # Umstrukturieren für Aggregat-Auswertung
+    aggregiert = df_trend.groupby(["stunde", "symbol", "trend"], observed=True).size().unstack(fill_value=0).reset_index()
 
     result = []
-    for _, row in gruppiert.iterrows():
+    for _, row in aggregiert.iterrows():
         stunde = row["stunde"]
         symbol = row["symbol"]
         bullish = row.get("bullish", 0)
@@ -60,12 +69,7 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
         neutral = row.get("neutral", 0)
 
         score = bullish - bearish
-        if score > 0:
-            farbe = "green"
-        elif score < 0:
-            farbe = "red"
-        else:
-            farbe = "#888"
+        farbe = "green" if score > 0 else "red" if score < 0 else "#888"
 
         result.append({
             "stunde": int(stunde),
@@ -78,6 +82,7 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
         })
 
     return result
+
 
 
 def sende_email(betreff, inhalt):
