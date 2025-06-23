@@ -23,12 +23,25 @@ app = Flask(__name__)
 def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
     df["stunde"] = df["timestamp"].dt.strftime("%H")
-    gruppiert = df.groupby(["stunde", "symbol", "trend"]).size().reset_index(name="anzahl")
+
+    def gruppenzuordnung(symbol):
+        if symbol in ["BTC.D", "ETH.D", "USDT.D", "USDC.D"]:
+            return "Dominance"
+        elif symbol == "OTHERS/BTCUSD":
+            return "Others"
+        elif symbol.startswith("TOTAL/"):
+            return "Total"
+        return None
+
+    df["gruppe"] = df["symbol"].apply(gruppenzuordnung)
+    df = df[df["gruppe"].notna()]
+
+    gruppiert = df.groupby(["stunde", "gruppe", "trend"]).size().reset_index(name="anzahl")
 
     struktur = defaultdict(dict)
     for _, row in gruppiert.iterrows():
         stunde = row["stunde"]
-        key = f"{row['symbol']}_{row['trend']}"
+        key = f"{row['gruppe']}_{row['trend']}"
         struktur[stunde][key] = row["anzahl"]
 
     result = []
@@ -42,6 +55,7 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
     return result
 
 import pytz
+
 
 def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
     if "timestamp" not in df.columns or "symbol" not in df.columns:
@@ -78,6 +92,37 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
             aggregation[key] = {"bullish": 0, "bearish": 0, "neutral": 0}
 
         aggregation[key][trend] += anzahl
+
+def erzeuge_trend_score_daten(df: pd.DataFrame) -> list[dict]:
+    gruppe_1 = ["BTC.D", "ETH.D", "USDT.D", "USDC.D"]
+    gruppe_2 = [s for s in df["symbol"].unique() if str(s).startswith("TOTAL/")]
+
+    df = df[df["trend"].isin(["bullish", "bearish"])].copy()
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
+    df["stunde"] = df["timestamp"].dt.hour
+
+    df["gruppe"] = df["symbol"].apply(lambda x: "Gruppe 1" if x in gruppe_1 else "Gruppe 2" if x in gruppe_2 else None)
+    df = df[df["gruppe"].notna()]
+
+    grouped = df.groupby(["stunde", "gruppe", "trend"]).size().unstack(fill_value=0)
+    result = []
+
+    for (stunde, gruppe), werte in grouped.groupby(level=[0,1]):
+        bullish = werte.get("bullish", 0).values[0] if "bullish" in werte else 0
+        bearish = werte.get("bearish", 0).values[0] if "bearish" in werte else 0
+        score = bullish - bearish
+        farbe = "green" if score > 0 else "red" if score < 0 else "#999"
+
+        result.append({
+            "stunde": stunde,
+            "gruppe": gruppe,
+            "bullish": bullish,
+            "bearish": bearish,
+            "score": score,
+            "farbe": farbe
+        })
+
+    return result
 
     # Ergebnisstruktur
     result = []
