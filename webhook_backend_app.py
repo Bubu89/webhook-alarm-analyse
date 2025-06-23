@@ -49,7 +49,7 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
     df["stunde"] = df["timestamp"].dt.strftime("%H")
 
     df_trend = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
-    gruppiert = df_trend.groupby(["stunde", "symbol", "trend"]).size().unstack(fill_value=0).reset_index()
+    gruppiert["symbol_trend"] = gruppiert["symbol"].astype(str) + " - " + gruppiert["trend"].astype(str)
 
     result = []
     for _, row in gruppiert.iterrows():
