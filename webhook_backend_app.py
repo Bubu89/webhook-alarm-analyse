@@ -88,6 +88,10 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
 
         aggregation[key][trend] += anzahl
 
+    result = []
+    for (stunde, symbol), werte in aggregation.items():
+        score = werte["bullish"] - werte["bearish"]
+        farbe = "green" if score > 0 else "red" if score < 0 else "#888"
 
         result.append({
             "stunde": stunde,
@@ -100,6 +104,7 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
         })
 
     return result
+
 
 
 def erzeuge_trend_score_daten(df: pd.DataFrame) -> list[dict]:
@@ -127,24 +132,6 @@ def erzeuge_trend_score_daten(df: pd.DataFrame) -> list[dict]:
             "gruppe": gruppe,
             "bullish": bullish,
             "bearish": bearish,
-            "score": score,
-            "farbe": farbe
-        })
-
-    return result
-
-    # Ergebnisstruktur
-    result = []
-    for (stunde, symbol), werte in aggregation.items():
-        score = werte["bullish"] - werte["bearish"]
-        farbe = "green" if score > 0 else "red" if score < 0 else "#888"
-
-        result.append({
-            "stunde": stunde,
-            "symbol": symbol,
-            "bullish": werte["bullish"],
-            "bearish": werte["bearish"],
-            "neutral": werte["neutral"],
             "score": score,
             "farbe": farbe
         })
@@ -351,26 +338,27 @@ trend_aggregat_view = {
     "farben": zielbalkenFarben
 }
 
-    einstellungen = {}
-    if os.path.exists(SETTINGS_DATEI):
-        with open(SETTINGS_DATEI, "r") as f:
-            try:
-                einstellungen = json.load(f)
-            except Exception as e:
-                print("Fehler beim Laden der Einstellungen:", e)
-                einstellungen = {}
+        einstellungen = {}
+        if os.path.exists(SETTINGS_DATEI):
+            with open(SETTINGS_DATEI, "r") as f:
+                try:
+                    einstellungen = json.load(f)
+                except Exception as e:
+                    print("Fehler beim Laden der Einstellungen:", e)
+                    einstellungen = {}
 
-    return render_template("dashboard.html",
-        einstellungen=einstellungen,
-        letzte_ereignisse=letzte_ereignisse,
-        stunden_daten=stunden_daten,
-        gruppen_trends=gruppen_trends,
-        trend_aggregat_daten=trend_aggregat_view,
-        matrix=matrix,
-        monate=monate,
-        aktuelles_jahr=aktuelles_jahr,
-        verfuegbare_jahre=jahre
-    )
+        return render_template("dashboard.html",
+            einstellungen=einstellungen,
+            letzte_ereignisse=letzte_ereignisse,
+            stunden_daten=stunden_daten,
+            gruppen_trends=gruppen_trends,
+            trend_aggregat_daten=trend_aggregat_view,
+            matrix=matrix,
+            monate=monate,
+            aktuelles_jahr=aktuelles_jahr,
+            verfuegbare_jahre=jahre
+        )
+
 
     )
 
@@ -420,15 +408,14 @@ def delete_multiple_settings():
     if not keys_to_delete:
         return redirect(url_for("dashboard"))
 
-einstellungen = {}
-if os.path.exists(SETTINGS_DATEI):
-    with open(SETTINGS_DATEI, "r") as f:
-        try:
-            einstellungen = json.load(f)
-        except Exception as e:
-            print("Fehler beim Laden der Einstellungen:", e)
-            einstellungen = {}
-
+    einstellungen = {}
+    if os.path.exists(SETTINGS_DATEI):
+        with open(SETTINGS_DATEI, "r") as f:
+            try:
+                einstellungen = json.load(f)
+            except Exception as e:
+                print("Fehler beim Laden der Einstellungen:", e)
+                einstellungen = {}
 
     for key in keys_to_delete:
         if key in einstellungen:
@@ -437,7 +424,10 @@ if os.path.exists(SETTINGS_DATEI):
     with open(SETTINGS_DATEI, "w") as f:
         json.dump(einstellungen, f, indent=2)
 
+    git_upload(SETTINGS_DATEI, ".")
+
     return redirect(url_for("dashboard"))
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
