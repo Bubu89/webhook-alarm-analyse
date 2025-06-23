@@ -195,14 +195,14 @@
                 {% endfor %}
                 {% if matrix %}
                     {% for symbol, werte in matrix.items() %}
-                        <div><strong>{{ symbol }}</strong></div>
+                        <div onclick="this.textContent = this.dataset.full || this.textContent" data-full="{{ symbol }}"><strong>{{ symbol[:6] }}</strong></div>
                         {% for wert in werte %}
                             <div>{{ wert }}</div>
                         {% endfor %}
                     {% endfor %}
                 {% else %}
                     {% for symbol in ['BTC', 'ETH', 'XRP'] %}
-                        <div><strong>{{ symbol }}</strong></div>
+                        <div onclick="this.textContent = this.dataset.full || this.textContent" data-full="{{ symbol }}"><strong>{{ symbol[:6] }}</strong></div>
                         {% for _ in range(12) %}
                             <div>-</div>
                         {% endfor %}
@@ -335,28 +335,8 @@ new Chart(document.getElementById("hourlyChart").getContext("2d"), {
         }
     }
 });
-</script>
 
 
-new Chart(document.getElementById("hourlyChart").getContext("2d"), {
-    type: "bar",
-    data: {
-        labels: stundenLabels,
-        datasets: stundenDatasets
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { position: 'top' },
-            title: { display: true, text: '🔄 Stündliche Alarmverteilung nach Symbol & Trend' }
-        },
-        scales: {
-            x: { stacked: true },
-            y: { stacked: true, beginAtZero: true }
-        }
-    }
-});
 </script>
 </body>
 </html>
