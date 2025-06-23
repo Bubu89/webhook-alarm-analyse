@@ -51,26 +51,18 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
     gruppiert = df.groupby(["stunde", "symbol", "trend"], observed=False).size().reset_index(name="anzahl")
 
-
-# Pivotieren: jede Trend-Art in eigene Spalte
     pivot = gruppiert.pivot_table(index=["stunde", "symbol"], columns="trend", values="anzahl", fill_value=0).reset_index()
 
     result = []
-for _, row in pivot.iterrows():
-    stunde = row["stunde"]
-    symbol = row["symbol"]
-    bullish = row.get("bullish", 0)
-    bearish = row.get("bearish", 0)
-    neutral = row.get("neutral", 0)
-
+    for _, row in pivot.iterrows():
+        stunde = row["stunde"]
+        symbol = row["symbol"]
+        bullish = row.get("bullish", 0)
+        bearish = row.get("bearish", 0)
+        neutral = row.get("neutral", 0)
 
         score = bullish - bearish
-        if score > 0:
-            farbe = "green"
-        elif score < 0:
-            farbe = "red"
-        else:
-            farbe = "#888"
+        farbe = "green" if score > 0 else "red" if score < 0 else "#888"
 
         result.append({
             "stunde": int(stunde),
