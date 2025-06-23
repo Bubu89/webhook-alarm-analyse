@@ -301,7 +301,6 @@ else:
             wert = bullish - bearish
             monatliche_werte.append(wert)
         matrix[symbol] = monatliche_werte
-    }
 
 
         letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
