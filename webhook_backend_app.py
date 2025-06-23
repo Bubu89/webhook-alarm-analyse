@@ -420,13 +420,15 @@ def delete_multiple_settings():
     if not keys_to_delete:
         return redirect(url_for("dashboard"))
 
-    einstellungen = {}
-    if os.path.exists(SETTINGS_DATEI):
-        with open(SETTINGS_DATEI, "r") as f:
-            try:
-                einstellungen = json.load(f)
-            except json.JSONDecodeError:
-                einstellungen = {}
+einstellungen = {}
+if os.path.exists(SETTINGS_DATEI):
+    with open(SETTINGS_DATEI, "r") as f:
+        try:
+            einstellungen = json.load(f)
+        except Exception as e:
+            print("Fehler beim Laden der Einstellungen:", e)
+            einstellungen = {}
+
 
     for key in keys_to_delete:
         if key in einstellungen:
