@@ -286,7 +286,15 @@ new Chart(document.getElementById("trendzielChart").getContext("2d"), {
         const stundenDaten = {{ stunden_daten | tojson }};
         const stundenLabels = stundenDaten.map(row => row.stunde);
         const stundenDatasets = [];
-        const farben = { bullish: "#00ff88", bearish: "#ff4466" };
+        const farben = {
+    "Dominance_bullish": "#00ff88",
+    "Dominance_bearish": "#ff4466",
+    "Others_bullish": "#66ffcc",
+    "Others_bearish": "#ff99aa",
+    "Total_bullish": "#33cc99",
+    "Total_bearish": "#ff6666"
+};
+
         const stundenKeys = Object.keys(stundenDaten[0] || {}).filter(k => k !== "stunde");
         const symbole = ["Dominance", "Others", "Total"];
 
@@ -296,7 +304,7 @@ new Chart(document.getElementById("trendzielChart").getContext("2d"), {
                 stundenDatasets.push({
                     label: `${symbol} ${richtung}`,
                     data: stundenDaten.map(row => row[key] || 0),
-                    backgroundColor: farben[richtung],
+                    backgroundColor: farben[key],
                     stack: symbol
                 });
             });
