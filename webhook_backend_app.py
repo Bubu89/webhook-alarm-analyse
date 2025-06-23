@@ -331,7 +331,8 @@ for eintrag in stunden_daten:
 stunden_strahl_daten = stunden_daten
 
 trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
-...
+# ... hier erfolgt die Verarbeitung zu zielbalkenLabels, zielbalkenDaten, zielbalkenFarben
+
 trend_aggregat_view = {
     "labels": zielbalkenLabels,
     "werte": zielbalkenDaten,
@@ -339,27 +340,25 @@ trend_aggregat_view = {
 }
 
 einstellungen = {}
-    if os.path.exists(SETTINGS_DATEI):
-        with open(SETTINGS_DATEI, "r") as f:
-            try:
-                einstellungen = json.load(f)
-            except Exception as e:
-                print("Fehler beim Laden der Einstellungen:", e)
-                einstellungen = {}
+if os.path.exists(SETTINGS_DATEI):
+    with open(SETTINGS_DATEI, "r") as f:
+        try:
+            einstellungen = json.load(f)
+        except Exception as e:
+            print("Fehler beim Laden der Einstellungen:", e)
+            einstellungen = {}
 
-    return render_template("dashboard.html",
-        einstellungen=einstellungen,
-        letzte_ereignisse=letzte_ereignisse,
-        stunden_daten=stunden_daten,
-        gruppen_trends=gruppen_trends,
-        trend_aggregat_daten=trend_aggregat_view,
-        matrix=matrix,
-        monate=monate,
-        aktuelles_jahr=aktuelles_jahr,
-        verfuegbare_jahre=jahre
-    )
-
-
+return render_template("dashboard.html",
+    einstellungen=einstellungen,
+    letzte_ereignisse=letzte_ereignisse,
+    stunden_daten=stunden_daten,
+    gruppen_trends=gruppen_trends,
+    trend_aggregat_daten=trend_aggregat_view,
+    matrix=matrix,
+    monate=monate,
+    aktuelles_jahr=aktuelles_jahr,
+    verfuegbare_jahre=jahre
+)
 
 
 @app.route("/update-settings", methods=["POST"])
@@ -393,7 +392,6 @@ def update_settings():
 
     with open(SETTINGS_DATEI, "w") as f:
         json.dump(einstellungen, f, indent=2)
-
 
     git_upload(SETTINGS_DATEI, ".")
 
@@ -431,4 +429,3 @@ def delete_multiple_settings():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
-
