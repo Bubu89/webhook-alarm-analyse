@@ -269,7 +269,7 @@ def dashboard():
         stunden_strahl_daten = []
 
         trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
-        zielbalkenLabels = [f"{e['stunde']}h ({e['symbol']})" for e in trend_aggregat_roh]
+        zielbalkenLabels = [f"{e['stunde']}h ({e['symbol'][:6]}…)" if len(e['symbol']) > 6 else f"{e['stunde']}h ({e['symbol']})" for e in trend_aggregat_roh]
         zielbalkenDaten = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
         zielbalkenFarben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
         trend_aggregat_view = {
