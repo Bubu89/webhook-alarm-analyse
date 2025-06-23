@@ -172,6 +172,57 @@
             <canvas id="hourlyChart"></canvas>
         </div>
     </div>
+<div class="section">
+    <h2>
+        🎯 Trend-Zielbalken je Stunde
+        <button onclick="toggleVisibility('trendzielChartContainer')" style="float: right;">Anzeigen / Verstecken</button>
+    </h2>
+    <div id="trendzielChartContainer" class="hidden">
+        <canvas id="trendzielChart"></canvas>
+    </div>
+    <script>
+    const zielbalkenLabels = {{ trend_aggregat_daten.labels | tojson }};
+    const zielbalkenDaten = {{ trend_aggregat_daten.werte | tojson }};
+    const zielbalkenFarben = {{ trend_aggregat_daten.farben | tojson }};
+
+    new Chart(document.getElementById("trendzielChart").getContext("2d"), {
+        type: 'bar',
+        data: {
+            labels: zielbalkenLabels,
+            datasets: [{
+                label: 'Trend-Saldo je Stunde',
+                data: zielbalkenDaten,
+                backgroundColor: zielbalkenFarben,
+                borderColor: '#222',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: '🧭 Stundenbasierter Netto-Trendverlauf (rot = bearish, grün = bullish, grau = neutral)'
+                },
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Trendwert (Summe)' }
+                },
+                x: {
+                    title: { display: true, text: 'Stunde (UTC)' }
+                }
+            }
+        }
+    });
+</script>
+
+</div>
 
     <div class="section">
         <h2>
