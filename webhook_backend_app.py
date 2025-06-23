@@ -109,7 +109,7 @@ def webhook():
     now = datetime.now(MEZ)
 
     data = {
-        "timestamp": raw_data.get("timestamp", now.isoformat()),
+        "timestamp": now.isoformat(),
         "symbol": str(raw_data.get("symbol", "UNKNOWN")),
         "event": raw_data.get("event", "unspecified"),
         "price": raw_data.get("price", 0),
