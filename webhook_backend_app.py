@@ -360,9 +360,6 @@ trend_aggregat_view = {
         )
 
 
-    )
-
-
 @app.route("/update-settings", methods=["POST"])
 def update_settings():
     symbol = request.form.get("symbol", "").strip().upper()
