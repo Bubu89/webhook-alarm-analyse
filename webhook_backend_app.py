@@ -13,6 +13,10 @@ load_dotenv()
 
 LOG_DATEI = "webhook_logs.json"
 SETTINGS_DATEI = "settings.json"
+# settings.json sicherstellen, falls sie nicht existiert
+if not os.path.exists(SETTINGS_DATEI):
+    with open(SETTINGS_DATEI, "w") as f:
+        json.dump({}, f, indent=2)
 EMAIL_ABSENDER = os.getenv("EMAIL_ABSENDER")
 EMAIL_PASSWORT = os.getenv("EMAIL_PASSWORT")
 EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
@@ -53,9 +57,6 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
         result.append(eintrag)
 
     return result
-
-import pytz
-
 
 def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
     if "timestamp" not in df.columns or "symbol" not in df.columns:
@@ -153,9 +154,6 @@ def erzeuge_trend_score_daten(df: pd.DataFrame) -> list[dict]:
         })
 
     return result
-
-
-
 
 def sende_email(betreff, inhalt):
     try:
@@ -373,13 +371,13 @@ for eintrag in stunden_daten:
 def dashboard():
     return render_template("dashboard.html",
         einstellungen=einstellungen,
-        letzte_ereignisse=ereignisse[-20:],
+        letzte_ereignisse=letzte_ereignisse,
         stunden_daten=stunden_daten,
-        trend_aggregat_daten=trend_aggregat_daten,
+        trend_aggregat_daten=trend_aggregat_view,
         matrix=matrix,
         monate=monate,
-        aktuelles_jahr=jahr,
-        verfuegbare_jahre=alle_jahre
+        aktuelles_jahr=aktuelles_jahr,
+        verfuegbare_jahre=jahre
     )
 
 
@@ -415,7 +413,11 @@ def update_settings():
     with open(SETTINGS_DATEI, "w") as f:
         json.dump(einstellungen, f, indent=2)
 
+
+    git_upload(SETTINGS_DATEI, ".")
+
     return redirect(url_for("dashboard"))
+
 
 @app.route("/delete-multiple-settings", methods=["POST"])
 def delete_multiple_settings():
