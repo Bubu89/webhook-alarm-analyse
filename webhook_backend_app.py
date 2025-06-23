@@ -114,9 +114,12 @@ def webhook():
         "event": raw_data.get("event", "unspecified"),
         "price": raw_data.get("price", 0),
         "interval": raw_data.get("interval", "unspecified"),
-        "trend": raw_data.get("trend", "neutral"),
+        "trend": raw_data.get("trend") or None,
         "nachricht": raw_data.get("nachricht", None)
     }
+
+    if data["trend"] not in ["bullish", "bearish"]:
+        return jsonify({"status": "Trend nicht ausgewertet – neutral oder leer"}), 200
 
     data["valid"] = data["symbol"] != "UNKNOWN" and data["price"] > 0
 
@@ -163,6 +166,7 @@ def webhook():
         sende_email(f"Alarm: {symbol}", f"{len(symbol_df)} Alarme in {config['interval_hours']}h ({trend})")
 
     return jsonify({"status": "ok"})
+
 
 @app.route("/dashboard")
 def dashboard():
