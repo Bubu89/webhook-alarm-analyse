@@ -188,14 +188,18 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
             trendfarbe = "red"
 
         result.append({
-            "stunde": row["stunde"],
+            "stunde": int(row["stunde"]),
             "bullish": bullish,
             "bearish": bearish,
             "neutral": neutral,
             "farbe": trendfarbe
         })
-    return result
 
+    # ✅ Nur den aktuellsten Stundeneintrag behalten
+    if result:
+        result = [max(result, key=lambda x: x["stunde"])]
+
+    return result
 
     else:
         df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
