@@ -41,11 +41,23 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
 
     return result
 
+import pytz
+
 def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
     if "timestamp" not in df.columns or "symbol" not in df.columns:
         return []
 
-    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True)
+    MEZ = pytz.timezone("Europe/Vienna")
+
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce')
+
+    # Wenn keine Zeitzone vorhanden ist, nehme UTC an
+    if df["timestamp"].dt.tz is None:
+        df["timestamp"] = df["timestamp"].dt.tz_localize("UTC")
+
+    # In MEZ umwandeln
+    df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
+
     df = df[df["timestamp"].notna()]
     df["stunde"] = df["timestamp"].dt.strftime("%H")
 
@@ -84,6 +96,7 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
         })
 
     return result
+
 
 
 
