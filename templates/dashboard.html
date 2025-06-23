@@ -342,6 +342,27 @@
                 });
             });
         });
+
+            new Chart(document.getElementById("hourlyChart").getContext("2d"), {
+            type: "bar",
+            data: {
+                labels: stundenLabels,
+                datasets: stundenDatasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    title: { display: true, text: '🔄 Stündliche Alarmverteilung nach Symbol & Trend' }
+                },
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true }
+                }
+            }
+        });
+
     </script>
 </body>
 </html>
