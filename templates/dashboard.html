@@ -167,17 +167,9 @@
         🎯 Trend-Zielbalken je Stunde
         <button onclick="toggleVisibility('trendzielChartContainer')" style="float: right;">Anzeigen / Verstecken</button>
     </h2>
-    <div id="trendzielChartContainer" class="hidden">
-        <canvas id="trendzielChart"></canvas>
-    </div>
-<script>
-const zielbalkenLabels = {{ trend_aggregat_daten.labels | tojson }};
-const zielbalkenDaten = {{ trend_aggregat_daten.werte | tojson }};
-const zielbalkenFarben = {{ trend_aggregat_daten.farben | tojson }};
-// Kein Chart-Aufruf hier!
-</script>
-
-
+<div id="trendzielChartContainer" class="hidden">
+    <canvas id="trendzielChart"></canvas>
+</div> <!-- korrekt: schließt den Container -->
 
 
 </div>
@@ -220,30 +212,45 @@ const zielbalkenFarben = {{ trend_aggregat_daten.farben | tojson }};
         </div>
     </div>
 
-    <script>
-        function toggleAlarme() {
-            const btn = document.getElementById("toggleAlarmeBtn");
-            const liste = document.querySelectorAll("#alarmListe li");
-            const expanded = btn.getAttribute("data-expanded") === "true";
-            liste.forEach((el, idx) => {
-                if (idx >= 5) el.classList.toggle("hidden", !expanded);
-            });
-            btn.textContent = expanded ? "📋 Alle anzeigen" : "📋 Weniger anzeigen";
-            btn.setAttribute("data-expanded", expanded ? "false" : "true");
-        }
+   <script>
+function toggleAlarme() {
+    const btn = document.getElementById("toggleAlarmeBtn");
+    const liste = document.querySelectorAll("#alarmListe li");
+    const expanded = btn.getAttribute("data-expanded") === "true";
+    liste.forEach((el, idx) => {
+        if (idx >= 5) el.classList.toggle("hidden", !expanded);
+    });
+    btn.textContent = expanded ? "📋 Alle anzeigen" : "📋 Weniger anzeigen";
+    btn.setAttribute("data-expanded", expanded ? "false" : "true");
+}
 
-        function ladeEinstellungen(interval, max, trend) {
-            if (!confirm("Diese Aktion überschreibt die aktuellen Eingaben. Fortfahren?")) return;
-            document.querySelector("select[name='interval_hours_dropdown']").value = interval;
-            document.querySelector("input[name='max_alarms']").value = max;
-            document.querySelector("select[name='trend_richtung']").value = trend;
-        }
+function ladeEinstellungen(interval, max, trend) {
+    if (!confirm("Diese Aktion überschreibt die aktuellen Eingaben. Fortfahren?")) return;
+    document.querySelector("select[name='interval_hours_dropdown']").value = interval;
+    document.querySelector("input[name='max_alarms']").value = max;
+    document.querySelector("select[name='trend_richtung']").value = trend;
+}
 
-        function toggleVisibility(id) {
-            document.getElementById(id).classList.toggle('hidden');
-        }
+function toggleVisibility(id) {
+    document.getElementById(id).classList.toggle('hidden');
+}
 
+// Farbdefinitionen
+const farben = {
+    "Dominance_bullish": "#00cc44",
+    "Others_bullish": "#66ff99",
+    "Total_bullish": "#006633",
+    "Dominance_bearish": "#ff3333",
+    "Others_bearish": "#ff9999",
+    "Total_bearish": "#990000"
+};
 
+// Daten für Trendziel-Chart
+const zielbalkenLabels = {{ trend_aggregat_daten.labels | tojson }};
+const zielbalkenDaten = {{ trend_aggregat_daten.werte | tojson }};
+const zielbalkenFarben = {{ trend_aggregat_daten.farben | tojson }};
+
+// Trendziel-Chart
 new Chart(document.getElementById("trendzielChart").getContext("2d"), {
     type: 'bar',
     data: {
@@ -274,79 +281,83 @@ new Chart(document.getElementById("trendzielChart").getContext("2d"), {
                 beginAtZero: true,
                 title: { display: true, text: 'Trendwert (bullish - bearish)' }
             },
-x: {
-    title: { display: true, text: 'Stunde (UTC)' },
-    ticks: {
-        maxRotation: 45,
-        minRotation: 30,
-        font: { size: 13 },
-        color: '#ccc',
-        callback: function(value, index, ticks) {
-            return this.getLabelForValue(index);
-        }
-    }
-}
-
-
+            x: {
+                title: { display: true, text: 'Stunde (UTC)' },
+                ticks: {
+                    maxRotation: 45,
+                    minRotation: 30,
+                    font: { size: 13 },
+                    color: '#ccc',
+                    callback: function(value, index) {
+                        return this.getLabelForValue(index);
+                    }
+                }
+            }
         }
     }
 });
 
+// Daten für Stunden-Chart
+const stundenDaten = {{ stunden_daten | tojson }};
+const stundenLabels = stundenDaten.map(row => row.stunde);
+const stundenDatasets = [];
+const symbole = ["Dominance", "Others", "Total"];
 
-        // Stundenverlauf (neu)
-        const stundenDaten = {{ stunden_daten | tojson }};
-        const stundenLabels = stundenDaten.map(row => row.stunde);
-        const stundenDatasets = [];
-        const farben = {
-const farben = {
-    // GRÜNTÖNE – gut unterscheidbar:
-    "Dominance_bullish": "#00cc44",   // sattes Grün (Basis)
-    "Others_bullish":    "#66ff99",   // mintgrün (hell & weich)
-    "Total_bullish":     "#006633",   // sehr dunkles Tannengrün
-
-    // ROTTÖNE – klar getrennt:
-    "Dominance_bearish": "#ff3333",   // leuchtendes Signalrot
-    "Others_bearish":    "#ff9999",   // rosiges Altrosa
-    "Total_bearish":     "#990000"    // blutrot, tiefdunkel
-};
-
-
-
-        const stundenKeys = Object.keys(stundenDaten[0] || {}).filter(k => k !== "stunde");
-        const symbole = ["Dominance", "Others", "Total"];
-
-        symbole.forEach(symbol => {
-            ["bullish", "bearish"].forEach(richtung => {
-                const key = `${symbol}_${richtung}`;
-                stundenDatasets.push({
-                    label: `${symbol} ${richtung}`,
-                    data: stundenDaten.map(row => row[key] || 0),
-                    backgroundColor: farben[key],
-                    stack: symbol
-                });
-            });
+symbole.forEach(symbol => {
+    ["bullish", "bearish"].forEach(richtung => {
+        const key = `${symbol}_${richtung}`;
+        stundenDatasets.push({
+            label: `${symbol} ${richtung}`,
+            data: stundenDaten.map(row => row[key] || 0),
+            backgroundColor: farben[key],
+            stack: symbol
         });
+    });
+});
 
-            new Chart(document.getElementById("hourlyChart").getContext("2d"), {
-            type: "bar",
-            data: {
-                labels: stundenLabels,
-                datasets: stundenDatasets
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'top' },
-                    title: { display: true, text: '🔄 Stündliche Alarmverteilung nach Symbol & Trend' }
-                },
-                scales: {
-                    x: { stacked: true },
-                    y: { stacked: true, beginAtZero: true }
-                }
-            }
-        });
+// Stunden-Chart
+new Chart(document.getElementById("hourlyChart").getContext("2d"), {
+    type: "bar",
+    data: {
+        labels: stundenLabels,
+        datasets: stundenDatasets
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'top' },
+            title: { display: true, text: '🔄 Stündliche Alarmverteilung nach Symbol & Trend' }
+        },
+        scales: {
+            x: { stacked: true },
+            y: { stacked: true, beginAtZero: true }
+        }
+    }
+});
+</script>
 
-    </script>
+
+new Chart(document.getElementById("hourlyChart").getContext("2d"), {
+    type: "bar",
+    data: {
+        labels: stundenLabels,
+        datasets: stundenDatasets
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'top' },
+            title: { display: true, text: '🔄 Stündliche Alarmverteilung nach Symbol & Trend' }
+        },
+        scales: {
+            x: { stacked: true },
+            y: { stacked: true, beginAtZero: true }
+        }
+    }
+});
+</script>
 </body>
 </html>
+
