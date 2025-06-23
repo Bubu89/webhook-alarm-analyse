@@ -174,43 +174,48 @@
 
 </div>
 
-    <div class="section">
-        <h2>
-            📅 Monatliche Verteilung
-            <button onclick="toggleVisibility('verteilungContainer')" style="float: right;">Anzeigen / Verstecken</button>
-        </h2>
-        <div id="verteilungContainer" class="hidden">
-            <form method="get" action="/dashboard">
-                <label>Jahr wählen:</label>
-                <select name="year" onchange="this.form.submit()">
-                    {% for jahr in verfuegbare_jahre %}
-                        <option value="{{ jahr }}" {% if jahr == aktuelles_jahr %}selected{% endif %}>{{ jahr }}</option>
-                    {% endfor %}
-                </select>
-            </form>
-            <div class="matrix">
-                <div><strong>Symbol</strong></div>
-                {% for monat in monate %}
-                    <div><strong>{{ monat }}</strong></div>
+<div class="section">
+    <h2>
+        📅 Monatliche Verteilung
+        <button onclick="toggleVisibility('verteilungContainer')" style="float: right;">Anzeigen / Verstecken</button>
+    </h2>
+    <div id="verteilungContainer" class="hidden">
+        <form method="get" action="/dashboard">
+            <label>Jahr wählen:</label>
+            <select name="year" onchange="this.form.submit()">
+                {% for jahr in verfuegbare_jahre %}
+                    <option value="{{ jahr }}" {% if jahr == aktuelles_jahr %}selected{% endif %}>{{ jahr }}</option>
                 {% endfor %}
-                {% if matrix %}
-                    {% for symbol, werte in matrix.items() %}
-                        <div onclick="this.textContent = this.dataset.full || this.textContent" data-full="{{ symbol }}"><strong>{{ symbol[:6] }}</strong></div>
-                        {% for wert in werte %}
-                            <div>{{ wert }}</div>
-                        {% endfor %}
+            </select>
+        </form>
+        <div class="matrix">
+            <div><strong>Symbol</strong></div>
+            {% for monat in monate %}
+                <div><strong>{{ monat }}</strong></div>
+            {% endfor %}
+
+            {% if matrix %}
+                {% for symbol, werte in matrix.items() %}
+                    <div onclick="this.textContent = this.dataset.full || this.textContent" data-full="{{ symbol }}"><strong>{{ symbol[:6] }}</strong></div>
+                    {% for wert in werte %}
+                        <div>
+                            <span style="color: #ff4444;">{{ wert[0] }}</span> /
+                            <span style="color: #00cc66;">{{ wert[1] }}</span>
+                        </div>
                     {% endfor %}
-                {% else %}
-                    {% for symbol in ['BTC', 'ETH', 'XRP'] %}
-                        <div onclick="this.textContent = this.dataset.full || this.textContent" data-full="{{ symbol }}"><strong>{{ symbol[:6] }}</strong></div>
-                        {% for _ in range(12) %}
-                            <div>-</div>
-                        {% endfor %}
+                {% endfor %}
+            {% else %}
+                {% for symbol in ['BTC', 'ETH', 'XRP'] %}
+                    <div onclick="this.textContent = this.dataset.full || this.textContent" data-full="{{ symbol }}"><strong>{{ symbol[:6] }}</strong></div>
+                    {% for _ in range(12) %}
+                        <div><span style="color: #ff4444;">0</span> / <span style="color: #00cc66;">0</span></div>
                     {% endfor %}
-                {% endif %}
-            </div>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
+</div>
+
 
    <script>
 function toggleAlarme() {
