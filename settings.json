@@ -14,7 +14,7 @@
   "global_bearish": {
     "symbol": "ALL",
     "interval_hours": 1,
-    "max_alarms": 8,
+    "max_alarms": 9,
     "trend_richtung": "bearish"
   }
 }
