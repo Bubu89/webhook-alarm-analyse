@@ -338,8 +338,8 @@ trend_aggregat_view = {
     "farben": zielbalkenFarben
 }
 
-        einstellungen = {}
-        if os.path.exists(SETTINGS_DATEI):
+einstellungen = {}
+if os.path.exists(SETTINGS_DATEI):
             with open(SETTINGS_DATEI, "r") as f:
                 try:
                     einstellungen = json.load(f)
