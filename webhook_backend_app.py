@@ -339,13 +339,13 @@ trend_aggregat_view = {
 }
 
 einstellungen = {}
-if os.path.exists(SETTINGS_DATEI):
-            with open(SETTINGS_DATEI, "r") as f:
-                try:
-                    einstellungen = json.load(f)
-                except Exception as e:
-                    print("Fehler beim Laden der Einstellungen:", e)
-                    einstellungen = {}
+    if os.path.exists(SETTINGS_DATEI):
+        with open(SETTINGS_DATEI, "r") as f:
+            try:
+                einstellungen = json.load(f)
+            except Exception as e:
+                print("Fehler beim Laden der Einstellungen:", e)
+                einstellungen = {}
 
     return render_template("dashboard.html",
         einstellungen=einstellungen,
@@ -358,6 +358,7 @@ if os.path.exists(SETTINGS_DATEI):
         aktuelles_jahr=aktuelles_jahr,
         verfuegbare_jahre=jahre
     )
+
 
 
 
