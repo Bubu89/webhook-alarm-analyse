@@ -288,12 +288,8 @@ new Chart(document.getElementById("trendzielChart").getContext("2d"), {
         const stundenDatasets = [];
         const farben = { bullish: "#00ff88", bearish: "#ff4466" };
         const stundenKeys = Object.keys(stundenDaten[0] || {}).filter(k => k !== "stunde");
-        const symboleSet = new Set();
-        stundenKeys.forEach(k => {
-            const parts = k.split("_");
-            if (parts.length === 2) symboleSet.add(parts[0]);
-        });
-        const symbole = Array.from(symboleSet);
+        const symbole = ["Dominance", "Others", "Total"];
+
         symbole.forEach(symbol => {
             ["bullish", "bearish"].forEach(richtung => {
                 const key = `${symbol}_${richtung}`;
