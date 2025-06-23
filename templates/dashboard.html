@@ -189,13 +189,13 @@
         type: 'bar',
         data: {
             labels: zielbalkenLabels,
-            datasets: [{
-                label: 'Trend-Saldo je Stunde',
-                data: zielbalkenDaten,
-                backgroundColor: zielbalkenFarben,
+            datasets: zielbalkenDaten.map(eintrag => ({
+                label: eintrag.label,
+                data: eintrag.data,
+                backgroundColor: eintrag.backgroundColor || '#888',
                 borderColor: '#222',
                 borderWidth: 1
-            }]
+            }))
         },
         options: {
             responsive: true,
@@ -203,16 +203,17 @@
             plugins: {
                 title: {
                     display: true,
-                    text: '🧭 Stundenbasierter Netto-Trendverlauf (rot = bearish, grün = bullish, grau = neutral)'
+                    text: '🧭 Stundenbasierter Netto-Trendverlauf pro Symbol'
                 },
                 legend: {
-                    display: false
+                    display: true,
+                    position: 'top'
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    title: { display: true, text: 'Trendwert (Summe)' }
+                    title: { display: true, text: 'Trendwert (bullish - bearish)' }
                 },
                 x: {
                     title: { display: true, text: 'Stunde (UTC)' }
@@ -342,32 +343,6 @@
             });
         });
 
-        new Chart(document.getElementById("hourlyChart").getContext("2d"), {
-            type: "bar",
-            data: {
-                labels: stundenLabels,
-                datasets: stundenDatasets
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'top' },
-                    title: { display: true, text: 'Stündliche Alarmverteilung je Symbol & Trendrichtung' }
-                },
-                scales: {
-                    x: {
-                        stacked: true,
-                        title: { display: true, text: 'Stunde (UTC)' }
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true,
-                        title: { display: true, text: 'Anzahl Alarme' }
-                    }
-                }
-            }
-        });
-    </script>
+
 </body>
 </html>
