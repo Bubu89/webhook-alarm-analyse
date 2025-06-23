@@ -66,25 +66,18 @@ def webhook():
     if not request.is_json:
         return jsonify({"error": "Content-Type muss application/json sein"}), 415
 
-event = raw_data.get("event", "").lower()
-trend = raw_data.get("trend")
-if not trend:
-    if "buy" in event:
-        trend = "bullish"
-    elif "sell" in event:
-        trend = "bearish"
-    else:
-        trend = "neutral"
+    raw_data = request.get_json()
+    now = datetime.now(MEZ)
 
-data = {
-    "timestamp": raw_data.get("timestamp", now.isoformat()),
-    "symbol": str(raw_data.get("symbol", "UNKNOWN")),
-    "event": raw_data.get("event", "unspecified"),
-    "price": raw_data.get("price", 0),
-    "interval": raw_data.get("interval", "unspecified"),
-    "trend": trend,
-    "nachricht": raw_data.get("nachricht", None)
-}
+    data = {
+        "timestamp": raw_data.get("timestamp", now.isoformat()),
+        "symbol": str(raw_data.get("symbol", "UNKNOWN")),
+        "event": raw_data.get("event", "unspecified"),
+        "price": raw_data.get("price", 0),
+        "interval": raw_data.get("interval", "unspecified"),
+        "trend": raw_data.get("trend", "neutral"),
+        "nachricht": raw_data.get("nachricht", None)
+    }
 
     data["valid"] = data["symbol"] != "UNKNOWN" and data["price"] > 0
 
