@@ -36,18 +36,18 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
             return "Others", 1
         elif symbol.startswith("TOTAL/"):
             return "Total", 1
-        return ("Sonstige", 1)
+        else:
+            return None  # explizit ungültig
 
-
+    # wende Funktion an
     result = df["symbol"].apply(gruppenzuordnung)
 
-    if all(isinstance(x, tuple) and len(x) == 2 for x in result):
-        df["gruppe"] = [x[0] for x in result]
-        df["gewicht"] = [x[1] for x in result]
-    else:
-        raise ValueError("Einige Rückgaben von gruppenzuordnung sind keine 2er-Tupel.")
+    # lösche alle, die kein gültiges Ergebnis bekommen
+    df = df[result.notnull()].copy()
+    result = result[result.notnull()]
 
-    df = df[df["gruppe"].notna()]
+    # sichere Umwandlung in zwei Spalten
+    df[["gruppe", "gewicht"]] = pd.DataFrame(result.tolist(), index=result.index)
 
     gruppiert = df.groupby(["stunde", "gruppe", "trend"]).agg(
         anzahl=("symbol", "count"),
@@ -56,20 +56,11 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
 
     struktur = defaultdict(dict)
     for _, row in gruppiert.iterrows():
-        stunde = row["stunde"]
-        key = f"{row['gruppe']}_{row['trend']}"
-        schnitt = row["anzahl"] / row["gewicht"] if row["gewicht"] else row["anzahl"]
-        struktur[stunde][key] = round(schnitt, 2)
+        schnitt = row["anzahl"] / row["gewicht"]
+        struktur[row["stunde"]][f"{row['gruppe']}_{row['trend']}"] = round(schnitt, 1)
 
-    result = []
-    for h in range(24):
-        stunde = f"{h:02d}"
-        eintrag = {"stunde": stunde}
-        if stunde in struktur:
-            eintrag.update(struktur[stunde])
-        result.append(eintrag)
+    return [{"stunde": k, **v} for k, v in struktur.items()]
 
-    return result
 
 
 
