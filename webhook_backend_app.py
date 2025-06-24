@@ -24,9 +24,6 @@ EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
 MEZ = pytz.timezone("Europe/Vienna")
 app = Flask(__name__)
 
-def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
-    df = df[df["trend"].isin(["bullish", "bearish"])].copy()
-    df["stunde"] = df["timestamp"].dt.strftime("%H")
 
 def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
@@ -42,10 +39,12 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
         return None, 1
 
     result = df["symbol"].apply(gruppenzuordnung)
-    if isinstance(result.iloc[0], (list, tuple)) and len(result.iloc[0]) == 2:
-        df[["gruppe", "gewicht"]] = pd.DataFrame(result.tolist(), index=df.index)
+
+    if all(isinstance(x, tuple) and len(x) == 2 for x in result):
+        df["gruppe"] = [x[0] for x in result]
+        df["gewicht"] = [x[1] for x in result]
     else:
-        raise ValueError("Die Funktion gruppenzuordnung muss für jeden symbol ein Tupel (gruppe, gewicht) zurückgeben.")
+        raise ValueError("Einige Rückgaben von gruppenzuordnung sind keine 2er-Tupel.")
 
     df = df[df["gruppe"].notna()]
 
@@ -70,6 +69,7 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
         result.append(eintrag)
 
     return result
+
 
 
 def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
