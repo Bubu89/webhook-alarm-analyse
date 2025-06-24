@@ -304,6 +304,46 @@ def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
     return dict(minichart_daten)
 
 
+def berechne_prognosen(df: pd.DataFrame) -> dict:
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True).dt.tz_convert(MEZ)
+
+    def trend_score(symbol):
+        symbol_df = df[df["symbol"] == symbol]
+        bullish = symbol_df[symbol_df["trend"] == "bullish"].shape[0]
+        bearish = symbol_df[symbol_df["trend"] == "bearish"].shape[0]
+        return bullish - bearish
+
+    def total_coti_ratio():
+        total = trend_score("TOTAL")
+        coti = trend_score("COTIUSD")
+        if coti == 0: return 0
+        return total / coti
+
+    prognosen = {
+        "COTI": {
+            "score": trend_score("COTIUSD"),
+            "relation": round(total_coti_ratio(), 2),
+            "signal": "🟢" if total_coti_ratio() < 1 else "🔴"
+        },
+        "ETH": {
+            "score": trend_score("ETHUSD"),
+            "signal": "🟢" if trend_score("ETHUSD") > 0 else "🔴"
+        },
+        "VELO": {
+            "score": trend_score("VELOUSD"),
+            "signal": "🟢" if trend_score("VELOUSD") > 0 else "🔴"
+        },
+        "Altcoins": {
+            "score": trend_score("TOTAL") + trend_score("Others"),
+            "signal": "🟢" if (trend_score("TOTAL") + trend_score("Others")) > 0 else "🔴"
+        },
+        "BTC": {
+            "score": trend_score("BTCUSD"),
+            "signal": "🟢" if trend_score("BTCUSD") > 0 else "🔴"
+        }
+    }
+
+    return prognosen
 
 @app.route("/dashboard")
 def dashboard():
@@ -362,6 +402,7 @@ def dashboard():
     else:
         df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
         df["symbol"] = df["symbol"].astype(str)
+        prognosen = berechne_prognosen(df)
         df["jahr"] = df["timestamp"].dt.year
 
         minicharts = erzeuge_minichart_daten(df, interval_hours=interval_hours)
@@ -465,6 +506,8 @@ def dashboard():
         monate=monate,
         aktuelles_jahr=aktuelles_jahr,
         verfuegbare_jahre=jahre
+        prognosen=prognosen,
+
     )
 
 
