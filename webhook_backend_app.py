@@ -112,6 +112,12 @@ def lade_prognosen():
     except Exception:
         return {}
 
+def lade_logs():
+    try:
+        with open(LOG_DATEI, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
 
 @app.route("/dashboard")
 def dashboard():
