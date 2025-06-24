@@ -3070,27 +3070,7 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-24T14:03:03.640833+02:00",
-    "symbol": "BTC.D+CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D",
-    "event": "Buy",
-    "price": 0,
-    "interval": "unspecified",
-    "trend": "bullish",
-    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-24T14:03:17.766509+02:00",
-    "symbol": "BTC.D",
-    "event": "Buy",
-    "price": 0,
-    "interval": "unspecified",
-    "trend": "bullish",
-    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-24T14:03:48.192123+02:00",
+    "timestamp": "2025-06-24T14:07:03.244560+02:00",
     "symbol": "BTC.D",
     "event": "Buy",
     "price": 0,
