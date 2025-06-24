@@ -1,1 +1,7 @@
-{}
+{
+  "global_neutral": {
+    "interval_hours": 1,
+    "max_alarms": 3,
+    "trend_richtung": "neutral"
+  }
+}
