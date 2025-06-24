@@ -355,7 +355,8 @@ def dashboard():
         sortierte_paare = ["BTC", "ETH"] + sorted([s for s in df["symbol"].unique() if s not in ["BTC", "ETH"]])
         df["symbol"] = pd.Categorical(df["symbol"], categories=sortierte_paare, ordered=True)
 
-        stunden_daten = erzeuge_stunden_daten(df, interval=stunden_interval)
+        stunden_daten = erzeuge_stunden_daten(df, stunden_interval)
+
 
 
         gruppen_trends = []
