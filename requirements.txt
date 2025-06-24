@@ -5,3 +5,4 @@ pytz
 gunicorn
 sqlalchemy
 gitpython
+Flask-Caching>=2.0
