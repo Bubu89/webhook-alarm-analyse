@@ -14,7 +14,6 @@ SYMBOL_MAP = {
     "fet":  "FETUSD",
     "aero": "AEROUSD",
     "tao":  "TAOUSD"
-    "total": "TOTAL"  
 }
 
 def lade_kurse() -> dict:
