@@ -2200,8 +2200,8 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-24T09:42:31.198520+02:00",
-    "symbol": "BONKUSDT",
+    "timestamp": "2025-06-24T09:44:47.013365+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
     "event": "Buy",
     "price": 0,
     "interval": "unspecified",
