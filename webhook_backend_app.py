@@ -434,14 +434,12 @@ def dashboard():
         aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
         df_jahr = df[df["jahr"] == aktuelles_jahr]
 
-        aktueller_monat = datetime.now().month
-        monate_roh = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"]
-        start_index = max(0, aktueller_monat - 6)
-        monate = monate_roh[start_index:aktueller_monat]
+        # Neue Monatslogik: Letzte 6 Monate berechnen, aktuellster Monat ganz rechts
+        akt_monat = datetime.now().month
+        letzte_6_monate = [(akt_monat - i - 1) % 12 + 1 for i in reversed(range(6))]
+        monate = [calendar.month_abbr[m] for m in letzte_6_monate]
 
         matrix = {}
-
-
         for symbol in sorted(df_jahr["symbol"].dropna().unique()):
             monatliche_werte = []
             for monat in monate:
@@ -451,6 +449,7 @@ def dashboard():
                 wert = bullish - bearish
                 monatliche_werte.append(wert)
             matrix[symbol] = monatliche_werte
+
 
         letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
         fehlerhafte_eintraege = df[df["valid"] != True].sort_values("timestamp", ascending=False).head(10).to_dict("records")
