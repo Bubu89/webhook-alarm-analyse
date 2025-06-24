@@ -233,6 +233,28 @@ def webhook():
     return jsonify({"status": "ok"})
 
 
+def erzeuge_minichart_daten(df: pd.DataFrame) -> dict:
+    df = df.copy()
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True)
+    df = df[df["timestamp"].notna()]
+    df["stunde"] = df["timestamp"].dt.strftime("%H")
+    df = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
+
+    grouped = df.groupby(["symbol", "stunde", "trend"]).size().reset_index(name="anzahl")
+
+    minichart_daten = defaultdict(lambda: {"stunden": [], "werte": [], "farben": []})
+    
+    for (symbol, stunde), gruppe in grouped.groupby(["symbol", "stunde"]):
+        bullish = gruppe[gruppe["trend"] == "bullish"]["anzahl"].sum()
+        bearish = gruppe[gruppe["trend"] == "bearish"]["anzahl"].sum()
+        score = bullish - bearish
+        farbe = "#00cc66" if score > 0 else "#ff3333" if score < 0 else "#aaaaaa"
+        
+        minichart_daten[symbol]["stunden"].append(f"{stunde}h")
+        minichart_daten[symbol]["werte"].append(score)
+        minichart_daten[symbol]["farben"].append(farbe)
+
+    return dict(minichart_daten)
 
 
 @app.route("/dashboard")
@@ -288,6 +310,7 @@ def dashboard():
         df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
         df["symbol"] = df["symbol"].astype(str)
         df["jahr"] = df["timestamp"].dt.year
+        minicharts = erzeuge_minichart_daten(df)
         df["monat"] = df["timestamp"].dt.strftime("%b")
         df["tag"] = df["timestamp"].dt.date
         df["uhrzeit"] = df["timestamp"].dt.strftime("%H:%M")
@@ -370,6 +393,7 @@ def dashboard():
         stunden_daten=stunden_daten,
         gruppen_trends=gruppen_trends,
         trend_aggregat_daten=trend_aggregat_view,
+        minicharts=minicharts,
         matrix=matrix,
         monate=monate,
         aktuelles_jahr=aktuelles_jahr,
