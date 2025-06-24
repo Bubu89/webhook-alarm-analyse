@@ -25,42 +25,35 @@ MEZ = pytz.timezone("Europe/Vienna")
 app = Flask(__name__)
 
 
-def erzeuge_stunden_daten(df: pd.DataFrame, interval: int = 1) -> list[dict]:
+def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
-    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
 
-    start_von_heute = datetime.now(MEZ).replace(hour=0, minute=0, second=0, microsecond=0)
-    df = df[df["timestamp"] >= start_von_heute]
+    # Runde Zeit auf Intervall-Basis
+    df["zeitblock"] = df["timestamp"].dt.floor(f"{intervall_stunden}H")
+    df["symbolgruppe"] = df["symbol"].apply(lambda s: "Dominance" if "dominance" in s.lower() else "Others")
+    
+    gruppiert = df.groupby(["zeitblock", "symbolgruppe", "trend"]).size().reset_index(name="anzahl")
 
-    df["zeitfenster"] = df["timestamp"].dt.floor(f"{interval}H")
+    # Zusätzliche Gruppierung "Total"
+    gesamt = gruppiert.groupby(["zeitblock", "trend"])["anzahl"].sum().reset_index()
+    gesamt["symbolgruppe"] = "Total"
+    gruppiert = pd.concat([gruppiert, gesamt], ignore_index=True)
 
-    def gruppenzuordnung(symbol):
-        if symbol in ["BTC.D", "ETH.D", "USDT.D", "USDC.D"]:
-            return "Dominance", 4
-        elif symbol == "OTHERS/BTCUSD":
-            return "Others", 1
-        elif symbol.startswith("TOTAL/"):
-            return "Total", 1
-        else:
-            return None
-
-    result = df["symbol"].apply(gruppenzuordnung)
-    df = df[result.notnull()].copy()
-    df[["gruppe", "gewicht"]] = pd.DataFrame(result[result.notnull()].tolist(), index=result[result.notnull()].index)
-
-    gruppiert = df.groupby(["zeitfenster", "gruppe", "trend"]).agg(
-        anzahl=("symbol", "count"),
-        gewicht=("gewicht", "first")
-    ).reset_index()
-
+    # Struktur aufbauen
     struktur = defaultdict(dict)
     for _, row in gruppiert.iterrows():
-        schnitt = row["anzahl"] / row["gewicht"]
-        zeitfenster = row["zeitfenster"].strftime("%d.%m %H:%M")
-        struktur[zeitfenster][f"{row['gruppe']}_{row['trend']}"] = round(schnitt, 1)
+        zeit = row["zeitblock"].strftime("%d.%m %H:%M")
+        key = f"{row['symbolgruppe']}_{row['trend']}"
+        struktur[zeit][key] = row["anzahl"]
 
-    sortierte_slots = sorted(struktur.keys())
-    return [{"stunde": slot, **struktur[slot]} for slot in sortierte_slots]
+    daten = []
+    for zeit in sorted(struktur.keys())[-10:]:  # nur letzte 10 Blöcke
+        eintrag = {"stunde": zeit}
+        eintrag.update(struktur[zeit])
+        daten.append(eintrag)
+
+    return daten
 
 
 
