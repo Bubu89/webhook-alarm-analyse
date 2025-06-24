@@ -2920,8 +2920,8 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-24T13:03:00.789262+02:00",
-    "symbol": "BONKUSDT",
+    "timestamp": "2025-06-24T13:05:32.644814+02:00",
+    "symbol": "TOTAL/COINBASE:OPUSD",
     "event": "Sell",
     "price": 0,
     "interval": "unspecified",
