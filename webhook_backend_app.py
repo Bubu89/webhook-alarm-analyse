@@ -146,31 +146,138 @@ def trend_verlauf_letzte_stunden(logs, stunden=6):
             ergebnis[symbol][trend] += 1
     return ergebnis
 
-
 @app.route("/dashboard")
 def dashboard():
     try:
-        daten = lade_kurse()
-        prognosen = lade_prognosen()
+        # URL-Parameter auslesen
+        year = request.args.get("year")
+        mini_interval = request.args.get("mini_interval", "1")
+        interval_hours = int(mini_interval) if mini_interval.isdigit() else 1
+        stunden_interval = int(request.args.get("stunden_interval", "1"))
+
+        # Logs laden
         logs = lade_logs()
+        if isinstance(logs, dict):
+            logs = [logs]
+        logs = [e for e in logs if isinstance(e, dict)]
 
-        letzte_signale = extrahiere_letzte_signale(logs)
-        letzte_scores = extrahiere_letzte_scores(prognosen)
+        # DataFrame aus Logs
+        df = pd.DataFrame(logs)
+        if df.empty:
+            # Fallback-Werte wenn keine Daten vorhanden
+            jahre = [datetime.now().year]
+            aktuelles_jahr = int(year) if year and year.isdigit() else jahre[0]
+            monate = [datetime(aktuelles_jahr, m, 1).strftime("%b") for m in range(1, 13)]
+            matrix = {}
+            letzte_ereignisse = []
+            stunden_daten = []
+            minicharts = {}
+            gruppen_trends = []
+            trend_aggregat_view = {"labels": [], "werte": [], "farben": []}
+            prognosen = {}
+        else:
+            # Timestamp parsen und Zeitzone setzen
+            df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
+            df["symbol"] = df["symbol"].astype(str)
+            df["jahr"] = df["timestamp"].dt.year
+            aktuelles_jahr = int(year) if year and year.isdigit() else df["jahr"].max()
+            df_jahr = df[df["jahr"] == aktuelles_jahr]
+            monate = [datetime(aktuelles_jahr, m, 1).strftime("%b") for m in range(1, 13)]
 
-        # Trendverlauf pro Asset
-        trendverlauf = trend_verlauf_letzte_stunden(logs)
+            # Prognosen laden oder berechnen
+            prognosen = berechne_prognosen(df)
 
+            # Matrix für monatliche Verteilung
+            matrix = {}
+            for symbol in sorted(df_jahr["symbol"].unique()):
+                monatliche_werte = []
+                for monat in monate:
+                    df_monat = df_jahr[(df_jahr["symbol"] == symbol) & (df_jahr["timestamp"].dt.strftime("%b") == monat)]
+                    bullish = df_monat[df_monat["trend"] == "bullish"].shape[0]
+                    bearish = df_monat[df_monat["trend"] == "bearish"].shape[0]
+                    monatliche_werte.append(bullish - bearish)
+                matrix[symbol] = monatliche_werte
+
+            # Letzte 10 Alarme (sortiert nach timestamp absteigend)
+            letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
+
+            # Stunden-Daten (für Stunden-Chart)
+            stunden_daten = erzeuge_stunden_daten(df, stunden_interval)
+
+            # Gruppen-Trends für Farbdarstellung aufbereiten
+            gruppen_trends = []
+            farben_mapping = {
+                "Dominance_bullish": "lightgreen",
+                "Dominance_bearish": "lightcoral",
+                "Others_bullish": "#7CFC00",
+                "Others_bearish": "#FF4500",
+                "Total_bullish": "#00CED1",
+                "Total_bearish": "#DC143C"
+            }
+            for eintrag in stunden_daten:
+                stunde = eintrag["stunde"]
+                for key, wert in eintrag.items():
+                    if key == "stunde":
+                        continue
+                    gruppe, richtung = key.split("_")
+                    gruppen_trends.append({
+                        "stunde": stunde,
+                        "gruppe": gruppe,
+                        "richtung": richtung,
+                        "wert": wert,
+                        "farbe": farben_mapping.get(key, "#888")
+                    })
+
+            # Mini-Charts Daten
+            minicharts = erzeuge_minichart_daten(df, interval_hours=interval_hours)
+            # Daten für Chart.js (string, int, string)
+            for daten in minicharts.values():
+                daten["stunden"] = list(map(str, daten["stunden"]))
+                daten["werte"] = [int(w) for w in daten["werte"]]
+                daten["farben"] = list(map(str, daten["farben"]))
+
+            # Trend Aggregat Daten (für Balkendiagramme)
+            trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
+            labels = [f"{e['stunde']}h ({e['symbol'][:6]}…)" if len(e['symbol']) > 6 else f"{e['stunde']}h ({e['symbol']})" for e in trend_aggregat_roh]
+            werte = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
+            farben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
+            trend_aggregat_view = {
+                "labels": labels,
+                "werte": werte,
+                "farben": farben
+            }
+
+            jahre = sorted(df["jahr"].unique())
+
+        # Einstellungen laden
+        einstellungen = {}
+        if os.path.exists(SETTINGS_DATEI):
+            try:
+                with open(SETTINGS_DATEI, "r") as f:
+                    einstellungen = json.load(f)
+            except Exception as e:
+                print("Fehler beim Laden der Einstellungen:", e)
+
+        # Template rendern mit allen nötigen Variablen
         return render_template("dashboard.html",
-                               letzte_scores=letzte_scores,
-                               letzte_signale=letzte_signale,
-                               trendverlauf=trendverlauf)
+                               einstellungen=einstellungen,
+                               letzte_ereignisse=letzte_ereignisse,
+                               stunden_daten=stunden_daten,
+                               gruppen_trends=gruppen_trends,
+                               trend_aggregat_daten=trend_aggregat_view,
+                               minicharts=minicharts,
+                               mini_interval=mini_interval,
+                               stunden_interval=stunden_interval,
+                               matrix=matrix,
+                               monate=monate,
+                               aktuelles_jahr=aktuelles_jahr,
+                               verfuegbare_jahre=jahre,
+                               prognosen=prognosen)
+
     except Exception as e:
         return f"Fehler im Dashboard: {e}"
 
-# Rest des Codes unverändert, keine zweite Definition von dashboard()!
-# ...
 
-# Weitere Funktionen folgen hier (nicht verändert)
 
 # ...
 
