@@ -266,8 +266,14 @@ function ladeEinstellungen(interval, max, trend) {
 }
 
 function toggleVisibility(id) {
-    document.getElementById(id).classList.toggle('hidden');
+    const el = document.getElementById(id);
+    if (!el) {
+        console.warn(`Element mit ID '${id}' nicht gefunden.`);
+        return;
+    }
+    el.classList.toggle('hidden');
 }
+
 
 // Farbdefinitionen
 const farben = {
@@ -288,9 +294,9 @@ const symbole = ["Dominance", "Others", "Total"];
 
 symbole.forEach(symbol => {
     ["bullish", "bearish"].forEach(richtung => {
-        const key = ${symbol}_${richtung};
+        const key = `${symbol}_${richtung}`;
         stundenDatasets.push({
-            label: ${symbol} ${richtung},
+            label: `${symbol} ${richtung}`,
             data: stundenDaten.map(row => row[key] || 0),
             backgroundColor: farben[key],
             barThickness: 8,
@@ -300,6 +306,7 @@ symbole.forEach(symbol => {
         });
     });
 });
+
 
 
 // Stunden-Chart
