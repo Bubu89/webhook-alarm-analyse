@@ -2990,33 +2990,13 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-24T13:24:03.936269+02:00",
-    "symbol": "OTHERS/INDEX:BTCUSD",
+    "timestamp": "2025-06-24T13:25:17.722968+02:00",
+    "symbol": "BTCUSD",
     "event": "Buy",
     "price": 0,
     "interval": "unspecified",
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-24T13:24:07.392991+02:00",
-    "symbol": "BTC.D",
-    "event": "Sell",
-    "price": 0,
-    "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-24T13:25:06.491172+02:00",
-    "symbol": "TOTAL/COINBASE:OPUSD",
-    "event": "Sell",
-    "price": 0,
-    "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": false
   }
 ]
