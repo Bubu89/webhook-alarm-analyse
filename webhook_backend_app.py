@@ -8,6 +8,31 @@ from email.mime.text import MIMEText
 import pytz
 from collections import defaultdict
 from uploader import git_upload
+import threading
+global_df = None
+df_lock = threading.Lock()
+
+def lade_log_daten():
+    global global_df
+    try:
+        df = pd.read_json(LOG_DATEI, convert_dates=["timestamp"])
+        df = df[df["timestamp"].notna()]
+        grenze = pd.Timestamp.utcnow() - pd.Timedelta(hours=48)
+        df = df[df["timestamp"] > grenze]
+        with df_lock:
+            global_df = df.copy()
+    except Exception as e:
+        print(f"[Fehler beim Laden der Logs] {e}")
+        global_df = pd.DataFrame(columns=["timestamp", "symbol", "trend"])
+
+lade_log_daten()
+
+def aktualisiere_logs_regelmäßig():
+    while True:
+        lade_log_daten()
+        time.sleep(60)
+
+threading.Thread(target=aktualisiere_logs_regelmäßig, daemon=True).start()
 
 load_dotenv()
 
