@@ -12,6 +12,8 @@ import threading
 from flask_caching import Cache
 import time
 import calendar
+from kurs_handler import lade_kurse
+
 
 load_dotenv()  # ganz am Anfang
 
