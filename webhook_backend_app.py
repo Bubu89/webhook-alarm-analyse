@@ -379,6 +379,34 @@ def sende_email(betreff, inhalt):
     except Exception as e:
         print(f"E-Mail konnte nicht gesendet werden: {e}")
 
+# ------------------------------------------------------------------
+#  ➜  NEU: mehrere globale Settings per Checkbox löschen
+# ------------------------------------------------------------------
+@app.route("/delete-multiple-settings", methods=["POST"])
+def delete_multiple_settings():
+    keys = request.form.getlist("delete_keys")
+    if not keys:                       # nichts markiert
+        return redirect(url_for("dashboard"))
+
+    # Settings-Datei laden
+    try:
+        with open(SETTINGS_DATEI, "r", encoding="utf-8") as f:
+            settings = json.load(f)
+    except Exception:
+        settings = {}
+
+    # markierte Keys entfernen
+    for k in keys:
+        settings.pop(k, None)
+
+    # zurückschreiben
+    with open(SETTINGS_DATEI, "w", encoding="utf-8") as f:
+        json.dump(settings, f, indent=2)
+
+    # (optional) Auto-Commit
+    git_upload(SETTINGS_DATEI, ".")
+
+    return redirect(url_for("dashboard"))
 
 @app.route("/kursdaten", methods=["POST"])
 def empfange_kursdaten():
