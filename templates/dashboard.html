@@ -171,6 +171,18 @@
     <canvas id="trendzielChart"></canvas>
 </div> <!-- korrekt: schließt den Container -->
 
+    <div class="section">
+    <h2>🔎 Mini-Zielbalken pro Symbol</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        {% for i in range(trend_aggregat_daten.labels|length) %}
+            <div style="width: 120px; background: #222; padding: 5px; border-radius: 8px;">
+                <canvas id="miniChart{{i}}" width="100" height="60"></canvas>
+                <div style="text-align: center; font-size: 12px;">{{ trend_aggregat_daten.labels[i] }}</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
 
 </div>
 
@@ -340,6 +352,41 @@ new Chart(document.getElementById("hourlyChart").getContext("2d"), {
             x: { stacked: true },
             y: { stacked: true, beginAtZero: true }
         }
+    }
+});
+
+       // Mini-Zielbalken-Visualisierung
+document.addEventListener("DOMContentLoaded", function () {
+    const miniLabels = {{ trend_aggregat_daten.labels | tojson }};
+    const miniWerte = {{ trend_aggregat_daten.werte | tojson }};
+    const miniFarben = {{ trend_aggregat_daten.farben | tojson }};
+
+    for (let i = 0; i < miniLabels.length; i++) {
+        const ctx = document.getElementById('miniChart' + i).getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [''],
+                datasets: [{
+                    data: [miniWerte[i]],
+                    backgroundColor: miniFarben[i]
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                },
+                scales: {
+                    x: { display: false },
+                    y: {
+                        display: false,
+                        suggestedMin: -10,
+                        suggestedMax: 10
+                    }
+                }
+            }
+        });
     }
 });
 
