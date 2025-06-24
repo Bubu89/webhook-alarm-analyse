@@ -6,25 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .kleinbox {
-    font-size: 12px;
-    padding: 6px;
-    margin-right: 10px;
-    margin-top: 10px;
-    background: #222;
-    border-radius: 5px;
-    min-width: 280px;
-    flex: 1;
-    max-width: 48%;
-    box-sizing: border-box;
-}
-@media (max-width: 600px) {
-    .kleinbox {
-        max-width: 100%;
-        font-size: 13px;
-    }
-}
-
         body {
             font-family: Arial, sans-serif;
             background: #111;
@@ -89,100 +70,104 @@
         canvas {
             max-height: 250px;
         }
-@media (max-width: 600px) {
-    body {
-        font-size: 14px;
-    }
-    .matrix {
-        font-size: 12px;
-        grid-template-columns: repeat(13, minmax(20px, 1fr));
-    }
-    button, input, select {
-        font-size: 14px;
-    }
-    h1, h2, h3 {
-        font-size: 18px;
-    }
-    .section-container {
-        flex-direction: column !important;
-    }
-    canvas {
-        width: 100% !important;
-        height: auto !important;
-        max-width: 100%;
-    }
-    .mini-chart-box {
-        width: calc(50% - 10px) !important; /* 2 nebeneinander */
-    }
-}
-.anzeige-button {
-    padding: 4px 8px;
-    font-size: 13px;
-    margin-left: 6px;
-}
-
+        @media (max-width: 600px) {
+            body { font-size: 14px; }
+            .matrix { font-size: 12px; grid-template-columns: repeat(13, minmax(20px, 1fr)); }
+            button, input, select { font-size: 14px; }
+            h1, h2, h3 { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
     <h1>Webhook Alarm Dashboard</h1>
 
-<div class="section-container" style="display: flex; gap: 20px; flex-wrap: wrap;">
-
-
-
-<div class="section">
-    <h2>📊 Mini-Prognosen (aus Systemdaten)</h2>
-    {% if prognosen %}
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        {% for asset, daten in prognosen.items() %}
-            <div style="background:#222;padding:10px;border-radius:6px;width:130px;text-align:center;">
-                <strong>{{ asset }}</strong><br>
-                {{ daten.signal }}<br>
-                Score: {{ daten.score }}<br>
-                {% if daten.relation is defined %}
-                    Ratio: {{ daten.relation }}
-                {% endif %}
-            </div>
-        {% endfor %}
+    <div class="section">
+        <h2>1. Globale Alarmeinstellungen</h2>
+        <form action="/update-settings" method="post">
+            <label>Intervall in Stunden (Dropdown)</label>
+            <select name="interval_hours_dropdown">
+                <option value="1">1 Stunde</option>
+                <option value="3">3 Stunden</option>
+                <option value="6">6 Stunden</option>
+                <option value="12">12 Stunden</option>
+                <option value="24">24 Stunden</option>
+            </select>
+            <label>Oder manuell</label>
+            <input type="number" name="interval_hours_manual" placeholder="Manuelle Eingabe (hat Vorrang)">
+            <label>Maximale Alarme pro Intervall</label>
+            <input type="number" name="max_alarms" value="3" required>
+            <label>Trendrichtung</label>
+            <select name="trend_richtung">
+                <option value="neutral">Keine Trendvorgabe</option>
+                <option value="bullish">Positiver Trend (aufwärts)</option>
+                <option value="bearish">Negativer Trend (abwärts)</option>
+            </select>
+            <input type="hidden" name="symbol" value="ALL">
+            <button type="submit">📂 Einstellungen speichern</button>
+        </form>
     </div>
-    {% else %}
-        <p>Keine Prognosedaten verfügbar.</p>
-    {% endif %}
-</div>
+
+    <div class="section">
+        <h2>2. Aktuelle globale Einstellungen</h2>
+        {% if einstellungen %}
+        <form method="post" action="/delete-multiple-settings">
+            <ul>
+            {% for key, config in einstellungen.items() %}
+                <li>
+                    <input type="checkbox" name="delete_keys" value="{{ key }}" class="checkbox">
+                    <strong>{{ key }}</strong>:
+                    Intervall: {{ config.interval_hours }}h |
+                    Max. Alarme: {{ config.max_alarms }} |
+                    Trend:
+                    {% if config.trend_richtung == "bullish" %}🟢 bullisch
+                    {% elif config.trend_richtung == "bearish" %}🔴 bärisch
+                    {% else %}⚪ neutral
+                    {% endif %}
+                    <button type="button" onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">⟳ Laden</button>
+                </li>
+            {% endfor %}
+            </ul>
+            <button type="submit">🗑️ Ausgewählte löschen</button>
+        </form>
+        {% else %}
+            <p>Keine globalen Einstellungen gesetzt.</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>3. Letzte Alarme</h2>
+        <ul id="alarmListe">
+            {% if letzte_ereignisse %}
+                {% for eintrag in letzte_ereignisse %}
+                    <li class="{% if loop.index > 5 %}hidden{% endif %}">
+                        {{ eintrag["timestamp"].strftime('%Y-%m-%d %H:%M:%S') }} | {{ eintrag["symbol"] }}:
+                        {{ eintrag["nachricht"] if eintrag.get("nachricht") else eintrag.get("event", "-") }}
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li>Keine Alarme registriert.</li>
+            {% endif %}
+        </ul>
+        {% if letzte_ereignisse|length > 5 %}
+            <button id="toggleAlarmeBtn" onclick="toggleAlarme()" data-expanded="false">📋 Alle anzeigen</button>
+        {% endif %}
+    </div>
 
     <div class="section">
         <h2>
             🕒 Stundenverlauf (Trendrichtung & Symbol)
-            <button class="anzeige-button" onclick="toggleAndSave('hourlyChartContainer')" style="float: right;">Anzeigen</button>
-
-
+            <button onclick="toggleVisibility('hourlyChartContainer')" style="float: right;">Anzeigen / Verstecken</button>
         </h2>
         <div id="hourlyChartContainer" class="hidden">
             <canvas id="hourlyChart"></canvas>
         </div>
-<form method="get" action="/dashboard" style="margin-bottom: 10px;">
-    <label>Zeiteinheit wählen:</label>
-    <select name="mini_interval" onchange="this.form.submit()">
-        <option value="1" {% if mini_interval == "1" %}selected{% endif %}>4× 1 Stunde</option>
-        <option value="6" {% if mini_interval == "6" %}selected{% endif %}>4× 6 Stunden</option>
-        <option value="12" {% if mini_interval == "12" %}selected{% endif %}>4× 12 Stunden</option>
-        <option value="24" {% if mini_interval == "24" %}selected{% endif %}>4× 1 Tag</option>
-    </select>
-</form>
-
-<div id="miniChartContainer" class="hidden">
-    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        {% for symbol, daten in minicharts.items() %}
-            <div class="mini-chart-box" style="width: 160px; background: #222; padding: 5px; border-radius: 8px;">
-                <canvas id="miniChart_{{ symbol }}"></canvas>
-                <div style="text-align: center; font-size: 12px;">{{ symbol }}</div>
-            </div>
-        {% endfor %}
     </div>
-</div>
 
-
-
+<div class="section">
+    <h2>
+        📉 Mini-Zeitstrahl pro Symbol
+        <button onclick="toggleVisibility('miniChartContainer')" style="float: right;">Anzeigen / Verstecken</button>
+    </h2>
 
     <form method="get" action="/dashboard" style="margin-bottom: 10px;">
         <label>Zeiteinheit wählen:</label>
@@ -197,7 +182,7 @@
     <div id="miniChartContainer" class="hidden">
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
             {% for symbol, daten in minicharts.items() %}
-                <div class="mini-chart-box" style="width: 160px; background: #222; padding: 5px; border-radius: 8px;">
+                <div style="width: 160px; background: #222; padding: 5px; border-radius: 8px;">
                     <canvas id="miniChart_{{ symbol }}"></canvas>
                     <div style="text-align: center; font-size: 12px;">{{ symbol }}</div>
                 </div>
@@ -213,7 +198,7 @@
 <div class="section">
     <h2>
         📅 Monatliche Verteilung
-        <button class="anzeige-button" onclick="toggleAndSave('verteilungContainer')" style="float: right;">Anzeigen</button>
+        <button onclick="toggleVisibility('verteilungContainer')" style="float: right;">Anzeigen / Verstecken</button>
     </h2>
     <div id="verteilungContainer" class="hidden">
         <form method="get" action="/dashboard">
@@ -224,33 +209,34 @@
                 {% endfor %}
             </select>
         </form>
-<div class="matrix">
-    <div><strong>Symbol</strong></div>
-    {% for monat in monate %}
-        <div><strong>{{ monat }}</strong></div>
-    {% endfor %}
+        <div class="matrix">
+            <div><strong>Symbol</strong></div>
+            {% for monat in monate %}
+                <div><strong>{{ monat }}</strong></div>
+            {% endfor %}
 
-    {% if matrix %}
-        {% for symbol, werte in matrix.items() %}
-            <div><strong>{{ symbol }}</strong></div>
-            {% for wert in werte %}
-                <div style="
-                    color: {% if wert > 0 %}#00cc66{% elif wert < 0 %}#ff4444{% else %}#aaa{% endif %};
-                    font-weight: bold;">
-                    {{ wert }}
-                </div>
-            {% endfor %}
-        {% endfor %}
-    {% else %}
-        {% for symbol in ['BTC', 'ETH', 'XRP'] %}
-            <div><strong>{{ symbol }}</strong></div>
-            {% for _ in range(6) %}
-                <div style="color: #aaa; font-weight: bold;">0</div>
-            {% endfor %}
-        {% endfor %}
-    {% endif %}
+            {% if matrix %}
+                {% for symbol, werte in matrix.items() %}
+                    <div onclick="this.textContent = this.dataset.full || this.textContent" data-full="{{ symbol }}"><strong>{{ symbol[:6] }}</strong></div>
+                    {% for wert in werte %}
+                        <div style="
+                            color: {% if wert > 0 %}#00cc66{% elif wert < 0 %}#ff4444{% else %}#aaa{% endif %};
+                            font-weight: bold;">
+                            {{ wert }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            {% else %}
+                {% for symbol in ['BTC', 'ETH', 'XRP'] %}
+                    <div onclick="this.textContent = this.dataset.full || this.textContent" data-full="{{ symbol }}"><strong>{{ symbol[:6] }}</strong></div>
+                    {% for _ in range(12) %}
+                        <div style="color: #aaa; font-weight: bold;">0</div>
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
 </div>
-
 
 
 
@@ -296,19 +282,15 @@ const symbole = ["Dominance", "Others", "Total"];
 
 symbole.forEach(symbol => {
     ["bullish", "bearish"].forEach(richtung => {
-        const key = `${symbol}_${richtung}`;
+        const key = ${symbol}_${richtung};
         stundenDatasets.push({
-            label: `${symbol} ${richtung}`,
+            label: ${symbol} ${richtung},
             data: stundenDaten.map(row => row[key] || 0),
             backgroundColor: farben[key],
-            barThickness: 8,
-            maxBarThickness: 12,
-            categoryPercentage: 0.6,
-            barPercentage: 0.8
+            stack: symbol
         });
     });
 });
-
 
 // Stunden-Chart
 new Chart(document.getElementById("hourlyChart").getContext("2d"), {
@@ -325,8 +307,8 @@ new Chart(document.getElementById("hourlyChart").getContext("2d"), {
             title: { display: true, text: '🔄 Stündliche Alarmverteilung nach Symbol & Trend' }
         },
         scales: {
-            x: { stacked: false },
-            y: { stacked: false, beginAtZero: true }
+            x: { stacked: true },
+            y: { stacked: true, beginAtZero: true }
         }
     }
 });
@@ -365,151 +347,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-function toggleAndSave(id) {
-    const el = document.getElementById(id);
-    const visible = el.classList.toggle('hidden');
-    localStorage.setItem('section_' + id, !visible);
-}
 
-function restoreSectionVisibility() {
-    ['section1', 'section2'].forEach(id => {
-        const state = localStorage.getItem('section_' + id);
-        if (state === 'true') {
-            document.getElementById(id).classList.remove('hidden');
-        }
-    });
-}
 
-document.addEventListener("DOMContentLoaded", restoreSectionVisibility);
-
-</div> <!-- matrix -->
-</div> <!-- Ende von verteilungContainer -->
-</div> <!-- Ende von Monatliche Verteilung section -->
 </script>
-        
-
-<!-- 1. + 2. in einer gemeinsamen Zeile -->
-<div class="section-container" style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
-
-    <!-- 1. Globale Alarmeinstellungen -->
-    <div class="section" style="flex: 1; min-width: 300px;">
-        <h2>
-            1. Globale Alarmeinstellungen
-            <button class="anzeige-button" onclick="toggleAndSave('section1')" style="float: right;">Anzeigen</button>
-        </h2>
-        <div id="section1" class="hidden">
-            <form action="/update-settings" method="post">
-                <label>Intervall in Stunden (Dropdown)</label>
-                <select name="interval_hours_dropdown">
-                    <option value="1">1 Stunde</option>
-                    <option value="3">3 Stunden</option>
-                    <option value="6">6 Stunden</option>
-                    <option value="12">12 Stunden</option>
-                    <option value="24">24 Stunden</option>
-                </select>
-                <label>Oder manuell</label>
-                <input type="number" name="interval_hours_manual" placeholder="Manuelle Eingabe (hat Vorrang)">
-                <label>Maximale Alarme pro Intervall</label>
-                <input type="number" name="max_alarms" value="3" required>
-                <label>Trendrichtung</label>
-                <select name="trend_richtung">
-                    <option value="neutral">Keine Trendvorgabe</option>
-                    <option value="bullish">Positiver Trend (aufwärts)</option>
-                    <option value="bearish">Negativer Trend (abwärts)</option>
-                </select>
-                <input type="hidden" name="symbol" value="ALL">
-                <button type="submit">📂 Einstellungen speichern</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 2. Aktuelle globale Einstellungen -->
-    <div class="section" style="flex: 1; min-width: 300px;">
-        <h2>
-            2. Aktuelle globale Einstellungen
-            <button class="anzeige-button" onclick="toggleAndSave('section2')" style="float: right;">Anzeigen</button>
-        </h2>
-        <div id="section2" class="hidden">
-            {% if einstellungen %}
-            <form method="post" action="/delete-multiple-settings">
-                <ul>
-                    {% for key, config in einstellungen.items() %}
-                        <li>
-                            <input type="checkbox" name="delete_keys" value="{{ key }}" class="checkbox">
-                            <strong>{{ key }}</strong>:
-                            Intervall: {{ config.interval_hours }}h |
-                            Max. Alarme: {{ config.max_alarms }} |
-                            Trend:
-                            {% if config.trend_richtung == "bullish" %}🟢 bullisch
-                            {% elif config.trend_richtung == "bearish" %}🔴 bärisch
-                            {% else %}⚪ neutral
-                            {% endif %}
-                            <button type="button" onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">⟳ Laden</button>
-                        </li>
-                    {% endfor %}
-                </ul>
-                <button type="submit">🗑️ Ausgewählte löschen</button>
-            </form>
-            {% else %}
-                <p>Keine globalen Einstellungen gesetzt.</p>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-
-
-<!-- 3. Letzte Alarme (versteckt mit Button) -->
-<div class="section">
-    <h2>
-        3. Letzte Alarme
-        <button class="anzeige-button" onclick="toggleAndSave('section3')" style="float: right;">Anzeigen</button>
-    </h2>
-    <div id="section3" class="hidden">
-        <ul id="alarmListe">
-            {% if letzte_ereignisse %}
-                {% for eintrag in letzte_ereignisse %}
-                    <li class="{% if loop.index > 5 %}hidden{% endif %}">
-                        {{ eintrag["timestamp"].strftime('%Y-%m-%d %H:%M:%S') }} | {{ eintrag["symbol"] }}:
-                        {{ eintrag["nachricht"] if eintrag.get("nachricht") else eintrag.get("event", "-") }}
-                    </li>
-                {% endfor %}
-            {% else %}
-                <li>Keine Alarme registriert.</li>
-            {% endif %}
-        </ul>
-        {% if letzte_ereignisse|length > 5 %}
-            <button id="toggleAlarmeBtn" onclick="toggleAlarme()" data-expanded="false">📋 Alle anzeigen</button>
-        {% endif %}
-    </div>
-</div>
-<script>
-function toggleAndSave(id) {
-    const el = document.getElementById(id);
-    if (el) {
-        el.classList.toggle("hidden");
-        localStorage.setItem(id, el.classList.contains("hidden") ? "hidden" : "visible");
-    }
-}
-
-window.onload = function () {
-    const ids = ["section1", "section2", "section3", "section4", "section5", "hourlyChartContainer", "miniChartContainer", "verteilungContainer"];
-    ids.forEach(id => {
-        const el = document.getElementById(id);
-        if (el && localStorage.getItem(id) === "visible") {
-            el.classList.remove("hidden");
-        }
-    });
-};
-</script>
-
-<style>
-.hidden {
-    display: none;
-}
-</style>
-
-
 </body>
 </html>
-
