@@ -1990,28 +1990,8 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-24T08:36:42.616178+02:00",
-    "symbol": "BTCUSD",
-    "event": "Sell",
-    "price": 0,
-    "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-24T08:37:03.299372+02:00",
-    "symbol": "BTCUSD",
-    "event": "Sell",
-    "price": 0,
-    "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-24T08:37:17.412624+02:00",
-    "symbol": "BTCUSD",
+    "timestamp": "2025-06-24T08:39:05.162442+02:00",
+    "symbol": "ETHUSD",
     "event": "Sell",
     "price": 0,
     "interval": "unspecified",
