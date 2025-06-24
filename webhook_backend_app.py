@@ -204,6 +204,30 @@ def sende_email(betreff, inhalt):
         print("E-Mail erfolgreich gesendet")
     except Exception as e:
         print(f"E-Mail konnte nicht gesendet werden: {e}")
+        
+@app.route("/kursdaten", methods=["POST"])
+def empfange_kursdaten():
+    daten = request.get_json()
+    symbol = daten.get("symbol", "").upper()
+    trend = daten.get("trend", "neutral")
+    nachricht = daten.get("nachricht", "")
+    kurswert = float(daten.get("wert", 0))
+
+    # Speichere Alarmsignal
+    empfange_webhook(symbol, trend, nachricht)
+
+    # Speichere Kurswert separat
+    if symbol and kurswert > 0:
+        eintrag = {
+            "symbol": symbol,
+            "wert": kurswert,
+            "zeit": datetime.utcnow().isoformat()
+        }
+        with open("kurswerte.json", "a", encoding="utf-8") as f:
+            f.write(json.dumps(eintrag) + "\n")
+
+    return jsonify({"status": "ok"})
+
 
 @app.route("/")
 def home():
