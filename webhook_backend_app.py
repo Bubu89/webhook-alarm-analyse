@@ -553,7 +553,7 @@ def dashboard():
 
 from kurs_handler import lade_kurse  # hinzufügen
 
-@app.route("/dashboard")
+
 def dashboard():
     ...
     kursdaten = lade_kurse()
