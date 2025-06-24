@@ -271,6 +271,8 @@ def dashboard():
     year = request.args.get("year")
     mini_interval = request.args.get("mini_interval", "1")
     interval_hours = int(mini_interval) if mini_interval.isdigit() else 1
+    stunden_interval = int(request.args.get("stunden_interval", "1"))
+
 
     daten = []
     if os.path.exists(LOG_DATEI):
@@ -360,7 +362,8 @@ def dashboard():
         sortierte_paare = ["BTC", "ETH"] + sorted([s for s in df["symbol"].unique() if s not in ["BTC", "ETH"]])
         df["symbol"] = pd.Categorical(df["symbol"], categories=sortierte_paare, ordered=True)
 
-        stunden_daten = erzeuge_stunden_daten(df)
+        stunden_daten = erzeuge_stunden_daten(df, interval=stunden_interval)
+
 
         gruppen_trends = []
         farben_mapping = {
@@ -417,6 +420,7 @@ def dashboard():
         trend_aggregat_daten=trend_aggregat_view,
         minicharts=minicharts,
         mini_interval=mini_interval,
+        stunden_interval=stunden_interval,
         matrix=matrix,
         monate=monate,
         aktuelles_jahr=aktuelles_jahr,
@@ -436,6 +440,8 @@ def update_settings():
         interval_hours = int(manual_value) if manual_value else int(dropdown_value)
     except ValueError:
         interval_hours = 1
+        stunden_interval = int(request.args.get("stunden_interval", "1"))
+
 
     max_alarms = int(request.form.get("max_alarms", 3))
     trend_richtung = request.form.get("trend_richtung", "neutral")
