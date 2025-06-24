@@ -153,7 +153,8 @@
     <div class="section">
         <h2>
             🕒 Stundenverlauf (Trendrichtung & Symbol)
-            <button class="anzeige-button" onclick="toggleVisibility('letzteAlarme')" style="float: right;">Anzeigen</button>
+            <button class="anzeige-button" onclick="toggleVisibility('hourlyChartContainer')" style="float: right;">Anzeigen</button>
+
 
         </h2>
         <div id="hourlyChartContainer" class="hidden">
@@ -210,7 +211,7 @@
 <div class="section">
     <h2>
         📅 Monatliche Verteilung
-        <button onclick="toggleVisibility('verteilungContainer')" style="float: right; margin-left: 4px;">Anzeige</button>
+        <button class="anzeige-button" onclick="toggleVisibility('verteilungContainer')" style="float: right;">Anzeigen</button>
     </h2>
     <div id="verteilungContainer" class="hidden">
         <form method="get" action="/dashboard">
