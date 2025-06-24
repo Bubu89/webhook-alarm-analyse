@@ -434,7 +434,11 @@ def dashboard():
         aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
         df_jahr = df[df["jahr"] == aktuelles_jahr]
 
-        monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
+        aktueller_monat = datetime.now().month
+        monate_roh = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"]
+        start_index = max(0, aktueller_monat - 6)
+        monate = monate_roh[start_index:aktueller_monat]
+
         matrix = {}
 
 
