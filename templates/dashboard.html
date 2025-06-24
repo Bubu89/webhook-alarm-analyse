@@ -168,6 +168,17 @@
         📉 Mini-Zeitstrahl pro Symbol
         <button onclick="toggleVisibility('miniChartContainer')" style="float: right;">Anzeigen / Verstecken</button>
     </h2>
+
+    <form method="get" action="/dashboard" style="margin-bottom: 10px;">
+        <label>Zeiteinheit wählen:</label>
+        <select name="mini_interval" onchange="this.form.submit()">
+            <option value="1" {% if mini_interval == "1" %}selected{% endif %}>4× 1 Stunde</option>
+            <option value="6" {% if mini_interval == "6" %}selected{% endif %}>4× 6 Stunden</option>
+            <option value="12" {% if mini_interval == "12" %}selected{% endif %}>4× 12 Stunden</option>
+            <option value="24" {% if mini_interval == "24" %}selected{% endif %}>4× 1 Tag</option>
+        </select>
+    </form>
+
     <div id="miniChartContainer" class="hidden">
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
             {% for symbol, daten in minicharts.items() %}
