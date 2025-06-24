@@ -161,17 +161,18 @@
         <div id="hourlyChartContainer" class="hidden">
             <canvas id="hourlyChart"></canvas>
         </div>
-        <form method="get" action="/dashboard" style="margin-top: 10px;">
-    <label>Zeiteinheit für Stundenverlauf wählen:</label>
-    <select name="stundenverlauf_interval" onchange="this.form.submit()">
-        <option value="1" {% if stundenverlauf_interval == "1" %}selected{% endif %}>10× 1 Stunde</option>
-        <option value="6" {% if stundenverlauf_interval == "6" %}selected{% endif %}>10× 6 Stunden</option>
-        <option value="12" {% if stundenverlauf_interval == "12" %}selected{% endif %}>10× 12 Stunden</option>
-        <option value="24" {% if stundenverlauf_interval == "24" %}selected{% endif %}>10× 1 Tag</option>
-        <option value="48" {% if stundenverlauf_interval == "48" %}selected{% endif %}>10× 2 Tage</option>
-        <option value="168" {% if stundenverlauf_interval == "168" %}selected{% endif %}>10× 1 Woche</option>
+<form method="get" action="/dashboard" style="margin-bottom: 10px;">
+    <label for="stunden_interval">Stunden-Intervall:</label>
+    <select name="stunden_interval" onchange="this.form.submit()">
+        <option value="1" {% if stunden_interval == 1 %}selected{% endif %}>1 Stunde (10 Balken)</option>
+        <option value="6" {% if stunden_interval == 6 %}selected{% endif %}>6 Stunden (10 Balken)</option>
+        <option value="12" {% if stunden_interval == 12 %}selected{% endif %}>12 Stunden (10 Balken)</option>
+        <option value="24" {% if stunden_interval == 24 %}selected{% endif %}>1 Tag (10 Balken)</option>
+        <option value="48" {% if stunden_interval == 48 %}selected{% endif %}>2 Tage (10 Balken)</option>
+        <option value="168" {% if stunden_interval == 168 %}selected{% endif %}>1 Woche (10 Balken)</option>
     </select>
 </form>
+
 
     </div>
 
