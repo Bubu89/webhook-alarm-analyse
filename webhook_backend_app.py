@@ -414,7 +414,7 @@ def dashboard():
         df["symbol"] = df["symbol"].astype(str)
         prognosen = berechne_prognosen(df)
         jetzt = datetime.now(MEZ)
-        df = df[df["timestamp"] >= jetzt - timedelta(hours=6)]
+       # df = df[df["timestamp"] >= jetzt - timedelta(hours=6)]
 
         df["jahr"] = df["timestamp"].dt.year
 
