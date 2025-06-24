@@ -233,33 +233,43 @@ def webhook():
     return jsonify({"status": "ok"})
 
 
-def erzeuge_minichart_daten(df: pd.DataFrame) -> dict:
+def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
     df = df.copy()
-    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True)
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True).dt.tz_convert(MEZ)
     df = df[df["timestamp"].notna()]
-    df["stunde"] = df["timestamp"].dt.strftime("%H")
     df = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
 
-    grouped = df.groupby(["symbol", "stunde", "trend"]).size().reset_index(name="anzahl")
+    endzeit = datetime.now(MEZ).replace(minute=0, second=0, microsecond=0)
+    zeitslots = [(endzeit - timedelta(hours=i * interval_hours)) for i in reversed(range(4))]
+
+    labels = [f"{slot.strftime('%d.%m %H:%M')}" for slot in zeitslots]
+    df["slot"] = pd.cut(df["timestamp"], bins=zeitslots + [endzeit + timedelta(hours=interval_hours)],
+                        labels=labels, right=False)
+
+    grouped = df.groupby(["symbol", "slot", "trend"]).size().reset_index(name="anzahl")
 
     minichart_daten = defaultdict(lambda: {"stunden": [], "werte": [], "farben": []})
-    
-    for (symbol, stunde), gruppe in grouped.groupby(["symbol", "stunde"]):
+
+    for (symbol, slot), gruppe in grouped.groupby(["symbol", "slot"]):
         bullish = gruppe[gruppe["trend"] == "bullish"]["anzahl"].sum()
         bearish = gruppe[gruppe["trend"] == "bearish"]["anzahl"].sum()
         score = bullish - bearish
         farbe = "#00cc66" if score > 0 else "#ff3333" if score < 0 else "#aaaaaa"
-        
-        minichart_daten[symbol]["stunden"].append(f"{stunde}h")
+
+        minichart_daten[symbol]["stunden"].append(str(slot))
         minichart_daten[symbol]["werte"].append(score)
         minichart_daten[symbol]["farben"].append(farbe)
 
     return dict(minichart_daten)
 
 
+
 @app.route("/dashboard")
 def dashboard():
     year = request.args.get("year")
+    mini_interval = request.args.get("mini_interval", "1")
+    interval_hours = int(mini_interval) if mini_interval.isdigit() else 1
+
     daten = []
     if os.path.exists(LOG_DATEI):
         with open(LOG_DATEI, "r") as f:
@@ -311,7 +321,8 @@ def dashboard():
         df["symbol"] = df["symbol"].astype(str)
         df["jahr"] = df["timestamp"].dt.year
 
-        minicharts = erzeuge_minichart_daten(df)
+        minicharts = erzeuge_minichart_daten(df, interval_hours=interval_hours)
+
 
         # JSON-kompatible Umwandlung für Jinja/Chart.js
         for daten in minicharts.values():
@@ -403,6 +414,7 @@ def dashboard():
         gruppen_trends=gruppen_trends,
         trend_aggregat_daten=trend_aggregat_view,
         minicharts=minicharts,
+        mini_interval=mini_interval,
         matrix=matrix,
         monate=monate,
         aktuelles_jahr=aktuelles_jahr,
