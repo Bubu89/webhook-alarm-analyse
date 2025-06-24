@@ -1,50 +1,50 @@
+# kurs_handler.py  (komplett)
+
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 
 KURSDATEI = "kursdaten.json"
 
-def lade_kurse():
+SYMBOL_MAP = {
+    "btc":  "BTCUSD",
+    "eth":  "ETHUSD",
+    "coti": "COTIUSD",
+    "velo": "VELOUSD",
+    "op":   "OPUSD",
+    "fet":  "FETUSD",
+    "aero": "AEROUSD",
+    "tao":  "TAOUSD"
+}
+
+def lade_kurse() -> dict:
     try:
         with open(KURSDATEI, "r", encoding="utf-8") as f:
             return json.load(f)
     except:
         return {}
 
-def speichere_kurse(daten):
+def speichere_kurse(data: dict) -> None:
     with open(KURSDATEI, "w", encoding="utf-8") as f:
-        json.dump(daten, f, indent=2)
+        json.dump(data, f, indent=2)
 
-def verarbeite_kursdaten(payload):
+def verarbeite_kursdaten(payload: dict) -> None:
     daten = lade_kurse()
-    zeitstempel = payload.get("time")
-
-    symbole = ["btc", "eth", "coti", "velo", "op", "fet", "aero", "tao"]
-    for symbol in symbole:
-        kurs_neu = payload.get(symbol)
-        if kurs_neu is None:
+    ts   = payload.get("time", int(datetime.utcnow().timestamp()))
+    for fld, pair in SYMBOL_MAP.items():
+        price = payload.get(fld)
+        if price is None:
             continue
-
-        eintrag = daten.get(symbol, {})
-        eintrag["neu"] = {"timestamp": zeitstempel, "wert": kurs_neu}
-
-        # Letzter bekannter Kurs
-        alt = eintrag.get("alt")
-        if alt and abs(zeitstempel - alt["timestamp"]) >= 7200:
-            delta = kurs_neu - alt["wert"]
+        eintrag = daten.get(fld, {})
+        alt     = eintrag.get("alt")
+        if alt and ts - alt["timestamp"] >= 7200:
+            delta = price - alt["wert"]
             eintrag["verlauf"] = "bullish" if delta > 0 else "bearish" if delta < 0 else "neutral"
-            # Trefferquote hier (Dummy)
-            eintrag["trefferquote"] = berechne_trefferquote(delta, eintrag.get("einschaetzung"))
-
-        eintrag["alt"] = {"timestamp": zeitstempel, "wert": kurs_neu}
-        daten[symbol] = eintrag
-
+            eintrag["trefferquote"] = 1 if (
+                (eintrag.get("einschaetzung") == "bullish" and delta > 0) or
+                (eintrag.get("einschaetzung") == "bearish" and delta < 0)
+            ) else 0
+        eintrag["neu"] = {"timestamp": ts, "wert": price}
+        eintrag["alt"] = {"timestamp": ts, "wert": price}
+        eintrag["symbol"] = pair
+        daten[fld] = eintrag
     speichere_kurse(daten)
-
-def berechne_trefferquote(delta, einschätzung):
-    if not einschätzung:
-        return 0
-    if einschätzung == "bullish" and delta > 0:
-        return 1
-    if einschätzung == "bearish" and delta < 0:
-        return 1
-    return 0
