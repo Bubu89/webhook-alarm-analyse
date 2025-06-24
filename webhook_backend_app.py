@@ -36,7 +36,8 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
             return "Others", 1
         elif symbol.startswith("TOTAL/"):
             return "Total", 1
-        return None, 1
+        return ("Sonstige", 1)
+
 
     result = df["symbol"].apply(gruppenzuordnung)
 
