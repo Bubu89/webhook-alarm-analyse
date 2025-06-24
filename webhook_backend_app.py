@@ -11,6 +11,7 @@ from uploader import git_upload
 import threading
 from flask_caching import Cache
 import time
+import calendar
 
 # ✅ Flask-App & Caching korrekt initialisieren
 app = Flask(__name__)
