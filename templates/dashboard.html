@@ -227,25 +227,26 @@
                 <div><strong>{{ monat }}</strong></div>
             {% endfor %}
 
-            {% if matrix %}
-                {% for symbol, werte in matrix.items() %}
-                    <div onclick="this.textContent = this.dataset.full || this.textContent" data-full="{{ symbol }}"><strong>{{ symbol[:6] }}</strong></div>
-                    {% for wert in werte %}
-                        <div style="
-                            color: {% if wert > 0 %}#00cc66{% elif wert < 0 %}#ff4444{% else %}#aaa{% endif %};
-                            font-weight: bold;">
-                            {{ wert }}
-                        </div>
-                    {% endfor %}
-                {% endfor %}
-            {% else %}
-                {% for symbol in ['BTC', 'ETH', 'XRP'] %}
-                    <div onclick="this.textContent = this.dataset.full || this.textContent" data-full="{{ symbol }}"><strong>{{ symbol[:6] }}</strong></div>
-                    {% for _ in range(12) %}
-                        <div style="color: #aaa; font-weight: bold;">0</div>
-                    {% endfor %}
-                {% endfor %}
-            {% endif %}
+{% if matrix %}
+    {% for symbol, werte in matrix.items() %}
+        <div><strong>{{ symbol }}</strong></div>
+        {% for wert in werte %}
+            <div style="
+                color: {% if wert > 0 %}#00cc66{% elif wert < 0 %}#ff4444{% else %}#aaa{% endif %};
+                font-weight: bold;">
+                {{ wert }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% else %}
+    {% for symbol in ['BTC', 'ETH', 'XRP'] %}
+        <div><strong>{{ symbol }}</strong></div>
+        {% for _ in range(12) %}
+            <div style="color: #aaa; font-weight: bold;">0</div>
+        {% endfor %}
+    {% endfor %}
+{% endif %}
+
         </div>
     </div>
 </div>
