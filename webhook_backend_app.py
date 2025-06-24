@@ -24,6 +24,8 @@ EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
 MEZ = pytz.timezone("Europe/Vienna")
 app = Flask(__name__)
 
+print(df["symbol"].apply(gruppenzuordnung).head(10))
+
 def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
     df["stunde"] = df["timestamp"].dt.strftime("%H")
