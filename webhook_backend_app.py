@@ -407,6 +407,42 @@ def delete_multiple_settings():
     git_upload(SETTINGS_DATEI, ".")
 
     return redirect(url_for("dashboard"))
+# ------------------------------------------------------------------
+#  ➜  NEU: globale Alarmeinstellungen speichern / überschreiben
+# ------------------------------------------------------------------
+@app.route("/update-settings", methods=["POST"])
+def update_settings():
+    # Werte aus dem Formular holen
+    interval_dropdown = request.form.get("interval_hours_dropdown", type=int)
+    interval_manual   = request.form.get("interval_hours_manual", type=int)
+    max_alarms        = request.form.get("max_alarms", type=int, default=3)
+    trend             = request.form.get("trend_richtung", default="neutral")
+    symbol            = request.form.get("symbol", default="ALL")
+
+    # manuelle Eingabe hat Vorrang
+    interval_hours = interval_manual or interval_dropdown or 1
+
+    # Settings-Datei einlesen
+    try:
+        with open(SETTINGS_DATEI, "r", encoding="utf-8") as f:
+            settings = json.load(f)
+    except Exception:
+        settings = {}
+
+    key = f"global_{trend}" if symbol == "ALL" else f"global_{trend}_{symbol}"
+
+    settings[key] = {
+        "interval_hours": interval_hours,
+        "max_alarms":     max_alarms,
+        "trend_richtung": trend
+    }
+
+    # speichern
+    with open(SETTINGS_DATEI, "w", encoding="utf-8") as f:
+        json.dump(settings, f, indent=2)
+
+    git_upload(SETTINGS_DATEI, ".")          # optionaler Auto-Commit
+    return redirect(url_for("dashboard"))
 
 @app.route("/kursdaten", methods=["POST"])
 def empfange_kursdaten():
