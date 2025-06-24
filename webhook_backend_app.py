@@ -78,10 +78,13 @@ def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict
     # 📊 Gruppieren nach Zeitblock, Gruppe und Trend
     gruppiert = df.groupby(["zeitblock", "symbolgruppe", "trend"]).size().reset_index(name="anzahl")
 
-    # ➕ Total summieren
+    # 🆕 Total separat aus allen Gruppen berechnen
     gesamt = gruppiert.groupby(["zeitblock", "trend"])["anzahl"].sum().reset_index()
     gesamt["symbolgruppe"] = "Total"
+
+    # Reihenfolge beibehalten
     gruppiert = pd.concat([gruppiert, gesamt], ignore_index=True)
+
 
     # 📦 In strukturierte Dict-Form überführen
     struktur = defaultdict(dict)
