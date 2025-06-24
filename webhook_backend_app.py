@@ -104,6 +104,13 @@ def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict
 
     return daten
 
+def lade_prognosen():
+    PROGNOSE_DATEI = "prognosen.json"
+    try:
+        with open(PROGNOSE_DATEI, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
 
 
 @app.route("/dashboard")
