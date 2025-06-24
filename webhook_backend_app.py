@@ -75,7 +75,11 @@ def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict
     df["zeitblock"] = df["timestamp"].dt.floor(f"{intervall_stunden}h")
 
     # 🔄 Gruppierung nach Symbolart (Dominance/Others)
-    df["symbolgruppe"] = df["symbol"].apply(lambda s: "Dominance" if "dominance" in s.lower() else "Others")
+    DOMI = {"BTC.D", "ETH.D", "USDT.D", "USDC.D"}          # kannst Du beliebig erweitern
+    df["symbolgruppe"] = df["symbol"].apply(
+        lambda s: "Dominance" if s.upper() in DOMI else "Others"
+    )
+
 
     # 📊 Gruppieren nach Zeitblock, Gruppe und Trend
     gruppiert = df.groupby(["zeitblock", "symbolgruppe", "trend"]).size().reset_index(name="anzahl")
