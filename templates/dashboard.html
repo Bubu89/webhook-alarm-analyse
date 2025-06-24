@@ -287,10 +287,14 @@ symbole.forEach(symbol => {
             label: `${symbol} ${richtung}`,
             data: stundenDaten.map(row => row[key] || 0),
             backgroundColor: farben[key],
-            stack: symbol
+            barThickness: 8,
+            maxBarThickness: 12,
+            categoryPercentage: 0.6,
+            barPercentage: 0.8
         });
     });
 });
+
 
 // Stunden-Chart
 new Chart(document.getElementById("hourlyChart").getContext("2d"), {
@@ -307,8 +311,8 @@ new Chart(document.getElementById("hourlyChart").getContext("2d"), {
             title: { display: true, text: '🔄 Stündliche Alarmverteilung nach Symbol & Trend' }
         },
         scales: {
-            x: { stacked: true },
-            y: { stacked: true, beginAtZero: true }
+            x: { stacked: false },
+            y: { stacked: false, beginAtZero: true }
         }
     }
 });
