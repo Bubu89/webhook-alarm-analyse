@@ -10,11 +10,5 @@
     "interval_hours": 1,
     "max_alarms": 4,
     "trend_richtung": "bullish"
-  },
-  "global_bearish": {
-    "symbol": "ALL",
-    "interval_hours": 1,
-    "max_alarms": 4,
-    "trend_richtung": "bearish"
   }
 }
