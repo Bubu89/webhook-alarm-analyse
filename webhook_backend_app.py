@@ -13,6 +13,13 @@ from flask_caching import Cache
 import time
 from kurs_handler import lade_kurse, verarbeite_kursdaten   # <-  verarbeite_kursdaten neu
 
+import warnings, pandas as pd
+warnings.filterwarnings(
+    "ignore",
+    message="The default of observed=False is deprecated",
+    category=FutureWarning,
+    module="pandas.core.groupby"
+)
 
 
 load_dotenv()  # ganz am Anfang
