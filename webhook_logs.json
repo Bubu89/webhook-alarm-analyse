@@ -2250,13 +2250,13 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-24T09:49:09.782541+02:00",
-    "symbol": "TOTAL/COINBASE:OPUSD",
-    "event": "Sell",
+    "timestamp": "2025-06-24T09:50:47.896456+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
+    "event": "Buy",
     "price": 0,
     "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": false
   }
 ]
