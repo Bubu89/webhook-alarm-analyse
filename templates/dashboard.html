@@ -153,7 +153,7 @@
     <div class="section">
         <h2>
             🕒 Stundenverlauf (Trendrichtung & Symbol)
-            <button class="anzeige-button" onclick="toggleVisibility('hourlyChartContainer')" style="float: right;">Anzeigen</button>
+            <button class="anzeige-button" onclick="toggleAndSave('hourlyChartContainer')" style="float: right;">Anzeigen</button>
 
 
         </h2>
@@ -179,8 +179,9 @@
 <div class="section">
     <h2>
         📉 Mini-Zeitstrahl pro Symbol
-        <button class="anzeige-button" onclick="toggleVisibility('miniChartContainer')" style="float: right;">Anzeigen</button>
+        <button class="anzeige-button" onclick="toggleAndSave('miniChartContainer')" style="float: right;">Anzeigen</button>
     </h2>
+
 
     <form method="get" action="/dashboard" style="margin-bottom: 10px;">
         <label>Zeiteinheit wählen:</label>
@@ -211,7 +212,7 @@
 <div class="section">
     <h2>
         📅 Monatliche Verteilung
-        <button class="anzeige-button" onclick="toggleVisibility('verteilungContainer')" style="float: right;">Anzeigen</button>
+        <button class="anzeige-button" onclick="toggleAndSave('verteilungContainer')" style="float: right;">Anzeigen</button>
     </h2>
     <div id="verteilungContainer" class="hidden">
         <form method="get" action="/dashboard">
@@ -461,9 +462,9 @@ document.addEventListener("DOMContentLoaded", restoreSectionVisibility);
 <div class="section">
     <h2>
         3. Letzte Alarme
-        <button class="anzeige-button" onclick="toggleVisibility('letzteAlarme')" style="float: right;">Anzeigen</button>
+        <button class="anzeige-button" onclick="toggleAndSave('section3')" style="float: right;">Anzeigen</button>
     </h2>
-    <div id="letzteAlarme" class="hidden">
+    <div id="section3" class="hidden">
         <ul id="alarmListe">
             {% if letzte_ereignisse %}
                 {% for eintrag in letzte_ereignisse %}
@@ -481,6 +482,31 @@ document.addEventListener("DOMContentLoaded", restoreSectionVisibility);
         {% endif %}
     </div>
 </div>
+<script>
+function toggleAndSave(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.toggle("hidden");
+        localStorage.setItem(id, el.classList.contains("hidden") ? "hidden" : "visible");
+    }
+}
+
+window.onload = function () {
+    const ids = ["section1", "section2", "section3", "section4", "section5", "hourlyChartContainer", "miniChartContainer", "verteilungContainer"];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && localStorage.getItem(id) === "visible") {
+            el.classList.remove("hidden");
+        }
+    });
+};
+</script>
+
+<style>
+.hidden {
+    display: none;
+}
+</style>
 
 
 </body>
