@@ -30,6 +30,10 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
     df["stunde"] = df["timestamp"].dt.strftime("%H")
 
+def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
+    df = df[df["trend"].isin(["bullish", "bearish"])].copy()
+    df["stunde"] = df["timestamp"].dt.strftime("%H")
+
     def gruppenzuordnung(symbol):
         if symbol in ["BTC.D", "ETH.D", "USDT.D", "USDC.D"]:
             return "Dominance", 4
@@ -39,7 +43,12 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
             return "Total", 1
         return None, 1
 
-    df[["gruppe", "gewicht"]] = pd.DataFrame(df["symbol"].apply(gruppenzuordnung).tolist(), index=df.index)
+    result = df["symbol"].apply(gruppenzuordnung)
+    if isinstance(result.iloc[0], (list, tuple)) and len(result.iloc[0]) == 2:
+        df[["gruppe", "gewicht"]] = pd.DataFrame(result.tolist(), index=df.index)
+    else:
+        raise ValueError("Die Funktion gruppenzuordnung muss für jeden symbol ein Tupel (gruppe, gewicht) zurückgeben.")
+
     df = df[df["gruppe"].notna()]
 
     gruppiert = df.groupby(["stunde", "gruppe", "trend"]).agg(
