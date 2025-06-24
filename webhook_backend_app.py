@@ -554,7 +554,7 @@ from kurs_handler import lade_kurse  # hinzufügen
 def dashboard():
     ...
     kursdaten = lade_kurse()
-    return render_template("dashboard.html", mini_prognosen=mini_prognosen, kursdaten=kursdaten, ...)
+    return render_template("dashboard.html", mini_prognosen=mini_prognosen, kursdaten=kursdaten)
 
 @app.route("/update-settings", methods=["POST"])
 def update_settings():
