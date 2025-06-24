@@ -25,13 +25,14 @@ MEZ = pytz.timezone("Europe/Vienna")
 app = Flask(__name__)
 
 
-def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
+def erzeuge_stunden_daten(df: pd.DataFrame, interval: int = 1) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
+
     start_von_heute = datetime.now(MEZ).replace(hour=0, minute=0, second=0, microsecond=0)
     df = df[df["timestamp"] >= start_von_heute]
 
-    df["stunde"] = df["timestamp"].dt.strftime("%H")
+    df["zeitfenster"] = df["timestamp"].dt.floor(f"{interval}H")
 
     def gruppenzuordnung(symbol):
         if symbol in ["BTC.D", "ETH.D", "USDT.D", "USDC.D"]:
@@ -47,7 +48,7 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
     df = df[result.notnull()].copy()
     df[["gruppe", "gewicht"]] = pd.DataFrame(result[result.notnull()].tolist(), index=result[result.notnull()].index)
 
-    gruppiert = df.groupby(["stunde", "gruppe", "trend"]).agg(
+    gruppiert = df.groupby(["zeitfenster", "gruppe", "trend"]).agg(
         anzahl=("symbol", "count"),
         gewicht=("gewicht", "first")
     ).reset_index()
@@ -55,11 +56,11 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
     struktur = defaultdict(dict)
     for _, row in gruppiert.iterrows():
         schnitt = row["anzahl"] / row["gewicht"]
-        struktur[row["stunde"]][f"{row['gruppe']}_{row['trend']}"] = round(schnitt, 1)
+        zeitfenster = row["zeitfenster"].strftime("%d.%m %H:%M")
+        struktur[zeitfenster][f"{row['gruppe']}_{row['trend']}"] = round(schnitt, 1)
 
-    # sortiere nach Stunde, neueste Stunde zuletzt (also rechts im Chart)
-    sortierte_stunden = sorted(struktur.keys(), key=lambda h: int(h))
-    return [{"stunde": k, **struktur[k]} for k in sortierte_stunden]
+    sortierte_slots = sorted(struktur.keys())
+    return [{"stunde": slot, **struktur[slot]} for slot in sortierte_slots]
 
 
 
