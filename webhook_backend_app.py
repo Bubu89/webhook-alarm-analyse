@@ -109,6 +109,25 @@ def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict
 
 
 
+@app.route("/dashboard")
+def dashboard():
+    try:
+        daten = lade_kurse()
+        prognosen = lade_prognosen()
+        logs = lade_logs()
+
+        letzte_signale = extrahiere_letzte_signale(logs)
+        letzte_scores = extrahiere_letzte_scores(prognosen)
+
+        # Trendverlauf pro Asset
+        trendverlauf = trend_verlauf_letzte_stunden(logs)
+
+        return render_template("dashboard.html",
+                               letzte_scores=letzte_scores,
+                               letzte_signale=letzte_signale,
+                               trendverlauf=trendverlauf)
+    except Exception as e:
+        return f"Fehler im Dashboard: {e}"
 
 
 
