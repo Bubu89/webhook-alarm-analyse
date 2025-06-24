@@ -70,18 +70,40 @@
         canvas {
             max-height: 250px;
         }
-        @media (max-width: 600px) {
-            body { font-size: 14px; }
-            .matrix { font-size: 12px; grid-template-columns: repeat(13, minmax(20px, 1fr)); }
-            button, input, select { font-size: 14px; }
-            h1, h2, h3 { font-size: 18px; }
-        }
+@media (max-width: 600px) {
+    body {
+        font-size: 14px;
+    }
+    .matrix {
+        font-size: 12px;
+        grid-template-columns: repeat(13, minmax(20px, 1fr));
+    }
+    button, input, select {
+        font-size: 14px;
+    }
+    h1, h2, h3 {
+        font-size: 18px;
+    }
+    .section-container {
+        flex-direction: column !important;
+    }
+    canvas {
+        width: 100% !important;
+        height: auto !important;
+        max-width: 100%;
+    }
+    .mini-chart-box {
+        width: calc(50% - 10px) !important; /* 2 nebeneinander */
+    }
+}
+
     </style>
 </head>
 <body>
     <h1>Webhook Alarm Dashboard</h1>
 
-<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+<div class="section-container" style="display: flex; gap: 20px; flex-wrap: wrap;">
+
     <!-- 1. Globale Alarmeinstellungen -->
     <div class="section" style="flex: 1; min-width: 300px;">
         <h2>1. Globale Alarmeinstellungen</h2>
@@ -226,7 +248,7 @@
     <div id="miniChartContainer" class="hidden">
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
             {% for symbol, daten in minicharts.items() %}
-                <div style="width: 160px; background: #222; padding: 5px; border-radius: 8px;">
+                <div class="mini-chart-box" style="width: 160px; background: #222; padding: 5px; border-radius: 8px;">
                     <canvas id="miniChart_{{ symbol }}"></canvas>
                     <div style="text-align: center; font-size: 12px;">{{ symbol }}</div>
                 </div>
