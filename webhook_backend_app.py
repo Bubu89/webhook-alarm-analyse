@@ -310,12 +310,14 @@ def dashboard():
         df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
         df["symbol"] = df["symbol"].astype(str)
         df["jahr"] = df["timestamp"].dt.year
+
         minicharts = erzeuge_minichart_daten(df)
+
         # JSON-kompatible Umwandlung für Jinja/Chart.js
-    for daten in minicharts.values():
-        daten["stunden"] = list(map(str, daten["stunden"]))
-        daten["werte"] = [int(w) for w in daten["werte"]]
-        daten["farben"] = list(map(str, daten["farben"]))
+        for daten in minicharts.values():
+            daten["stunden"] = list(map(str, daten["stunden"]))
+            daten["werte"] = [int(w) for w in daten["werte"]]
+            daten["farben"] = list(map(str, daten["farben"]))
 
         df["monat"] = df["timestamp"].dt.strftime("%b")
         df["tag"] = df["timestamp"].dt.date
@@ -327,6 +329,7 @@ def dashboard():
 
         monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
         matrix = {}
+
 
         for symbol in sorted(df_jahr["symbol"].dropna().unique()):
             monatliche_werte = []
