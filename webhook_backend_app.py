@@ -505,7 +505,7 @@ def dashboard():
         matrix=matrix,
         monate=monate,
         aktuelles_jahr=aktuelles_jahr,
-        verfuegbare_jahre=jahre
+        verfuegbare_jahre=jahre,
         prognosen=prognosen
 
     )
