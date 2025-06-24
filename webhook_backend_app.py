@@ -14,6 +14,7 @@ import time
 import calendar
 
 LOG_DATEI = "webhook_logs.json"
+KURSDATEI = "kursdaten.json"
 
 # ✅ Flask-App & Caching korrekt initialisieren
 app = Flask(__name__)
