@@ -174,7 +174,7 @@
 <div class="section">
     <h2>📉 Mini-Zeitstrahl pro Symbol</h2>
     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        {% for symbol, daten in trend_aggregat_daten.items() %}
+        {% for symbol, daten in minicharts.items() %}
             <div style="width: 160px; background: #222; padding: 5px; border-radius: 8px;">
                 <canvas id="miniChart_{{ symbol }}"></canvas>
                 <div style="text-align: center; font-size: 12px;">{{ symbol }}</div>
@@ -357,7 +357,7 @@ new Chart(document.getElementById("hourlyChart").getContext("2d"), {
 
 // Mini-Zeitstrahl pro Symbol
 document.addEventListener("DOMContentLoaded", function () {
-    const zeitstrahlDaten = {{ trend_aggregat_daten | tojson }};
+    const zeitstrahlDaten = {{ minicharts | tojson }};
     for (const [symbol, daten] of Object.entries(zeitstrahlDaten)) {
         const ctx = document.getElementById("miniChart_" + symbol).getContext("2d");
         new Chart(ctx, {
