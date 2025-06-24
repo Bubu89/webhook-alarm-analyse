@@ -104,6 +104,9 @@
 
 <div class="section-container" style="display: flex; gap: 20px; flex-wrap: wrap;">
 
+<!-- 1. + 2. in einer gemeinsamen Zeile -->
+<div class="section-container" style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+
     <!-- 1. Globale Alarmeinstellungen -->
     <div class="section" style="flex: 1; min-width: 300px;">
         <h2>1. Globale Alarmeinstellungen</h2>
@@ -116,16 +119,20 @@
                 <option value="12">12 Stunden</option>
                 <option value="24">24 Stunden</option>
             </select>
+
             <label>Oder manuell</label>
             <input type="number" name="interval_hours_manual" placeholder="Manuelle Eingabe (hat Vorrang)">
+
             <label>Maximale Alarme pro Intervall</label>
             <input type="number" name="max_alarms" value="3" required>
+
             <label>Trendrichtung</label>
             <select name="trend_richtung">
                 <option value="neutral">Keine Trendvorgabe</option>
                 <option value="bullish">Positiver Trend (aufwärts)</option>
                 <option value="bearish">Negativer Trend (abwärts)</option>
             </select>
+
             <input type="hidden" name="symbol" value="ALL">
             <button type="submit">📂 Einstellungen speichern</button>
         </form>
@@ -137,20 +144,20 @@
         {% if einstellungen %}
         <form method="post" action="/delete-multiple-settings">
             <ul>
-            {% for key, config in einstellungen.items() %}
-                <li>
-                    <input type="checkbox" name="delete_keys" value="{{ key }}" class="checkbox">
-                    <strong>{{ key }}</strong>:
-                    Intervall: {{ config.interval_hours }}h |
-                    Max. Alarme: {{ config.max_alarms }} |
-                    Trend:
-                    {% if config.trend_richtung == "bullish" %}🟢 bullisch
-                    {% elif config.trend_richtung == "bearish" %}🔴 bärisch
-                    {% else %}⚪ neutral
-                    {% endif %}
-                    <button type="button" onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">⟳ Laden</button>
-                </li>
-            {% endfor %}
+                {% for key, config in einstellungen.items() %}
+                    <li>
+                        <input type="checkbox" name="delete_keys" value="{{ key }}" class="checkbox">
+                        <strong>{{ key }}</strong>:
+                        Intervall: {{ config.interval_hours }}h |
+                        Max. Alarme: {{ config.max_alarms }} |
+                        Trend:
+                        {% if config.trend_richtung == "bullish" %}🟢 bullisch
+                        {% elif config.trend_richtung == "bearish" %}🔴 bärisch
+                        {% else %}⚪ neutral
+                        {% endif %}
+                        <button type="button" onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">⟳ Laden</button>
+                    </li>
+                {% endfor %}
             </ul>
             <button type="submit">🗑️ Ausgewählte löschen</button>
         </form>
@@ -158,7 +165,9 @@
             <p>Keine globalen Einstellungen gesetzt.</p>
         {% endif %}
     </div>
+
 </div>
+
 
 <!-- 3. Letzte Alarme (versteckt mit Button) -->
 <div class="section">
