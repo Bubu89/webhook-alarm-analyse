@@ -11,8 +11,8 @@ from uploader import git_upload
 import threading
 from flask_caching import Cache
 import time
-import calendar
-from kurs_handler import lade_kurse
+from kurs_handler import lade_kurse, verarbeite_kursdaten   # <-  verarbeite_kursdaten neu
+
 
 
 load_dotenv()  # ganz am Anfang
@@ -72,7 +72,7 @@ def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict
     df = df.drop_duplicates(subset=["timestamp", "symbol", "trend"])
 
     # 🕓 Korrekte Zuordnung zur Stunden-Zeitgruppe
-    df["zeitblock"] = df["timestamp"].dt.floor(f"{intervall_stunden}H")
+    df["zeitblock"] = df["timestamp"].dt.floor(f"{intervall_stunden}h")
 
     # 🔄 Gruppierung nach Symbolart (Dominance/Others)
     df["symbolgruppe"] = df["symbol"].apply(lambda s: "Dominance" if "dominance" in s.lower() else "Others")
@@ -506,53 +506,31 @@ def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
 
 def berechne_prognosen(df: pd.DataFrame) -> dict:
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True).dt.tz_convert(MEZ)
+    kurse = lade_kurse()                       # <- neue Kursbasis
 
-    def trend_score(symbol):
-        symbol_df = df[df["symbol"] == symbol]
-        bullish = symbol_df[symbol_df["trend"] == "bullish"].shape[0]
-        bearish = symbol_df[symbol_df["trend"] == "bearish"].shape[0]
-        return bullish - bearish
+    def trend_score(sym):
+        s = df[df["symbol"] == sym]
+        return len(s[s["trend"] == "bullish"]) - len(s[s["trend"] == "bearish"])
 
-    def total_coti_ratio():
-        total = trend_score("TOTAL")
-        coti = trend_score("COTIUSD")
-        if coti == 0: return 0
-        return total / coti
+    def kurs_info(key):                        # Helper für Preis / Trefferquote
+        k = kurse.get(key, {})
+        return k.get("neu", {}).get("wert", 0), k.get("trefferquote", 0)
 
-    prognosen = {
-        "COTI": {
-            "score": trend_score("COTIUSD"),
-            "relation": round(total_coti_ratio(), 2),
-            "signal": "🟢" if total_coti_ratio() < 1 else "🔴"
-        },
-        "ETH": {
-            "score": trend_score("ETHUSD"),
-            "signal": "🟢" if trend_score("ETHUSD") > 0 else "🔴"
-        },
-        "VELO": {
-            "score": trend_score("VELOUSD"),
-            "signal": "🟢" if trend_score("VELOUSD") > 0 else "🔴"
-        },
-        "Altcoins": {
-            "score": trend_score("TOTAL") + trend_score("Others"),
-            "signal": "🟢" if (trend_score("TOTAL") + trend_score("Others")) > 0 else "🔴"
-        },
-        "BTC": {
-            "score": trend_score("BTCUSD"),
-            "signal": "🟢" if trend_score("BTCUSD") > 0 else "🔴"
+    prognosen = {}
+    for asset, key in {"COTI":"coti","ETH":"eth","VELO":"velo",
+                       "BTC":"btc","Altcoins":"total"}.items():
+        preis, treffer = kurs_info(key)
+        score = trend_score(f"{asset}USD") if asset not in ("Altcoins",) else \
+                trend_score("TOTAL") + trend_score("Others")
+
+        prognosen[asset] = {
+            "score": score,
+            "kurs": preis,
+            "trefferquote": treffer,
+            "signal": "🟢" if score > 0 else "🔴"
         }
-    }
 
-    # 🆕 Erweiterung: High-Signale für COTI einbinden
-    anzahl_high_signale = df[df["symbol"] == "COTIUSD"].shape[0]
-    prognosen["COTI"]["highs"] = anzahl_high_signale
-    if total_coti_ratio() < 1 and anzahl_high_signale >= 3:
-        prognosen["COTI"]["signal"] = "🟢"
-
+    # COTI-Sonderfall …
     return prognosen
 
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
 
