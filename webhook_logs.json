@@ -3020,8 +3020,8 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-24T13:34:02.953384+02:00",
-    "symbol": "BTC.D+CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D",
+    "timestamp": "2025-06-24T13:36:17.520718+02:00",
+    "symbol": "BTCUSD",
     "event": "Sell",
     "price": 0,
     "interval": "unspecified",
