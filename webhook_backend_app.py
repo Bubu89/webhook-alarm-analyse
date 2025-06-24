@@ -435,10 +435,8 @@ def dashboard():
         aktuelles_jahr = int(year) if year and year.isdigit() else jahre[-1]
         df_jahr = df[df["jahr"] == aktuelles_jahr]
 
-        # Neue Monatslogik: Letzte 6 Monate berechnen, aktuellster Monat ganz rechts
-        akt_monat = datetime.now().month
-        letzte_6_monate = [(akt_monat - i - 1) % 12 + 1 for i in reversed(range(6))]
-        monate = [calendar.month_abbr[m] for m in letzte_6_monate]
+        monate = [datetime(2025, m, 1).strftime("%b") for m in range(1, 13)]
+
 
         matrix = {}
         for symbol in sorted(df_jahr["symbol"].dropna().unique()):
