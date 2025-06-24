@@ -30,23 +30,27 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
 
     def gruppenzuordnung(symbol):
         if symbol in ["BTC.D", "ETH.D", "USDT.D", "USDC.D"]:
-            return "Dominance"
+            return "Dominance", 4
         elif symbol == "OTHERS/BTCUSD":
-            return "Others"
+            return "Others", 1
         elif symbol.startswith("TOTAL/"):
-            return "Total"
-        return None
+            return "Total", 1
+        return None, 1
 
-    df["gruppe"] = df["symbol"].apply(gruppenzuordnung)
+    df["gruppe"], df["gewicht"] = zip(*df["symbol"].apply(gruppenzuordnung))
     df = df[df["gruppe"].notna()]
 
-    gruppiert = df.groupby(["stunde", "gruppe", "trend"]).size().reset_index(name="anzahl")
+    gruppiert = df.groupby(["stunde", "gruppe", "trend"]).agg(
+        anzahl=("symbol", "count"),
+        gewicht=("gewicht", "first")
+    ).reset_index()
 
     struktur = defaultdict(dict)
     for _, row in gruppiert.iterrows():
         stunde = row["stunde"]
         key = f"{row['gruppe']}_{row['trend']}"
-        struktur[stunde][key] = row["anzahl"]
+        schnitt = row["anzahl"] / row["gewicht"] if row["gewicht"] else row["anzahl"]
+        struktur[stunde][key] = round(schnitt, 2)
 
     result = []
     for h in range(24):
@@ -57,6 +61,7 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
         result.append(eintrag)
 
     return result
+
 
 def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
     if "timestamp" not in df.columns or "symbol" not in df.columns:
