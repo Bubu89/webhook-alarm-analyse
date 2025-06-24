@@ -311,6 +311,12 @@ def dashboard():
         df["symbol"] = df["symbol"].astype(str)
         df["jahr"] = df["timestamp"].dt.year
         minicharts = erzeuge_minichart_daten(df)
+        # JSON-kompatible Umwandlung für Jinja/Chart.js
+    for daten in minicharts.values():
+        daten["stunden"] = list(map(str, daten["stunden"]))
+        daten["werte"] = [int(w) for w in daten["werte"]]
+        daten["farben"] = list(map(str, daten["farben"]))
+
         df["monat"] = df["timestamp"].dt.strftime("%b")
         df["tag"] = df["timestamp"].dt.date
         df["uhrzeit"] = df["timestamp"].dt.strftime("%H:%M")
