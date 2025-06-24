@@ -135,7 +135,10 @@
                 {{ daten.signal }}<br>
                 Score: {{ daten.score }}<br>
                 {% if daten.relation is defined %}
-                    Ratio: {{ daten.relation }}
+                    Ratio: {{ daten.relation }}<br>
+                {% endif %}
+                {% if daten.kurs is defined %}
+                    Kurs: {{ daten.kurs }}
                 {% endif %}
             </div>
         {% endfor %}
@@ -144,6 +147,7 @@
         <p>Keine Prognosedaten verfügbar.</p>
     {% endif %}
 </div>
+
 
     <div class="section">
         <h2>
