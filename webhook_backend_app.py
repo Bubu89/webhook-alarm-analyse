@@ -27,6 +27,10 @@ app = Flask(__name__)
 
 def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
+    start_von_heute = datetime.now(MEZ).replace(hour=0, minute=0, second=0, microsecond=0)
+    df = df[df["timestamp"] >= start_von_heute]
+
     df["stunde"] = df["timestamp"].dt.strftime("%H")
 
     def gruppenzuordnung(symbol):
@@ -37,17 +41,11 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
         elif symbol.startswith("TOTAL/"):
             return "Total", 1
         else:
-            return None  # explizit ungültig
+            return None
 
-    # wende Funktion an
     result = df["symbol"].apply(gruppenzuordnung)
-
-    # lösche alle, die kein gültiges Ergebnis bekommen
     df = df[result.notnull()].copy()
-    result = result[result.notnull()]
-
-    # sichere Umwandlung in zwei Spalten
-    df[["gruppe", "gewicht"]] = pd.DataFrame(result.tolist(), index=result.index)
+    df[["gruppe", "gewicht"]] = pd.DataFrame(result[result.notnull()].tolist(), index=result[result.notnull()].index)
 
     gruppiert = df.groupby(["stunde", "gruppe", "trend"]).agg(
         anzahl=("symbol", "count"),
@@ -59,7 +57,10 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
         schnitt = row["anzahl"] / row["gewicht"]
         struktur[row["stunde"]][f"{row['gruppe']}_{row['trend']}"] = round(schnitt, 1)
 
-    return [{"stunde": k, **v} for k, v in struktur.items()]
+    # sortiere nach Stunde, neueste Stunde zuletzt (also rechts im Chart)
+    sortierte_stunden = sorted(struktur.keys(), key=lambda h: int(h))
+    return [{"stunde": k, **struktur[k]} for k in sortierte_stunden]
+
 
 
 
