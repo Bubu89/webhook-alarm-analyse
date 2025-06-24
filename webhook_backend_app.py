@@ -119,6 +119,34 @@ def lade_logs():
     except Exception:
         return []
 
+def extrahiere_letzte_signale(logs):
+    if not logs:
+        return []
+    sortierte = sorted(logs, key=lambda x: x.get("timestamp", ""), reverse=True)
+    return sortierte[:10]
+
+def extrahiere_letzte_scores(prognosen):
+    if not prognosen:
+        return {}
+    # Beispiel: einfach die Scores aus dem Prognosen-Dict holen
+    return {k: v.get("score", 0) for k, v in prognosen.items()}
+
+def trend_verlauf_letzte_stunden(logs, stunden=6):
+    if not logs:
+        return []
+    jetzt = datetime.now(MEZ)
+    grenze = jetzt - timedelta(hours=stunden)
+    gefiltert = [e for e in logs if "timestamp" in e and datetime.fromisoformat(e["timestamp"]) >= grenze]
+    # Gruppieren nach Symbol und Trend für letzten Zeitraum
+    ergebnis = defaultdict(lambda: {"bullish": 0, "bearish": 0})
+    for eintrag in gefiltert:
+        symbol = eintrag.get("symbol")
+        trend = eintrag.get("trend")
+        if symbol and trend in ["bullish", "bearish"]:
+            ergebnis[symbol][trend] += 1
+    return ergebnis
+
+
 @app.route("/dashboard")
 def dashboard():
     try:
