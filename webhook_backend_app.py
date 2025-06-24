@@ -9,6 +9,16 @@ import pytz
 from collections import defaultdict
 from uploader import git_upload
 import threading
+from flask_caching import Cache
+import time
+
+# ✅ Flask-App & Caching korrekt initialisieren
+app = Flask(__name__)
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+
+
+
+
 global_df = None
 df_lock = threading.Lock()
 
