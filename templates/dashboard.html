@@ -140,6 +140,10 @@
                 {% if daten.kurs is defined %}
                     Kurs: {{ daten.kurs }}
                 {% endif %}
+                {% if daten.trefferquote is defined %}
+                Treffer: {{ daten.trefferquote }}%
+                {% endif %}
+
             </div>
         {% endfor %}
     </div>
