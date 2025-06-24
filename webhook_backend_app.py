@@ -37,7 +37,7 @@ def erzeuge_stunden_daten(df: pd.DataFrame) -> list[dict]:
             return "Total", 1
         return None, 1
 
-    df["gruppe"], df["gewicht"] = zip(*df["symbol"].apply(gruppenzuordnung))
+    df[["gruppe", "gewicht"]] = pd.DataFrame(df["symbol"].apply(gruppenzuordnung).tolist(), index=df.index)
     df = df[df["gruppe"].notna()]
 
     gruppiert = df.groupby(["stunde", "gruppe", "trend"]).agg(
