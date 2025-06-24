@@ -343,6 +343,12 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
         }
     }
 
+    # 🆕 Erweiterung: High-Signale für COTI einbinden
+    anzahl_high_signale = df[df["symbol"] == "COTIUSD"].shape[0]
+    prognosen["COTI"]["highs"] = anzahl_high_signale
+    if total_coti_ratio() < 1 and anzahl_high_signale >= 3:
+        prognosen["COTI"]["signal"] = "🟢"
+
     return prognosen
 
 @app.route("/dashboard")
@@ -403,6 +409,9 @@ def dashboard():
         df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
         df["symbol"] = df["symbol"].astype(str)
         prognosen = berechne_prognosen(df)
+        jetzt = datetime.now(MEZ)
+        df = df[df["timestamp"] >= jetzt - timedelta(hours=6)]
+
         df["jahr"] = df["timestamp"].dt.year
 
         minicharts = erzeuge_minichart_daten(df, interval_hours=interval_hours)
