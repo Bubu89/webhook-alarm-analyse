@@ -62,24 +62,35 @@ app = Flask(__name__)
 
 def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
-    df["timestamp"] = pd.to_datetime(df["timestamp"])
 
+    # 🔁 Zeitstempel in UTC zu MEZ konvertieren
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert("Europe/Vienna")
+
+    # ✅ Optional: Duplikate entfernen, falls mehrfach gesendet wurde
+    df = df.drop_duplicates(subset=["timestamp", "symbol", "trend"])
+
+    # 🕓 Korrekte Zuordnung zur Stunden-Zeitgruppe
     df["zeitblock"] = df["timestamp"].dt.floor(f"{intervall_stunden}H")
+
+    # 🔄 Gruppierung nach Symbolart (Dominance/Others)
     df["symbolgruppe"] = df["symbol"].apply(lambda s: "Dominance" if "dominance" in s.lower() else "Others")
-    
+
+    # 📊 Gruppieren nach Zeitblock, Gruppe und Trend
     gruppiert = df.groupby(["zeitblock", "symbolgruppe", "trend"]).size().reset_index(name="anzahl")
 
-    # Summen nur bilden – kein Durchschnitt!
+    # ➕ Total summieren
     gesamt = gruppiert.groupby(["zeitblock", "trend"])["anzahl"].sum().reset_index()
     gesamt["symbolgruppe"] = "Total"
     gruppiert = pd.concat([gruppiert, gesamt], ignore_index=True)
 
+    # 📦 In strukturierte Dict-Form überführen
     struktur = defaultdict(dict)
     for _, row in gruppiert.iterrows():
         zeit = row["zeitblock"].strftime("%d.%m %H:%M")
         key = f"{row['symbolgruppe']}_{row['trend']}"
         struktur[zeit][key] = row["anzahl"]
 
+    # 📈 Nur die letzten 10 Einträge anzeigen
     daten = []
     for zeit in sorted(struktur.keys())[-10:]:
         eintrag = {"stunde": zeit}
@@ -87,6 +98,7 @@ def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict
         daten.append(eintrag)
 
     return daten
+
 
 
 
