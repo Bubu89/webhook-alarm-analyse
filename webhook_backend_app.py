@@ -506,7 +506,7 @@ def dashboard():
         monate=monate,
         aktuelles_jahr=aktuelles_jahr,
         verfuegbare_jahre=jahre
-        prognosen=prognosen,
+        prognosen=prognosen
 
     )
 
