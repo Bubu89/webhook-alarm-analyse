@@ -2420,23 +2420,13 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-24T10:05:17.792935+02:00",
-    "symbol": "BTC.D+CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D",
-    "event": "Sell",
+    "timestamp": "2025-06-24T10:06:33.251930+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
+    "event": "Buy",
     "price": 0,
     "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-24T10:05:20.716852+02:00",
-    "symbol": "TOTAL/COINBASE:COTIUSD",
-    "event": "Sell",
-    "price": 0,
-    "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": false
   }
 ]
