@@ -382,13 +382,15 @@ def sende_email(betreff, inhalt):
 
 @app.route("/kursdaten", methods=["POST"])
 def empfange_kursdaten():
+    payload_raw = request.get_data(as_text=True)      # egal welcher Content-Type
     try:
-        payload = json.loads(request.data.decode("utf-8"))
-    except Exception:
-        return jsonify({"error": "Body ist kein gültiges JSON"}), 400
+        payload = json.loads(payload_raw)
+    except json.JSONDecodeError as err:
+        return jsonify({"error": f"Ungültiges JSON: {err}"}), 400
 
-    verarbeite_kursdaten(payload)  # Kurse & Trefferquote aktualisieren
+    verarbeite_kursdaten(payload)                     # schreibt/aktualisiert kursdaten.json
     return jsonify({"status": "ok"})
+
 
 
 @app.route("/")
