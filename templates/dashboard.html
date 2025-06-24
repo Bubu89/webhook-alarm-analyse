@@ -6,6 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        .kleinbox {
+    font-size: 12px;
+    padding: 6px;
+    margin-right: 10px;
+    margin-top: 10px;
+    background: #222;
+    border-radius: 5px;
+    min-width: 280px;
+    flex: 1;
+    max-width: 48%;
+    box-sizing: border-box;
+}
+@media (max-width: 600px) {
+    .kleinbox {
+        max-width: 100%;
+        font-size: 13px;
+    }
+}
+
         body {
             font-family: Arial, sans-serif;
             background: #111;
@@ -104,101 +123,7 @@
 
 <div class="section-container" style="display: flex; gap: 20px; flex-wrap: wrap;">
 
-<!-- 1. + 2. in einer gemeinsamen Zeile -->
-<div class="section-container" style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
 
-    <!-- 1. Globale Alarmeinstellungen -->
-    <div class="section" style="flex: 1; min-width: 300px;">
-        <h2>
-            1. Globale Alarmeinstellungen
-            <button onclick="toggleAndSave('section1')" style="float: right;">Anzeigen / Verstecken</button>
-        </h2>
-        <div id="section1" class="hidden">
-            <form action="/update-settings" method="post">
-                <label>Intervall in Stunden (Dropdown)</label>
-                <select name="interval_hours_dropdown">
-                    <option value="1">1 Stunde</option>
-                    <option value="3">3 Stunden</option>
-                    <option value="6">6 Stunden</option>
-                    <option value="12">12 Stunden</option>
-                    <option value="24">24 Stunden</option>
-                </select>
-                <label>Oder manuell</label>
-                <input type="number" name="interval_hours_manual" placeholder="Manuelle Eingabe (hat Vorrang)">
-                <label>Maximale Alarme pro Intervall</label>
-                <input type="number" name="max_alarms" value="3" required>
-                <label>Trendrichtung</label>
-                <select name="trend_richtung">
-                    <option value="neutral">Keine Trendvorgabe</option>
-                    <option value="bullish">Positiver Trend (aufwärts)</option>
-                    <option value="bearish">Negativer Trend (abwärts)</option>
-                </select>
-                <input type="hidden" name="symbol" value="ALL">
-                <button type="submit">📂 Einstellungen speichern</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 2. Aktuelle globale Einstellungen -->
-    <div class="section" style="flex: 1; min-width: 300px;">
-        <h2>
-            2. Aktuelle globale Einstellungen
-            <button onclick="toggleAndSave('section2')" style="float: right;">Anzeigen / Verstecken</button>
-        </h2>
-        <div id="section2" class="hidden">
-            {% if einstellungen %}
-            <form method="post" action="/delete-multiple-settings">
-                <ul>
-                    {% for key, config in einstellungen.items() %}
-                        <li>
-                            <input type="checkbox" name="delete_keys" value="{{ key }}" class="checkbox">
-                            <strong>{{ key }}</strong>:
-                            Intervall: {{ config.interval_hours }}h |
-                            Max. Alarme: {{ config.max_alarms }} |
-                            Trend:
-                            {% if config.trend_richtung == "bullish" %}🟢 bullisch
-                            {% elif config.trend_richtung == "bearish" %}🔴 bärisch
-                            {% else %}⚪ neutral
-                            {% endif %}
-                            <button type="button" onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">⟳ Laden</button>
-                        </li>
-                    {% endfor %}
-                </ul>
-                <button type="submit">🗑️ Ausgewählte löschen</button>
-            </form>
-            {% else %}
-                <p>Keine globalen Einstellungen gesetzt.</p>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-
-
-<!-- 3. Letzte Alarme (versteckt mit Button) -->
-<div class="section">
-    <h2>
-        3. Letzte Alarme
-        <button onclick="toggleVisibility('letzteAlarme')" style="float: right;">Anzeigen / Verstecken</button>
-    </h2>
-    <div id="letzteAlarme" class="hidden">
-        <ul id="alarmListe">
-            {% if letzte_ereignisse %}
-                {% for eintrag in letzte_ereignisse %}
-                    <li class="{% if loop.index > 5 %}hidden{% endif %}">
-                        {{ eintrag["timestamp"].strftime('%Y-%m-%d %H:%M:%S') }} | {{ eintrag["symbol"] }}:
-                        {{ eintrag["nachricht"] if eintrag.get("nachricht") else eintrag.get("event", "-") }}
-                    </li>
-                {% endfor %}
-            {% else %}
-                <li>Keine Alarme registriert.</li>
-            {% endif %}
-        </ul>
-        {% if letzte_ereignisse|length > 5 %}
-            <button id="toggleAlarmeBtn" onclick="toggleAlarme()" data-expanded="false">📋 Alle anzeigen</button>
-        {% endif %}
-    </div>
-</div>
 
 <div class="section">
     <h2>📊 Mini-Prognosen (aus Systemdaten)</h2>
@@ -451,6 +376,103 @@ document.addEventListener("DOMContentLoaded", restoreSectionVisibility);
 
 
 </script>
+
+<!-- 1. + 2. in einer gemeinsamen Zeile -->
+<div class="section-container" style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+
+    <!-- 1. Globale Alarmeinstellungen -->
+    <div class="section" style="flex: 1; min-width: 300px;">
+        <h2>
+            1. Globale Alarmeinstellungen
+            <button onclick="toggleAndSave('section1')" style="float: right;">Anzeigen / Verstecken</button>
+        </h2>
+        <div id="section1" class="hidden">
+            <form action="/update-settings" method="post">
+                <label>Intervall in Stunden (Dropdown)</label>
+                <select name="interval_hours_dropdown">
+                    <option value="1">1 Stunde</option>
+                    <option value="3">3 Stunden</option>
+                    <option value="6">6 Stunden</option>
+                    <option value="12">12 Stunden</option>
+                    <option value="24">24 Stunden</option>
+                </select>
+                <label>Oder manuell</label>
+                <input type="number" name="interval_hours_manual" placeholder="Manuelle Eingabe (hat Vorrang)">
+                <label>Maximale Alarme pro Intervall</label>
+                <input type="number" name="max_alarms" value="3" required>
+                <label>Trendrichtung</label>
+                <select name="trend_richtung">
+                    <option value="neutral">Keine Trendvorgabe</option>
+                    <option value="bullish">Positiver Trend (aufwärts)</option>
+                    <option value="bearish">Negativer Trend (abwärts)</option>
+                </select>
+                <input type="hidden" name="symbol" value="ALL">
+                <button type="submit">📂 Einstellungen speichern</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. Aktuelle globale Einstellungen -->
+    <div class="section" style="flex: 1; min-width: 300px;">
+        <h2>
+            2. Aktuelle globale Einstellungen
+            <button onclick="toggleAndSave('section2')" style="float: right;">Anzeigen / Verstecken</button>
+        </h2>
+        <div id="section2" class="hidden">
+            {% if einstellungen %}
+            <form method="post" action="/delete-multiple-settings">
+                <ul>
+                    {% for key, config in einstellungen.items() %}
+                        <li>
+                            <input type="checkbox" name="delete_keys" value="{{ key }}" class="checkbox">
+                            <strong>{{ key }}</strong>:
+                            Intervall: {{ config.interval_hours }}h |
+                            Max. Alarme: {{ config.max_alarms }} |
+                            Trend:
+                            {% if config.trend_richtung == "bullish" %}🟢 bullisch
+                            {% elif config.trend_richtung == "bearish" %}🔴 bärisch
+                            {% else %}⚪ neutral
+                            {% endif %}
+                            <button type="button" onclick="ladeEinstellungen('{{ config.interval_hours }}', '{{ config.max_alarms }}', '{{ config.trend_richtung }}')">⟳ Laden</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <button type="submit">🗑️ Ausgewählte löschen</button>
+            </form>
+            {% else %}
+                <p>Keine globalen Einstellungen gesetzt.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+
+<!-- 3. Letzte Alarme (versteckt mit Button) -->
+<div class="section">
+    <h2>
+        3. Letzte Alarme
+        <button onclick="toggleVisibility('letzteAlarme')" style="float: right;">Anzeigen / Verstecken</button>
+    </h2>
+    <div id="letzteAlarme" class="hidden">
+        <ul id="alarmListe">
+            {% if letzte_ereignisse %}
+                {% for eintrag in letzte_ereignisse %}
+                    <li class="{% if loop.index > 5 %}hidden{% endif %}">
+                        {{ eintrag["timestamp"].strftime('%Y-%m-%d %H:%M:%S') }} | {{ eintrag["symbol"] }}:
+                        {{ eintrag["nachricht"] if eintrag.get("nachricht") else eintrag.get("event", "-") }}
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li>Keine Alarme registriert.</li>
+            {% endif %}
+        </ul>
+        {% if letzte_ereignisse|length > 5 %}
+            <button id="toggleAlarmeBtn" onclick="toggleAlarme()" data-expanded="false">📋 Alle anzeigen</button>
+        {% endif %}
+    </div>
+</div>
+    
 </body>
 </html>
 
