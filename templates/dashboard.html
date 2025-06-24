@@ -171,13 +171,13 @@
     <canvas id="trendzielChart"></canvas>
 </div> <!-- korrekt: schließt den Container -->
 
-    <div class="section">
-    <h2>🔎 Mini-Zielbalken pro Symbol</h2>
+<div class="section">
+    <h2>📉 Mini-Zeitstrahl pro Symbol</h2>
     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        {% for i in range(trend_aggregat_daten.labels|length) %}
-            <div style="width: 120px; background: #222; padding: 5px; border-radius: 8px;">
-                <canvas id="miniChart{{i}}" width="100" height="60"></canvas>
-                <div style="text-align: center; font-size: 12px;">{{ trend_aggregat_daten.labels[i] }}</div>
+        {% for symbol, daten in trend_aggregat_daten.items() %}
+            <div style="width: 160px; background: #222; padding: 5px; border-radius: 8px;">
+                <canvas id="miniChart_{{ symbol }}"></canvas>
+                <div style="text-align: center; font-size: 12px;">{{ symbol }}</div>
             </div>
         {% endfor %}
     </div>
@@ -355,21 +355,18 @@ new Chart(document.getElementById("hourlyChart").getContext("2d"), {
     }
 });
 
-       // Mini-Zielbalken-Visualisierung
+// Mini-Zeitstrahl pro Symbol
 document.addEventListener("DOMContentLoaded", function () {
-    const miniLabels = {{ trend_aggregat_daten.labels | tojson }};
-    const miniWerte = {{ trend_aggregat_daten.werte | tojson }};
-    const miniFarben = {{ trend_aggregat_daten.farben | tojson }};
-
-    for (let i = 0; i < miniLabels.length; i++) {
-        const ctx = document.getElementById('miniChart' + i).getContext('2d');
+    const zeitstrahlDaten = {{ trend_aggregat_daten | tojson }};
+    for (const [symbol, daten] of Object.entries(zeitstrahlDaten)) {
+        const ctx = document.getElementById("miniChart_" + symbol).getContext("2d");
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: [''],
+                labels: daten.stunden,
                 datasets: [{
-                    data: [miniWerte[i]],
-                    backgroundColor: miniFarben[i]
+                    data: daten.werte,
+                    backgroundColor: daten.farben
                 }]
             },
             options: {
@@ -378,7 +375,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     tooltip: { enabled: false }
                 },
                 scales: {
-                    x: { display: false },
+                    x: {
+                        ticks: { font: { size: 8 }, color: '#ccc' }
+                    },
                     y: {
                         display: false,
                         suggestedMin: -10,
@@ -389,6 +388,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
 
 
 </script>
