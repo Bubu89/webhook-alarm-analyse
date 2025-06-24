@@ -13,6 +13,8 @@ from flask_caching import Cache
 import time
 import calendar
 
+LOG_DATEI = "webhook_logs.json"
+
 # ✅ Flask-App & Caching korrekt initialisieren
 app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
@@ -379,7 +381,7 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
 
     return prognosen
 
-@app.route("/dashboard")
+@app.route("/dashboard-alt")
 def dashboard():
     year = request.args.get("year")
     mini_interval = request.args.get("mini_interval", "1")
