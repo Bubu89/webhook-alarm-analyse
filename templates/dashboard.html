@@ -125,6 +125,7 @@
 
 
 
+<!-- dashboard.html  (nur der Mini-Prognosen-Abschnitt) -->
 <div class="section">
     <h2>📊 Mini-Prognosen (aus Systemdaten)</h2>
     {% if prognosen %}
@@ -137,13 +138,18 @@
                 {% if daten.relation is defined %}
                     Ratio: {{ daten.relation }}<br>
                 {% endif %}
-                {% if daten.kurs is defined %}
-                    Kurs: {{ daten.kurs }}
-                {% endif %}
-                {% if daten.trefferquote is defined %}
-                Treffer: {{ daten.trefferquote }}%
-                {% endif %}
-
+-               {% if daten.kurs is defined %}
+-                   Kurs: {{ daten.kurs }}
+-               {% endif %}
+-               {% if daten.trefferquote is defined %}
+-               Treffer: {{ daten.trefferquote }}%
+-               {% endif %}
++               {% if daten.kurs is defined %}
++                   Kurs: {{ "%.4f"|format(daten.kurs) }}<br>
++               {% endif %}
++               {% if daten.trefferquote is defined %}
++                   Treffer: {{ "%.0f%%"|format(daten.trefferquote*100) }}
++               {% endif %}
             </div>
         {% endfor %}
     </div>
@@ -151,6 +157,7 @@
         <p>Keine Prognosedaten verfügbar.</p>
     {% endif %}
 </div>
+
 
 
     <div class="section">
