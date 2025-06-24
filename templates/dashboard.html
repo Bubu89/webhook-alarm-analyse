@@ -148,7 +148,8 @@
     <div class="section">
         <h2>
             🕒 Stundenverlauf (Trendrichtung & Symbol)
-            <button onclick="toggleVisibility('hourlyChartContainer')" style="float: right;">Anzeigen / Verstecken</button>
+            <button onclick="toggleVisibility('hourlyChartContainer')" style="float: right;">Anzeigen</button>
+
         </h2>
         <div id="hourlyChartContainer" class="hidden">
             <canvas id="hourlyChart"></canvas>
@@ -172,7 +173,7 @@
 <div class="section">
     <h2>
         📉 Mini-Zeitstrahl pro Symbol
-        <button onclick="toggleVisibility('miniChartContainer')" style="float: right;">Anzeigen / Verstecken</button>
+        <button onclick="toggleVisibility('miniChartContainer')" style="float: right;">Anzeigen</button>
     </h2>
 
     <form method="get" action="/dashboard" style="margin-bottom: 10px;">
@@ -204,7 +205,7 @@
 <div class="section">
     <h2>
         📅 Monatliche Verteilung
-        <button onclick="toggleVisibility('verteilungContainer')" style="float: right;">Anzeigen / Verstecken</button>
+        <button onclick="toggleVisibility('verteilungContainer')" style="float: right; margin-left: 4px;">Anzeige</button>
     </h2>
     <div id="verteilungContainer" class="hidden">
         <form method="get" action="/dashboard">
@@ -384,7 +385,7 @@ document.addEventListener("DOMContentLoaded", restoreSectionVisibility);
     <div class="section" style="flex: 1; min-width: 300px;">
         <h2>
             1. Globale Alarmeinstellungen
-            <button onclick="toggleAndSave('section1')" style="float: right;">Anzeigen / Verstecken</button>
+            <button onclick="toggleAndSave('section1')" style="float: right;">Anzeigen</button>
         </h2>
         <div id="section1" class="hidden">
             <form action="/update-settings" method="post">
@@ -416,7 +417,7 @@ document.addEventListener("DOMContentLoaded", restoreSectionVisibility);
     <div class="section" style="flex: 1; min-width: 300px;">
         <h2>
             2. Aktuelle globale Einstellungen
-            <button onclick="toggleAndSave('section2')" style="float: right;">Anzeigen / Verstecken</button>
+            <button onclick="toggleAndSave('section2')" style="float: right;">Anzeigen</button>
         </h2>
         <div id="section2" class="hidden">
             {% if einstellungen %}
@@ -452,7 +453,7 @@ document.addEventListener("DOMContentLoaded", restoreSectionVisibility);
 <div class="section">
     <h2>
         3. Letzte Alarme
-        <button onclick="toggleVisibility('letzteAlarme')" style="float: right;">Anzeigen / Verstecken</button>
+        <button onclick="toggleVisibility('letzteAlarme')" style="float: right;">Anzeigen</button>
     </h2>
     <div id="letzteAlarme" class="hidden">
         <ul id="alarmListe">
