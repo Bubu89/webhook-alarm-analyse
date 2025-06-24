@@ -9,7 +9,7 @@ from datetime import datetime
 KURSDATEI = "kursdaten.json"
 
 # Mindestspeicherdauer für eine „alt“-Messung (3 h = 10 800 s)
-MIN_TTL = 3 * 3600
+MIN_TTL = 1 * 3600   # 1 h
 
 # Zuordnung aus Webhook-Payload → Symbol-String
 SYMBOL_MAP = {
