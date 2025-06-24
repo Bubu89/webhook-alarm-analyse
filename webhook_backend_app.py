@@ -64,18 +64,16 @@ def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
     df["timestamp"] = pd.to_datetime(df["timestamp"])
 
-    # Runde Zeit auf Intervall-Basis
     df["zeitblock"] = df["timestamp"].dt.floor(f"{intervall_stunden}H")
     df["symbolgruppe"] = df["symbol"].apply(lambda s: "Dominance" if "dominance" in s.lower() else "Others")
     
     gruppiert = df.groupby(["zeitblock", "symbolgruppe", "trend"]).size().reset_index(name="anzahl")
 
-    # Zusätzliche Gruppierung "Total"
+    # Summen nur bilden – kein Durchschnitt!
     gesamt = gruppiert.groupby(["zeitblock", "trend"])["anzahl"].sum().reset_index()
     gesamt["symbolgruppe"] = "Total"
     gruppiert = pd.concat([gruppiert, gesamt], ignore_index=True)
 
-    # Struktur aufbauen
     struktur = defaultdict(dict)
     for _, row in gruppiert.iterrows():
         zeit = row["zeitblock"].strftime("%d.%m %H:%M")
@@ -83,12 +81,13 @@ def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict
         struktur[zeit][key] = row["anzahl"]
 
     daten = []
-    for zeit in sorted(struktur.keys())[-10:]:  # nur letzte 10 Blöcke
+    for zeit in sorted(struktur.keys())[-10:]:
         eintrag = {"stunde": zeit}
         eintrag.update(struktur[zeit])
         daten.append(eintrag)
 
     return daten
+
 
 
 
