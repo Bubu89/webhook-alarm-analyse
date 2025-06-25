@@ -593,9 +593,15 @@ def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
 
     def normiere_symbol(s: str) -> str:
         s = s.upper()
-        s = s.split(":", 1)[-1]  # entferne Börse/Index-Prefix
+        s = s.replace("COINBASE:", "")
+        s = s.replace("BINANCE:", "")
+        s = s.replace("INDEX:", "")
+        s = s.replace("CRYPTOCAP:", "")
+        s = s.replace("TOTAL/", "")
         s = s.replace("USDT", "USD")
-        return s
+        return s.split("+")[0]  # im Fall von Mischsymbolen nur den 1. Teil nehmen
+
+
 
     dominanz_set = {
         "BTC.D", "ETH.D", "USDT.D", "USDC.D",
