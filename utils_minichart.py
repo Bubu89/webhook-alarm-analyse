@@ -55,6 +55,8 @@ def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
             return (0, "A")
         if kern == "ETH.D":
             return (0, "B")
+        if "OTHERS" in kern:
+            return (0, "C")
         if kern in dominanz_set:
             return (0, kern)
 
@@ -64,13 +66,13 @@ def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
             return (1, "B")
 
         if any(stable in kern for stable in ["USDT", "USDC", "DAI", "TUSD", "USD"]):
-            return (2, kern)
+            return (3, kern)
 
         if kern.startswith("TOTAL/"):
             base = kern.split("/", 1)[1]
             return (4, base + "_total")
 
-        return (3, kern)
+        return (2, kern)
 
     hauptsymbole = sorted(raw.keys(), key=sortschlüssel)
     geordnet = []
