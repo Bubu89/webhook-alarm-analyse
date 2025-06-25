@@ -6,7 +6,7 @@
   },
   "global_bearish": {
     "interval_hours": 1,
-    "max_alarms": 2,
+    "max_alarms": 4,
     "trend_richtung": "bearish"
   }
 }
