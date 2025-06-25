@@ -4350,48 +4350,8 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-25T11:26:03.985557+02:00",
-    "symbol": "BTCUSD",
-    "event": "Sell",
-    "price": 0,
-    "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-25T11:34:03.112132+02:00",
-    "symbol": "BTC.D",
-    "event": "Sell",
-    "price": 0,
-    "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-25T11:41:02.834129+02:00",
-    "symbol": "BTCUSD",
-    "event": "Sell",
-    "price": 0,
-    "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-25T11:47:11.680749+02:00",
-    "symbol": "DXY",
-    "event": "Sell",
-    "price": 0,
-    "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-25T11:51:03.169750+02:00",
-    "symbol": "BTC.D",
+    "timestamp": "2025-06-25T11:56:02.897173+02:00",
+    "symbol": "BTC.D-CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D",
     "event": "Sell",
     "price": 0,
     "interval": "unspecified",
