@@ -1,7 +1,7 @@
 {
   "global_bullish": {
     "interval_hours": 1,
-    "max_alarms": 6,
+    "max_alarms": 2,
     "trend_richtung": "bullish"
   },
   "global_bearish": {
