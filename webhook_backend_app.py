@@ -556,15 +556,15 @@ def webhook():
 # Mini-Zeitstrahl   (4 × Scores je Symbol, sortiert wie gewünscht)
 # ------------------------------------------------------------------
 def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
-    """Liefert einen OrderedDict mit Balken-Scores für den Mini-Zeitstrahl
-       Sortierlogik:
-       1. BTC.D
-       2. BTC.D+
-       3. Others/index:BTCUSD
-       4. übrige Symbole alphabetisch A-Z,
-          jeweils direkt gefolgt vom TOTAL/<symbol>-Pair (falls vorhanden).
     """
-    # ─────────────────── Grund­aufbereitung ───────────────────
+    Liefert einen OrderedDict mit Balken-Scores.
+    Sortierlogik:
+        1. BTC.D
+        2. BTC.D+
+        3. Others/index:BTCUSD   (egal ob …USD/USDT, Coinbase:, Index: …)
+        4. Rest alphabetisch; jeweils TOTAL/<symbol> direkt dahinter.
+    """
+    # ───────────────── Grundaufbereitung ─────────────────
     df = df.copy()
     df["timestamp"] = (
         pd.to_datetime(df["timestamp"], errors="coerce", utc=True)
@@ -576,13 +576,13 @@ def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
     endzeit   = datetime.now(MEZ).replace(minute=0, second=0, microsecond=0)
     zeitslots = [(endzeit - timedelta(hours=i * interval_hours))
                  for i in reversed(range(4))]
-
     labels = [slot.strftime("%d.%m %H:%M") for slot in zeitslots]
+
     df["slot"] = pd.cut(
         df["timestamp"],
         bins=zeitslots + [endzeit + timedelta(hours=interval_hours)],
         labels=labels,
-        right=False
+        right=False,
     )
 
     grouped = (
@@ -592,10 +592,9 @@ def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
     )
 
     raw = defaultdict(lambda: {"stunden": [], "werte": [], "farben": []})
-
-    for (symbol, slot), gruppe in grouped.groupby(["symbol", "slot"]):
-        bullish = gruppe.loc[gruppe["trend"] == "bullish", "anzahl"].sum()
-        bearish = gruppe.loc[gruppe["trend"] == "bearish", "anzahl"].sum()
+    for (symbol, slot), g in grouped.groupby(["symbol", "slot"]):
+        bullish = g.loc[g["trend"] == "bullish", "anzahl"].sum()
+        bearish = g.loc[g["trend"] == "bearish", "anzahl"].sum()
         score   = int(bullish - bearish)
         farbe   = "#00cc66" if score > 0 else "#ff3333" if score < 0 else "#aaaaaa"
 
@@ -603,66 +602,46 @@ def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
         raw[symbol]["werte"].append(score)
         raw[symbol]["farben"].append(farbe)
 
-   
-# ............................................................
+    # ───────────────── Sortierreihenfolge ─────────────────
+    def _kern(s: str) -> str:
+        """Normalisiert ein Symbol für den Vergleich."""
+        s = s.upper()
+        if ":" in s:
+            s = s.split(":", 1)[-1]       # Teil nach erstem ':'
+        return s.replace("USDT", "USD")
 
-# ─────────────────── gewünschte Reihenfolge ───────────────────
-# 1.  BTC.D
-# 2.  BTC.D+
-# 3.  Others/index:BTCUSD  (egal ob …USD/USDT, Coinbase:, Index: …)
-# 4.  Rest alphabetisch, jeweils TOTAL/<symbol> direkt dahinter
-# ----------------------------------------------------------------
+    prior_core   = ["BTC.D", "BTC.D+", "BTCUSD"]
+    prior_bucket = []       # [(rang, original_symbol), …]
+    rest_bucket  = []
 
-def _kern(s: str) -> str:
-    """
-    Normalisiert ein Symbol:
+    for sym in raw:
+        core = _kern(sym)
+        if core in prior_core:
+            prior_bucket.append((prior_core.index(core), sym))
+        else:
+            rest_bucket.append(sym)
 
-    - Präfixe vor ':' (z. B. Coinbase:, Index:, Others/) werden entfernt
-    - 'USDT' → 'USD', damit BTCUSD == BTCUSDT
-    - Großschreibung vereinheitlichen
-    """
-    s = s.upper()
-    if ":" in s:
-        s = s.split(":", 1)[-1]          # alles nach dem ersten ':'
-    s = s.replace("USDT", "USD")
-    return s
+    prior_bucket.sort()  # 0,1,2
+    sorted_rest = sorted(
+        s for s in rest_bucket if not s.upper().startswith("TOTAL/")
+    )
 
-# ❶ Prioritäten definieren (alle bereits normalisiert!)
-prior_core = ["BTC.D", "BTC.D+", "BTCUSD"]
-
-# ❷ Symbole in Buckets einteilen
-prior_bucket = []
-rest_bucket  = []
-
-for sym in raw.keys():
-    core = _kern(sym)
-    if core in prior_core:
-        # für Position 3 → nur Symbole, deren *Basis* in prior_core liegt
-        prior_bucket.append((prior_core.index(core), sym))
-    else:
-        # TOTAL/* erst später einsortieren
-        rest_bucket.append(sym)
-
-# ❸ Sortierreihenfolge aufbauen
-prior_bucket.sort()                       # 0,1,2
-sorted_rest = sorted(
-    s for s in rest_bucket
-    if not s.upper().startswith("TOTAL/")
-)
-
-order: list[str] = []
-for _, sym in prior_bucket + [(None, s) for s in sorted_rest]:
-    order.append(sym)
-    total_pair = f"TOTAL/{sym}"
-    if total_pair in raw:
-        order.append(total_pair)
-
-# ❹ Fallback – übrig gebliebene TOTAL/* (falls noch nicht drin)
-for sym in raw:
-    if sym not in order:
+    order = []
+    # zuerst die festen Positionen …
+    for _, sym in prior_bucket + [(None, s) for s in sorted_rest]:
         order.append(sym)
+        tot = f"TOTAL/{sym}"
+        if tot in raw:
+            order.append(tot)
 
-return OrderedDict((k, raw[k]) for k in order)
+    # Fallback für evtl. übrige TOTAL/*
+    for sym in raw:
+        if sym not in order:
+            order.append(sym)
+
+    # Fertig
+    return OrderedDict((k, raw[k]) for k in order)
+
 
 
 # ............................................................
