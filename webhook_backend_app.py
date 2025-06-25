@@ -43,37 +43,6 @@ MEZ = pytz.timezone("Europe/Vienna")
 global_df = None
 df_lock = threading.Lock()
 
-@app.route("/dashboard")
-def dashboard():
-    try:
-        logs = lade_logs()
-        df = pd.DataFrame(logs)
-        prognosen = berechne_prognosen(df)
-        letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records") if not df.empty else []
-        minicharts = erzeuge_minichart_daten(df, interval_hours=1) if not df.empty else {}
-        stunden_daten = erzeuge_trend_aggregat_daten(df)
-# oder deine eigene erzeuge_stunden_daten(df, 1)
-        einstellungen = {}
-        if os.path.exists(SETTINGS_DATEI):
-            with open(SETTINGS_DATEI, "r") as f:
-                einstellungen = json.load(f)
-
-        return render_template("dashboard.html",
-                               prognosen=prognosen,
-                               letzte_ereignisse=letzte_ereignisse,
-                               stunden_daten=stunden_daten,
-                               minicharts=minicharts,
-                               mini_interval="1",
-                               stunden_interval=1,
-                               matrix={},
-                               monate=["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
-                               aktuelles_jahr=datetime.now().year,
-                               verfuegbare_jahre=[datetime.now().year],
-                               einstellungen=einstellungen)
-    except Exception as e:
-        return f"Fehler im Dashboard: {e}"
-
-
 def normiere_symbol_prognose(s: str) -> str:
     s = s.upper()
     s = s.replace("COINBASE:", "")
