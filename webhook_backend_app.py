@@ -349,25 +349,27 @@ def dashboard():
 
             jahre = sorted(df["jahr"].unique())
 
-        # Einstellungen laden
-        einstellungen = {}
-        if os.path.exists(SETTINGS_DATEI):
-            try:
-                with open(SETTINGS_DATEI, "r") as f:
-                    einstellungen = json.load(f)
-            except Exception as e:
-                print("Fehler beim Laden der Einstellungen:", e)
+# Einstellungen laden
+einstellungen = {}
+if os.path.exists(SETTINGS_DATEI):
+    try:
+        with open(SETTINGS_DATEI, "r") as f:
+            einstellungen = json.load(f)
+    except Exception as e:
+        print("Fehler beim Laden der Einstellungen:", e)
 
-# Symbolsortierung festlegen
-# Hauptsymbol extrahieren, z. B. "BTCUSDT" → "BTC", "TOTAL/BINANCE:BTCUSDT" → "BTC"
+# Funktion zur Extraktion des Hauptsymbols aus komplexen Bezeichnern
 def extrahiere_hauptsymbol(symbol):
     if "/" in symbol:
         symbol = symbol.split("/")[-1]
     if ":" in symbol:
         symbol = symbol.split(":")[-1]
-    if symbol.endswith("USD") or symbol.endswith("USDT"):
-        symbol = symbol[:-3] if symbol.endswith("USD") else symbol[:-4]
+    if symbol.endswith("USDT"):
+        symbol = symbol[:-4]
+    elif symbol.endswith("USD"):
+        symbol = symbol[:-3]
     return symbol.upper()
+
 
 # Sortierreihenfolge nach Hauptsymbol
 priorisierte_reihenfolge = [
