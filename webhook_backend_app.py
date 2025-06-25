@@ -152,52 +152,37 @@ def erzeuge_monats_matrix(df: pd.DataFrame, jahr: int) -> pd.DataFrame:
 
     return matrix_final
 #...................................................... Neu
-def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict]:
-    # ... Funktion bleibt unverändert
+def erzeuge_stunden_score_daten(df: pd.DataFrame, intervall_stunden: int = 1) -> list[dict]:
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
 
-    # 🔁 Zeitstempel in UTC zu MEZ konvertieren
+    # 🔁 Zeitstempel verarbeiten
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert("Europe/Vienna")
-
-    # ✅ Optional: Duplikate entfernen, falls mehrfach gesendet wurde
     df = df.drop_duplicates(subset=["timestamp", "symbol", "trend"])
 
-    # 🕓 Korrekte Zuordnung zur Stunden-Zeitgruppe
+    # 🕓 Gruppierung nach Zeitblock
     df["zeitblock"] = df["timestamp"].dt.floor(f"{intervall_stunden}h")
 
-    # 🔄 Gruppierung nach Symbolart (Dominance/Others)
-    DOMI = {"BTC.D", "ETH.D", "USDT.D", "USDC.D"}          # kannst Du beliebig erweitern
-    df["symbolgruppe"] = df["symbol"].apply(
-        lambda s: "Dominance" if s.upper() in DOMI else "Others"
-    )
+    # 📊 Gruppieren nach Zeitblock und Trend
+    gruppiert = df.groupby(["zeitblock", "trend"]).size().unstack(fill_value=0).reset_index()
 
+    # ➕ Score berechnen
+    gruppiert["score"] = gruppiert.get("bullish", 0) - gruppiert.get("bearish", 0)
 
-    # 📊 Gruppieren nach Zeitblock, Gruppe und Trend
-    gruppiert = df.groupby(["zeitblock", "symbolgruppe", "trend"]).size().reset_index(name="anzahl")
-
-    # 🆕 Total separat aus allen Gruppen berechnen
-    gesamt = gruppiert.groupby(["zeitblock", "trend"])["anzahl"].sum().reset_index()
-    gesamt["symbolgruppe"] = "Total"
-
-    # Reihenfolge beibehalten
-    gruppiert = pd.concat([gruppiert, gesamt], ignore_index=True)
-
-
-    # 📦 In strukturierte Dict-Form überführen
-    struktur = defaultdict(dict)
+    # 🔁 Formatieren für Chart.js
+    daten = []
     for _, row in gruppiert.iterrows():
         zeit = row["zeitblock"].strftime("%d.%m %H:%M")
-        key = f"{row['symbolgruppe']}_{row['trend']}"
-        struktur[zeit][key] = row["anzahl"]
+        score = row["score"]
+        farbe = "green" if score > 0 else "red" if score < 0 else "#888"
+        daten.append({
+            "stunde": zeit,
+            "score": score,
+            "farbe": farbe
+        })
 
-    # 📈 Nur die letzten 10 Einträge anzeigen
-    daten = []
-    for zeit in sorted(struktur.keys())[-10:]:
-        eintrag = {"stunde": zeit}
-        eintrag.update(struktur[zeit])
-        daten.append(eintrag)
+    # 🧾 Nur die letzten 10 Balken anzeigen
+    return daten[-10:]
 
-    return daten
 
 def lade_prognosen():
     PROGNOSE_DATEI = "prognosen.json"
