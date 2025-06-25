@@ -548,8 +548,9 @@ def webhook():
 
     git_upload(LOG_DATEI, ".")
     return jsonify({"status": "ok"})
-# + ganz oben bei den Imports ergänzen …
-from collections import OrderedDict   # ⇦ neu
+
+
+
 
 # ------------------------------------------------------------------
 # Mini-Zeitstrahl   (4 × Scores je Symbol, sortiert wie gewünscht)
@@ -602,31 +603,69 @@ def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
         raw[symbol]["werte"].append(score)
         raw[symbol]["farben"].append(farbe)
 
-    # ─────────────────── gewünschte Reihenfolge ───────────────────
-    prior = ["BTC.D", "BTC.D+", "Others/index:BTCUSD"]
-    vorhanden_prior = [s for s in prior if s in raw]
+   
+# ............................................................
 
-    rest = sorted(
-        s for s in raw
-        if s not in prior and not s.upper().startswith("TOTAL/")
-    )
+# ─────────────────── gewünschte Reihenfolge ───────────────────
+# 1.  BTC.D
+# 2.  BTC.D+
+# 3.  Others/index:BTCUSD  (egal ob …USD/USDT, Coinbase:, Index: …)
+# 4.  Rest alphabetisch, jeweils TOTAL/<symbol> direkt dahinter
+# ----------------------------------------------------------------
 
-    order: list[str] = []
-    for sym in vorhanden_prior + rest:
+def _kern(s: str) -> str:
+    """
+    Normalisiert ein Symbol:
+
+    - Präfixe vor ':' (z. B. Coinbase:, Index:, Others/) werden entfernt
+    - 'USDT' → 'USD', damit BTCUSD == BTCUSDT
+    - Großschreibung vereinheitlichen
+    """
+    s = s.upper()
+    if ":" in s:
+        s = s.split(":", 1)[-1]          # alles nach dem ersten ':'
+    s = s.replace("USDT", "USD")
+    return s
+
+# ❶ Prioritäten definieren (alle bereits normalisiert!)
+prior_core = ["BTC.D", "BTC.D+", "BTCUSD"]
+
+# ❷ Symbole in Buckets einteilen
+prior_bucket = []
+rest_bucket  = []
+
+for sym in raw.keys():
+    core = _kern(sym)
+    if core in prior_core:
+        # für Position 3 → nur Symbole, deren *Basis* in prior_core liegt
+        prior_bucket.append((prior_core.index(core), sym))
+    else:
+        # TOTAL/* erst später einsortieren
+        rest_bucket.append(sym)
+
+# ❸ Sortierreihenfolge aufbauen
+prior_bucket.sort()                       # 0,1,2
+sorted_rest = sorted(
+    s for s in rest_bucket
+    if not s.upper().startswith("TOTAL/")
+)
+
+order: list[str] = []
+for _, sym in prior_bucket + [(None, s) for s in sorted_rest]:
+    order.append(sym)
+    total_pair = f"TOTAL/{sym}"
+    if total_pair in raw:
+        order.append(total_pair)
+
+# ❹ Fallback – übrig gebliebene TOTAL/* (falls noch nicht drin)
+for sym in raw:
+    if sym not in order:
         order.append(sym)
-        total_pair = f"TOTAL/{sym}"
-        if total_pair in raw:
-            order.append(total_pair)
 
-    # Fallback für evtl. verbliebene Symbole
-    for sym in raw:
-        if sym not in order:
-            order.append(sym)
-
-    # OrderedDict bewahrt die Reihenfolge im Template
-    return OrderedDict((k, raw[k]) for k in order)
+return OrderedDict((k, raw[k]) for k in order)
 
 
+# ............................................................
 
 def berechne_prognosen(df: pd.DataFrame) -> dict:
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True).dt.tz_convert(MEZ)
