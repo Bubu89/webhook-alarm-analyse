@@ -84,9 +84,11 @@ def lade_log_daten():
         print(f"[Fehler beim Laden der Logs] {e}")
         global_df = pd.DataFrame(columns=["timestamp", "symbol", "trend"])
 
-lade_log_daten()
+try:
+    lade_log_daten()
+    time.sleep(60)
 
-def aktualisiere_logs_regelmäßig():
+def aktualisiere_logs_regelmäßig():  # ← BOOM: SyntaxError
     while True:
         lade_log_daten()
         time.sleep(60)
