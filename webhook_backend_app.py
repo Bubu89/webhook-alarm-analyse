@@ -349,20 +349,23 @@ def dashboard():
 
             jahre = sorted(df["jahr"].unique())
 
-# Einstellungen laden
 SETTINGS_DATEI = "settings.json"
-if not os.path.exists(SETTINGS_DATEI):
-    with open(SETTINGS_DATEI, "w") as f:
-        json.dump({}, f, indent=2)
 
-# Danach erst laden:
+# Datei erstellen, falls nicht vorhanden
+if not os.path.exists(SETTINGS_DATEI):
+    try:
+        with open(SETTINGS_DATEI, "w") as f:
+            json.dump({}, f, indent=2)
+    except Exception as e:
+        print("Fehler beim Erstellen der settings.json:", e)
+
+# Danach laden
 einstellungen = {}
 try:
     with open(SETTINGS_DATEI, "r") as f:
         einstellungen = json.load(f)
 except Exception as e:
     print("Fehler beim Laden der Einstellungen:", e)
-
 
 
 # Funktion zur Extraktion des Hauptsymbols aus komplexen Bezeichnern
@@ -376,7 +379,6 @@ def extrahiere_hauptsymbol(symbol):
     elif symbol.endswith("USD"):
         symbol = symbol[:-3]
     return symbol.upper()
-
 
 
 # Sortierreihenfolge nach Hauptsymbol
@@ -399,7 +401,7 @@ def sortierschluessel(symbol):
     hs = extrahiere_hauptsymbol(symbol)
 
     if "BTC.D+" in symbol:
-        return (0, hs)  # Ganz oben, aber intern alphabetisch sortiert
+        return (0, hs)
     if "BTC.D" in symbol:
         return (1, "")
     if "ETH.D" in symbol:
@@ -409,6 +411,10 @@ def sortierschluessel(symbol):
     if hs in priorisierte_reihenfolge:
         return (4, priorisierte_reihenfolge.index(hs))
     return (5, hs)
+
+# Matrix nach Hauptsymbol-Sortierung ordnen
+matrix_sorted = dict(sorted(matrix.items(), key=lambda item: sortierschluessel(item[0])))
+
 
 
 # Matrix nach Hauptsymbol-Sortierung ordnen
