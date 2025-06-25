@@ -4550,18 +4550,8 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-25T15:13:03.854274+02:00",
-    "symbol": "BTC.D",
-    "event": "Sell",
-    "price": 0,
-    "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-25T15:13:14.681138+02:00",
-    "symbol": "AEROUSD",
+    "timestamp": "2025-06-25T15:16:04.756081+02:00",
+    "symbol": "BTCUSD",
     "event": "Sell",
     "price": 0,
     "interval": "unspecified",
