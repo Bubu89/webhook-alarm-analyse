@@ -358,6 +358,7 @@ if os.path.exists(SETTINGS_DATEI):
     except Exception as e:
         print("Fehler beim Laden der Einstellungen:", e)
 
+
 # Funktion zur Extraktion des Hauptsymbols aus komplexen Bezeichnern
 def extrahiere_hauptsymbol(symbol):
     if "/" in symbol:
