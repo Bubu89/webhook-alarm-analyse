@@ -4320,8 +4320,8 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-25T09:48:22.295015+02:00",
-    "symbol": "BTCUSD",
+    "timestamp": "2025-06-25T10:00:14.287253+02:00",
+    "symbol": "TOTAL/COINBASE:OPUSD",
     "event": "Sell",
     "price": 0,
     "interval": "unspecified",
