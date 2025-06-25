@@ -104,7 +104,54 @@ EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
 
 MEZ = pytz.timezone("Europe/Vienna")
 
+#...................................................... Neu
+def erzeuge_monats_matrix(df: pd.DataFrame, jahr: int) -> pd.DataFrame:
+    df = df[df["timestamp"].dt.year == jahr].copy()
+    df["monat"] = df["timestamp"].dt.month
 
+    matrix = df.groupby(["symbol", "monat", "trend"]).size().unstack(fill_value=0)
+
+    if "bullish" not in matrix.columns:
+        matrix["bullish"] = 0
+    if "bearish" not in matrix.columns:
+        matrix["bearish"] = 0
+
+    matrix["gesamt"] = matrix["bullish"] - matrix["bearish"]
+    matrix = matrix.reset_index()
+
+    # Monatswerte extrahieren für separate Spalten
+    monatliche_trends = []
+    for monat in range(1, 13):
+        df_monat = df[df["monat"] == monat]
+        trends = df_monat.groupby(["symbol", "trend"]).size().unstack(fill_value=0)
+        trends["gesamt"] = trends.get("bullish", 0) - trends.get("bearish", 0)
+        trends = trends.reset_index()
+        trends = trends[["symbol", "gesamt"]].rename(columns={"gesamt": calendar.month_abbr[monat]})
+        monatliche_trends.append(trends)
+
+    # Initialisiere Gesamtdaten mit allen Symbolen
+    alle_symbole = pd.concat(monatliche_trends)["symbol"].unique()
+    matrix_final = pd.DataFrame({"Symbol": alle_symbole})
+
+    # Füge Monatsspalten hinzu
+    for trends in monatliche_trends:
+        matrix_final = matrix_final.merge(trends, on="symbol", how="left")
+
+    matrix_final = matrix_final.fillna(0)
+
+    # Sortierung gemäß Prognose-Dashboard
+    symbol_sortierung = [
+        "BTCUSD", "BTC.D", "BTC.D+CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D",
+        "ETHUSD", "COTIUSDT", "VELOUSDT", "BONKUSDT",
+        "TOTAL/COINBASE:COTIUSD", "TOTAL/COINBASE:OPUSD",
+        "TOTAL/BINANCE:FETUSD", "OTHERS/INDEX:BTCUSD"
+    ]
+
+    matrix_final["Symbol"] = pd.Categorical(matrix_final["Symbol"], categories=symbol_sortierung, ordered=True)
+    matrix_final = matrix_final.sort_values("Symbol").reset_index(drop=True)
+
+    return matrix_final
+#...................................................... Neu
 def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict]:
     # ... Funktion bleibt unverändert
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
