@@ -4330,8 +4330,8 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-25T11:05:05.898942+02:00",
-    "symbol": "TOTAL/COINBASE:COTIUSD",
+    "timestamp": "2025-06-25T11:07:03.360114+02:00",
+    "symbol": "BTC.D",
     "event": "Sell",
     "price": 0,
     "interval": "unspecified",
