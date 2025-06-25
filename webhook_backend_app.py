@@ -84,12 +84,9 @@ def lade_log_daten():
         print(f"[Fehler beim Laden der Logs] {e}")
         global_df = pd.DataFrame(columns=["timestamp", "symbol", "trend"])
 
+lade_log_daten()
 
-try:
-    lade_log_daten()
-    time.sleep(60)
-
-def aktualisiere_logs_regelmäßig():  # ← BOOM: SyntaxError
+def aktualisiere_logs_regelmäßig():
     while True:
         lade_log_daten()
         time.sleep(60)
@@ -97,22 +94,15 @@ def aktualisiere_logs_regelmäßig():  # ← BOOM: SyntaxError
 threading.Thread(target=aktualisiere_logs_regelmäßig, daemon=True).start()
 
 SETTINGS_DATEI = "settings.json"
-
-try:
-    if not os.path.exists(SETTINGS_DATEI):
-        with open(SETTINGS_DATEI, "w") as f:
-            json.dump({}, f, indent=2)
-except Exception as e:
-    print("Fehler beim Erstellen der settings.json:", e)
-
+# settings.json sicherstellen, falls sie nicht existiert
+if not os.path.exists(SETTINGS_DATEI):
+    with open(SETTINGS_DATEI, "w") as f:
+        json.dump({}, f, indent=2)
 EMAIL_ABSENDER = os.getenv("EMAIL_ABSENDER")
 EMAIL_PASSWORT = os.getenv("EMAIL_PASSWORT")
 EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
 
 MEZ = pytz.timezone("Europe/Vienna")
-
-
-
 
 #...................................................... Neu
 def erzeuge_monats_matrix(df: pd.DataFrame, jahr: int) -> pd.DataFrame:
@@ -162,37 +152,52 @@ def erzeuge_monats_matrix(df: pd.DataFrame, jahr: int) -> pd.DataFrame:
 
     return matrix_final
 #...................................................... Neu
-def erzeuge_stunden_score_daten(df: pd.DataFrame, intervall_stunden: int = 1) -> list[dict]:
+def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict]:
+    # ... Funktion bleibt unverändert
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
 
-    # 🔁 Zeitstempel verarbeiten
+    # 🔁 Zeitstempel in UTC zu MEZ konvertieren
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert("Europe/Vienna")
+
+    # ✅ Optional: Duplikate entfernen, falls mehrfach gesendet wurde
     df = df.drop_duplicates(subset=["timestamp", "symbol", "trend"])
 
-    # 🕓 Gruppierung nach Zeitblock
+    # 🕓 Korrekte Zuordnung zur Stunden-Zeitgruppe
     df["zeitblock"] = df["timestamp"].dt.floor(f"{intervall_stunden}h")
 
-    # 📊 Gruppieren nach Zeitblock und Trend
-    gruppiert = df.groupby(["zeitblock", "trend"]).size().unstack(fill_value=0).reset_index()
+    # 🔄 Gruppierung nach Symbolart (Dominance/Others)
+    DOMI = {"BTC.D", "ETH.D", "USDT.D", "USDC.D"}          # kannst Du beliebig erweitern
+    df["symbolgruppe"] = df["symbol"].apply(
+        lambda s: "Dominance" if s.upper() in DOMI else "Others"
+    )
 
-    # ➕ Score berechnen
-    gruppiert["score"] = gruppiert.get("bullish", 0) - gruppiert.get("bearish", 0)
 
-    # 🔁 Formatieren für Chart.js
-    daten = []
+    # 📊 Gruppieren nach Zeitblock, Gruppe und Trend
+    gruppiert = df.groupby(["zeitblock", "symbolgruppe", "trend"]).size().reset_index(name="anzahl")
+
+    # 🆕 Total separat aus allen Gruppen berechnen
+    gesamt = gruppiert.groupby(["zeitblock", "trend"])["anzahl"].sum().reset_index()
+    gesamt["symbolgruppe"] = "Total"
+
+    # Reihenfolge beibehalten
+    gruppiert = pd.concat([gruppiert, gesamt], ignore_index=True)
+
+
+    # 📦 In strukturierte Dict-Form überführen
+    struktur = defaultdict(dict)
     for _, row in gruppiert.iterrows():
         zeit = row["zeitblock"].strftime("%d.%m %H:%M")
-        score = row["score"]
-        farbe = "green" if score > 0 else "red" if score < 0 else "#888"
-        daten.append({
-            "stunde": zeit,
-            "score": score,
-            "farbe": farbe
-        })
+        key = f"{row['symbolgruppe']}_{row['trend']}"
+        struktur[zeit][key] = row["anzahl"]
 
-    # 🧾 Nur die letzten 10 Balken anzeigen
-    return daten[-10:]
+    # 📈 Nur die letzten 10 Einträge anzeigen
+    daten = []
+    for zeit in sorted(struktur.keys())[-10:]:
+        eintrag = {"stunde": zeit}
+        eintrag.update(struktur[zeit])
+        daten.append(eintrag)
 
+    return daten
 
 def lade_prognosen():
     PROGNOSE_DATEI = "prognosen.json"
@@ -721,5 +726,3 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
         prognosen = dict(sorted(prognosen.items(), key=lambda item: sortschlüssel_prognose(item[0])))
 
     return prognosen
-
-
