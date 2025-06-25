@@ -1,25 +1,33 @@
 import os, json
 from datetime import datetime, timedelta
-from flask import Flask, request, jsonify, render_template, redirect, url_for
+
+from flask import (
+    Flask, request, jsonify, render_template,
+    redirect, url_for
+)
 from dotenv import load_dotenv
 import pandas as pd
 import smtplib
 from email.mime.text import MIMEText
 import pytz
-from collections import defaultdict
+
+from collections import defaultdict, OrderedDict   # ← OrderedDict NEU
 from uploader import git_upload
 import threading
 from flask_caching import Cache
 import time
-from kurs_handler import lade_kurse, verarbeite_kursdaten   # <-  verarbeite_kursdaten neu
 
-import warnings, pandas as pd
+from kurs_handler import lade_kurse, verarbeite_kursdaten  # Kurs-Handling
+
+# ─────────────────────────  pandas-Warnung ausblenden  ─────────────────────────
+import warnings
 warnings.filterwarnings(
     "ignore",
     message="The default of observed=False is deprecated",
     category=FutureWarning,
-    module="pandas.core.groupby"
+    module="pandas.core.groupby",
 )
+
 
 
 load_dotenv()  # ganz am Anfang
