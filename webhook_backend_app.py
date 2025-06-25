@@ -51,7 +51,8 @@ def dashboard():
         prognosen = berechne_prognosen(df)
         letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records") if not df.empty else []
         minicharts = erzeuge_minichart_daten(df, interval_hours=1) if not df.empty else {}
-        stunden_daten = []  # oder deine eigene erzeuge_stunden_daten(df, 1)
+        stunden_daten = erzeuge_trend_aggregat_daten(df)
+# oder deine eigene erzeuge_stunden_daten(df, 1)
         einstellungen = {}
         if os.path.exists(SETTINGS_DATEI):
             with open(SETTINGS_DATEI, "r") as f:
