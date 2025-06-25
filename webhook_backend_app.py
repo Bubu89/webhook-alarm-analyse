@@ -64,7 +64,7 @@ load_dotenv()  # ganz am Anfang
 LOG_DATEI = "webhook_logs.json"
 KURSDATEI = "kursdaten.json"
 
-# ✅ Flask-App & Caching korrekt initialisieren - NUR EINMAL
+# ✅ Flask-App & Caching korrekt initialisieren – NUR EINMAL
 app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
@@ -93,6 +93,7 @@ def aktualisiere_logs_regelmäßig():
 
 threading.Thread(target=aktualisiere_logs_regelmäßig, daemon=True).start()
 
+# ✅ settings.json sicherstellen
 SETTINGS_DATEI = "settings.json"
 
 if not os.path.exists(SETTINGS_DATEI):
@@ -100,13 +101,16 @@ if not os.path.exists(SETTINGS_DATEI):
         with open(SETTINGS_DATEI, "w") as f:
             json.dump({}, f, indent=2)
     except Exception as e:
-        print("Fehler beim Erstellen der settings.json:", e)
+        print(f"[Fehler beim Erstellen von settings.json] {e}")
 
+# ✅ Umgebungsvariablen laden
 EMAIL_ABSENDER = os.getenv("EMAIL_ABSENDER")
 EMAIL_PASSWORT = os.getenv("EMAIL_PASSWORT")
 EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
 
+# ✅ Zeitzone
 MEZ = pytz.timezone("Europe/Vienna")
+
 
 #...................................................... Neu
 def erzeuge_monats_matrix(df: pd.DataFrame, jahr: int) -> pd.DataFrame:
