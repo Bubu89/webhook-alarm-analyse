@@ -301,12 +301,25 @@ const farben = {
 
 
 // Daten für Stunden-Chart
-// 🔄 Neuer Score-basierter Stunden-Chart
-const scoreDaten = {{ stunden_score_daten | tojson }};
-const scoreLabels = scoreDaten.map(d => d.stunde);
-const scoreWerte = scoreDaten.map(d => d.score);
-const scoreFarben = scoreDaten.map(d => d.farbe);
+const stundenDaten = {{ stunden_daten | tojson }};
+const stundenLabels = stundenDaten.map(row => row.stunde);
+const stundenDatasets = [];
+const symbole = ["Dominance", "Others", "Total"];
 
+symbole.forEach(symbol => {
+    ["bullish", "bearish"].forEach(richtung => {
+        const key = `${symbol}_${richtung}`;
+        stundenDatasets.push({
+            label: `${symbol} ${richtung}`,
+            data: stundenDaten.map(row => row[key] || 0),
+            backgroundColor: farben[key],
+            barThickness: 8,
+            maxBarThickness: 12,
+            categoryPercentage: 0.6,
+            barPercentage: 0.8
+        });
+    });
+});
 
 
 
@@ -314,31 +327,22 @@ const scoreFarben = scoreDaten.map(d => d.farbe);
 new Chart(document.getElementById("hourlyChart").getContext("2d"), {
     type: "bar",
     data: {
-        labels: scoreLabels,
-        datasets: [{
-            label: "Trend Score",
-            data: scoreWerte,
-            backgroundColor: scoreFarben,
-            barThickness: 12
-        }]
+        labels: stundenLabels,
+        datasets: stundenDatasets
     },
     options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-            legend: { display: false },
-            title: { display: true, text: '🔄 Stündlicher Trend-Score (bullish vs bearish)' }
+            legend: { position: 'top' },
+            title: { display: true, text: '🔄 Stündliche Alarmverteilung nach Symbol & Trend' }
         },
         scales: {
-            y: {
-                beginAtZero: true,
-                suggestedMin: -10,
-                suggestedMax: 10
-            }
+            x: { stacked: false },
+            y: { stacked: false, beginAtZero: true }
         }
     }
 });
-
 
 // Mini-Zeitstrahl pro Symbol
 document.addEventListener("DOMContentLoaded", function () {
@@ -351,22 +355,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 labels: daten.stunden,
                 datasets: [{
                     data: daten.werte,
-                    backgroundColor: daten.farben,
-                    barThickness: 10
+                    backgroundColor: daten.farben
                 }]
             },
             options: {
-                responsive: true,
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: false }
                 },
                 scales: {
                     x: {
-                        ticks: {
-                            font: { size: 8 },
-                            color: '#ccc'
-                        }
+                        ticks: { font: { size: 8 }, color: '#ccc' }
                     },
                     y: {
                         display: false,
@@ -378,7 +377,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-
 
 function toggleAndSave(id) {
     const el = document.getElementById(id);
