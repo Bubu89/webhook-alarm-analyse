@@ -540,34 +540,84 @@ def webhook():
 
     git_upload(LOG_DATEI, ".")
     return jsonify({"status": "ok"})
+# + ganz oben bei den Imports ergänzen …
+from collections import OrderedDict   # ⇦ neu
+
+# ------------------------------------------------------------------
+# Mini-Zeitstrahl   (4 × Scores je Symbol, sortiert wie gewünscht)
+# ------------------------------------------------------------------
 def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
+    """Liefert einen OrderedDict mit Balken-Scores für den Mini-Zeitstrahl
+       Sortierlogik:
+       1. BTC.D
+       2. BTC.D+
+       3. Others/index:BTCUSD
+       4. übrige Symbole alphabetisch A-Z,
+          jeweils direkt gefolgt vom TOTAL/<symbol>-Pair (falls vorhanden).
+    """
+    # ─────────────────── Grund­aufbereitung ───────────────────
     df = df.copy()
-    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True).dt.tz_convert(MEZ)
-    df = df[df["timestamp"].notna()]
-    df = df[df["trend"].isin(["bullish", "bearish", "neutral"])]
+    df["timestamp"] = (
+        pd.to_datetime(df["timestamp"], errors="coerce", utc=True)
+          .dt.tz_convert(MEZ)
+    )
+    df = df[df["timestamp"].notna() &
+            df["trend"].isin(["bullish", "bearish", "neutral"])]
 
-    endzeit = datetime.now(MEZ).replace(minute=0, second=0, microsecond=0)
-    zeitslots = [(endzeit - timedelta(hours=i * interval_hours)) for i in reversed(range(4))]
+    endzeit   = datetime.now(MEZ).replace(minute=0, second=0, microsecond=0)
+    zeitslots = [(endzeit - timedelta(hours=i * interval_hours))
+                 for i in reversed(range(4))]
 
-    labels = [f"{slot.strftime('%d.%m %H:%M')}" for slot in zeitslots]
-    df["slot"] = pd.cut(df["timestamp"], bins=zeitslots + [endzeit + timedelta(hours=interval_hours)],
-                        labels=labels, right=False)
+    labels = [slot.strftime("%d.%m %H:%M") for slot in zeitslots]
+    df["slot"] = pd.cut(
+        df["timestamp"],
+        bins=zeitslots + [endzeit + timedelta(hours=interval_hours)],
+        labels=labels,
+        right=False
+    )
 
-    grouped = df.groupby(["symbol", "slot", "trend"]).size().reset_index(name="anzahl")
+    grouped = (
+        df.groupby(["symbol", "slot", "trend"])
+          .size()
+          .reset_index(name="anzahl")
+    )
 
-    minichart_daten = defaultdict(lambda: {"stunden": [], "werte": [], "farben": []})
+    raw = defaultdict(lambda: {"stunden": [], "werte": [], "farben": []})
 
     for (symbol, slot), gruppe in grouped.groupby(["symbol", "slot"]):
-        bullish = gruppe[gruppe["trend"] == "bullish"]["anzahl"].sum()
-        bearish = gruppe[gruppe["trend"] == "bearish"]["anzahl"].sum()
-        score = bullish - bearish
-        farbe = "#00cc66" if score > 0 else "#ff3333" if score < 0 else "#aaaaaa"
+        bullish = gruppe.loc[gruppe["trend"] == "bullish", "anzahl"].sum()
+        bearish = gruppe.loc[gruppe["trend"] == "bearish", "anzahl"].sum()
+        score   = int(bullish - bearish)
+        farbe   = "#00cc66" if score > 0 else "#ff3333" if score < 0 else "#aaaaaa"
 
-        minichart_daten[symbol]["stunden"].append(str(slot))
-        minichart_daten[symbol]["werte"].append(score)
-        minichart_daten[symbol]["farben"].append(farbe)
+        raw[symbol]["stunden"].append(str(slot))
+        raw[symbol]["werte"].append(score)
+        raw[symbol]["farben"].append(farbe)
 
-    return dict(minichart_daten)
+    # ─────────────────── gewünschte Reihenfolge ───────────────────
+    prior = ["BTC.D", "BTC.D+", "Others/index:BTCUSD"]
+    vorhanden_prior = [s for s in prior if s in raw]
+
+    rest = sorted(
+        s for s in raw
+        if s not in prior and not s.upper().startswith("TOTAL/")
+    )
+
+    order: list[str] = []
+    for sym in vorhanden_prior + rest:
+        order.append(sym)
+        total_pair = f"TOTAL/{sym}"
+        if total_pair in raw:
+            order.append(total_pair)
+
+    # Fallback für evtl. verbliebene Symbole
+    for sym in raw:
+        if sym not in order:
+            order.append(sym)
+
+    # OrderedDict bewahrt die Reihenfolge im Template
+    return OrderedDict((k, raw[k]) for k in order)
+
 
 
 def berechne_prognosen(df: pd.DataFrame) -> dict:
