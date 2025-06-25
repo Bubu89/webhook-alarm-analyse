@@ -358,21 +358,38 @@ def dashboard():
             except Exception as e:
                 print("Fehler beim Laden der Einstellungen:", e)
 
-        # Template rendern mit allen nötigen Variablen
-        return render_template("dashboard.html",
-                               einstellungen=einstellungen,
-                               letzte_ereignisse=letzte_ereignisse,
-                               stunden_daten=stunden_daten,
-                               gruppen_trends=gruppen_trends,
-                               trend_aggregat_daten=trend_aggregat_view,
-                               minicharts=minicharts,
-                               mini_interval=mini_interval,
-                               stunden_interval=stunden_interval,
-                               matrix=matrix,
-                               monate=monate,
-                               aktuelles_jahr=aktuelles_jahr,
-                               verfuegbare_jahre=jahre,
-                               prognosen=prognosen)
+# Symbolsortierung festlegen
+symbol_sortierung = [
+    "BONKUSDT",
+    "BTC.D",
+    "BTC.D+",
+    "BTCUSD",
+    "COTIUSDT",
+    "ETHUSD",
+    "OTHERS",
+    "TOTAL/",
+    "TOTAL/COINBASE:COTIUSD",
+    "TOTAL/COINBASE:OPUSD",
+    "VELOUSD"
+]
+matrix_sorted = {symbol: matrix.get(symbol, [0] * 12) for symbol in symbol_sortierung}
+
+# Template rendern
+return render_template("dashboard.html",
+                       einstellungen=einstellungen,
+                       letzte_ereignisse=letzte_ereignisse,
+                       stunden_daten=stunden_daten,
+                       gruppen_trends=gruppen_trends,
+                       trend_aggregat_daten=trend_aggregat_view,
+                       minicharts=minicharts,
+                       mini_interval=mini_interval,
+                       stunden_interval=stunden_interval,
+                       matrix=matrix_sorted,
+                       monate=monate,
+                       aktuelles_jahr=aktuelles_jahr,
+                       verfuegbare_jahre=jahre,
+                       prognosen=prognosen)
+
 
     except Exception as e:
         return f"Fehler im Dashboard: {e}"
