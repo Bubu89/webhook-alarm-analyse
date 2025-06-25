@@ -359,20 +359,49 @@ def dashboard():
                 print("Fehler beim Laden der Einstellungen:", e)
 
 # Symbolsortierung festlegen
-symbol_sortierung = [
-    "BONKUSDT",
+# Hauptsymbol extrahieren, z. B. "BTCUSDT" → "BTC", "TOTAL/BINANCE:BTCUSDT" → "BTC"
+def extrahiere_hauptsymbol(symbol):
+    if "/" in symbol:
+        symbol = symbol.split("/")[-1]
+    if ":" in symbol:
+        symbol = symbol.split(":")[-1]
+    if symbol.endswith("USD") or symbol.endswith("USDT"):
+        symbol = symbol[:-3] if symbol.endswith("USD") else symbol[:-4]
+    return symbol.upper()
+
+# Sortierreihenfolge nach Hauptsymbol
+priorisierte_reihenfolge = [
     "BTC.D",
-    "BTC.D+",
-    "BTCUSD",
-    "COTIUSDT",
-    "ETHUSD",
+    "ETH.D",
     "OTHERS",
-    "TOTAL/",
-    "TOTAL/COINBASE:COTIUSD",
-    "TOTAL/COINBASE:OPUSD",
-    "VELOUSD"
+    "BTC",
+    "ETH",
+    "AERO",
+    "COTI",
+    "FET",
+    "OP",
+    "TAO",
+    "VELO"
 ]
-matrix_sorted = {symbol: matrix.get(symbol, [0] * 12) for symbol in symbol_sortierung}
+
+# Funktion zur Sortierung nach obiger Liste
+def sortierschluessel(symbol):
+    hs = extrahiere_hauptsymbol(symbol)
+    if "BTC.D" in symbol:
+        return (0, "")
+    if "ETH.D" in symbol:
+        return (1, "")
+    if "OTHERS" in symbol:
+        return (2, "")
+    try:
+        index = priorisierte_reihenfolge.index(hs)
+        return (3, index)
+    except ValueError:
+        return (4, hs)
+
+# Matrix nach Hauptsymbol-Sortierung ordnen
+matrix_sorted = dict(sorted(matrix.items(), key=lambda item: sortierschluessel(item[0])))
+
 
 # Template rendern
 return render_template("dashboard.html",
