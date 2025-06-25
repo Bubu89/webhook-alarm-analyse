@@ -134,9 +134,14 @@ def lade_prognosen():
 def lade_logs():
     try:
         with open(LOG_DATEI, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
+            daten = json.load(f)
+            if isinstance(daten, list):
+                return daten[-100:]  # ⏩ nur die letzten 100 Einträge
+            return [daten] if isinstance(daten, dict) else []
+    except Exception as e:
+        print(f"[lade_logs] Fehler beim Einlesen: {e}")
         return []
+
 
 def extrahiere_letzte_signale(logs):
     if not logs:
