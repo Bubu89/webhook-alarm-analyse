@@ -94,10 +94,14 @@ def aktualisiere_logs_regelmäßig():
 threading.Thread(target=aktualisiere_logs_regelmäßig, daemon=True).start()
 
 SETTINGS_DATEI = "settings.json"
-# settings.json sicherstellen, falls sie nicht existiert
+
 if not os.path.exists(SETTINGS_DATEI):
-    with open(SETTINGS_DATEI, "w") as f:
-        json.dump({}, f, indent=2)
+    try:
+        with open(SETTINGS_DATEI, "w") as f:
+            json.dump({}, f, indent=2)
+    except Exception as e:
+        print("Fehler beim Erstellen der settings.json:", e)
+
 EMAIL_ABSENDER = os.getenv("EMAIL_ABSENDER")
 EMAIL_PASSWORT = os.getenv("EMAIL_PASSWORT")
 EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
