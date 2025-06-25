@@ -636,19 +636,31 @@ def webhook():
             "CRYPTOCAP", "DEFI"
         }
 
-        def sortschlüssel(sym):
-            kern = normiere_symbol(sym)
+    def sortschlüssel(sym: str):
+        kern = normiere_symbol(sym)
 
-            if kern in prior_core:
-                return (0, prior_core.index(kern))  # fixe Reihung
-            if any(kern.startswith(k) for k in dominanz_set):
-                return (1, kern)
-            if kern.endswith(("USD", "DAI", "TUSD")):
-                return (2, kern)
-            if kern.startswith("TOTAL/"):
-                base = kern.split("/", 1)[1]
-                return (4, base + "_total")
-            return (3, kern)
+        # 1. Dominanz & Gesamtmarkt zuerst
+        dominanz_set = {
+            "BTC.D", "ETH.D", "USDT.D", "USDC.D",
+            "TOTAL", "TOTAL2", "TOTAL3", "OTHERS", "DEFI"
+        }
+        if kern in dominanz_set or kern.startswith("TOTAL") or kern.startswith("OTHERS"):
+            return (0, kern)
+
+        # 2. BTCUSD und ETHUSD explizit danach
+        if kern == "BTCUSD":
+            return (1, kern)
+        if kern == "ETHUSD":
+            return (2, kern)
+
+        # 3. TOTAL/XYZ Werte direkt nach deren Basiswert
+        if "TOTAL/" in sym.upper():
+            base = normiere_symbol(sym.split("/", 1)[-1])
+            return (3, base)
+
+        # 4. Der Rest alphabetisch
+        return (4, kern)
+
 
         hauptsymbole = sorted(raw.keys(), key=sortschlüssel)
         geordnet = []
