@@ -387,17 +387,19 @@ priorisierte_reihenfolge = [
 # Funktion zur Sortierung nach obiger Liste
 def sortierschluessel(symbol):
     hs = extrahiere_hauptsymbol(symbol)
+
+    if "BTC.D+" in symbol:
+        return (0, hs)  # Ganz oben, aber intern alphabetisch sortiert
     if "BTC.D" in symbol:
-        return (0, "")
-    if "ETH.D" in symbol:
         return (1, "")
-    if "OTHERS" in symbol:
+    if "ETH.D" in symbol:
         return (2, "")
-    try:
-        index = priorisierte_reihenfolge.index(hs)
-        return (3, index)
-    except ValueError:
-        return (4, hs)
+    if "OTHERS" in symbol:
+        return (3, "")
+    if hs in priorisierte_reihenfolge:
+        return (4, priorisierte_reihenfolge.index(hs))
+    return (5, hs)
+
 
 # Matrix nach Hauptsymbol-Sortierung ordnen
 matrix_sorted = dict(sorted(matrix.items(), key=lambda item: sortierschluessel(item[0])))
