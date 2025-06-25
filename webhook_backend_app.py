@@ -561,26 +561,12 @@ def webhook():
 # Mini-Zeitstrahl   (4 × Scores je Symbol, sortiert wie gewünscht)
 # ------------------------------------------------------------------
 def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
-    """
-    Liefert einen OrderedDict mit Balken-Scores.
-    Sortierlogik:
-        1. BTC.D
-        2. BTC.D+
-        3. Others/index:BTCUSD   (egal ob …USD/USDT, Coinbase:, Index: …)
-        4. Rest alphabetisch; jeweils TOTAL/<symbol> direkt dahinter.
-    """
-    # ───────────────── Grundaufbereitung ─────────────────
     df = df.copy()
-    df["timestamp"] = (
-        pd.to_datetime(df["timestamp"], errors="coerce", utc=True)
-          .dt.tz_convert(MEZ)
-    )
-    df = df[df["timestamp"].notna() &
-            df["trend"].isin(["bullish", "bearish", "neutral"])]
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True).dt.tz_convert(MEZ)
+    df = df[df["timestamp"].notna() & df["trend"].isin(["bullish", "bearish", "neutral"])]
 
-    endzeit   = datetime.now(MEZ).replace(minute=0, second=0, microsecond=0)
-    zeitslots = [(endzeit - timedelta(hours=i * interval_hours))
-                 for i in reversed(range(4))]
+    endzeit = datetime.now(MEZ).replace(minute=0, second=0, microsecond=0)
+    zeitslots = [(endzeit - timedelta(hours=i * interval_hours)) for i in reversed(range(4))]
     labels = [slot.strftime("%d.%m %H:%M") for slot in zeitslots]
 
     df["slot"] = pd.cut(
@@ -590,62 +576,73 @@ def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
         right=False,
     )
 
-    grouped = (
-        df.groupby(["symbol", "slot", "trend"])
-          .size()
-          .reset_index(name="anzahl")
-    )
+    grouped = df.groupby(["symbol", "slot", "trend"]).size().reset_index(name="anzahl")
 
     raw = defaultdict(lambda: {"stunden": [], "werte": [], "farben": []})
     for (symbol, slot), g in grouped.groupby(["symbol", "slot"]):
         bullish = g.loc[g["trend"] == "bullish", "anzahl"].sum()
         bearish = g.loc[g["trend"] == "bearish", "anzahl"].sum()
-        score   = int(bullish - bearish)
-        farbe   = "#00cc66" if score > 0 else "#ff3333" if score < 0 else "#aaaaaa"
+        score = int(bullish - bearish)
+        farbe = "#00cc66" if score > 0 else "#ff3333" if score < 0 else "#aaaaaa"
 
         raw[symbol]["stunden"].append(str(slot))
         raw[symbol]["werte"].append(score)
         raw[symbol]["farben"].append(farbe)
 
-    # ───────────────── Sortierreihenfolge ─────────────────
-    def _kern(s: str) -> str:
-        """Normalisiert ein Symbol für den Vergleich."""
+    # ───────────────────── Neue Sortierung ─────────────────────
+
+    def normiere_symbol(s: str) -> str:
         s = s.upper()
-        if ":" in s:
-            s = s.split(":", 1)[-1]       # Teil nach erstem ':'
-        return s.replace("USDT", "USD")
+        s = s.split(":", 1)[-1]  # entferne Börse/Index-Prefix
+        s = s.replace("USDT", "USD")
+        return s
 
-    prior_core   = ["BTC.D", "BTC.D+", "BTCUSD"]
-    prior_bucket = []       # [(rang, original_symbol), …]
-    rest_bucket  = []
+    dominanz_set = {
+        "BTC.D", "ETH.D", "USDT.D", "USDC.D",
+        "TOTAL", "TOTAL2", "TOTAL3", "OTHERS",
+        "CRYPTOCAP", "DEFI"
+    }
+
+    def sortschlüssel(sym):
+        kern = normiere_symbol(sym)
+
+        if any(kern.startswith(k) for k in dominanz_set):
+            return (0, kern)
+        if any(stable in kern for stable in ["USDT", "USDC", "DAI", "TUSD", "USD"]):
+            return (1, kern)
+        if kern.startswith("TOTAL/"):
+            base = kern.split("/", 1)[1]
+            return (3, base + "_total")
+        return (2, kern)
+
+    # Hauptsymbole + TOTAL/*-Paare sammeln
+    hauptsymbole = sorted(raw.keys(), key=sortschlüssel)
+    geordnet = []
+    hinzugefügt = set()
+
+    for sym in hauptsymbole:
+        if sym in hinzugefügt:
+            continue
+        geordnet.append(sym)
+        hinzugefügt.add(sym)
+
+        normiert = normiere_symbol(sym)
+        total_sym = f"TOTAL/{sym}"
+        alt1 = f"TOTAL/{normiert}"
+        alt2 = f"TOTAL/COINBASE:{normiert}"
+        alt3 = f"TOTAL/BINANCE:{normiert}"
+
+        for variant in [total_sym, alt1, alt2, alt3]:
+            if variant in raw and variant not in hinzugefügt:
+                geordnet.append(variant)
+                hinzugefügt.add(variant)
 
     for sym in raw:
-        core = _kern(sym)
-        if core in prior_core:
-            prior_bucket.append((prior_core.index(core), sym))
-        else:
-            rest_bucket.append(sym)
+        if sym not in hinzugefügt:
+            geordnet.append(sym)
 
-    prior_bucket.sort()  # 0,1,2
-    sorted_rest = sorted(
-        s for s in rest_bucket if not s.upper().startswith("TOTAL/")
-    )
+    return OrderedDict((k, raw[k]) for k in geordnet)
 
-    order = []
-    # zuerst die festen Positionen …
-    for _, sym in prior_bucket + [(None, s) for s in sorted_rest]:
-        order.append(sym)
-        tot = f"TOTAL/{sym}"
-        if tot in raw:
-            order.append(tot)
-
-    # Fallback für evtl. übrige TOTAL/*
-    for sym in raw:
-        if sym not in order:
-            order.append(sym)
-
-    # Fertig
-    return OrderedDict((k, raw[k]) for k in order)
 
 
 
