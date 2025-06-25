@@ -9,6 +9,12 @@ __pycache__/
 webhook_data.db
 backup_webhook_logs_*.json
 
+webhook_logs.json
+kursdaten.json
+prognosen.json
+settings.json
+__pycache__/
+
 
 # Distribution / packaging
 .Python
