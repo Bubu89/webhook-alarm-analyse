@@ -7488,5 +7488,15 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": false
+  },
+  {
+    "timestamp": "2025-06-26T14:30:12.473641+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
+    "event": "Buy",
+    "price": 0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
   }
 ]
