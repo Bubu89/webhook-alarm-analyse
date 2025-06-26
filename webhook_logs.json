@@ -7658,5 +7658,15 @@
     "trend": "bearish",
     "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": false
+  },
+  {
+    "timestamp": "2025-06-26T15:07:00.620115+02:00",
+    "symbol": "TOTAL/BITGET:AEROUSDT",
+    "event": "Sell",
+    "price": 0,
+    "interval": "unspecified",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": false
   }
 ]
