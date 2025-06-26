@@ -8258,5 +8258,15 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": false
+  },
+  {
+    "timestamp": "2025-06-26T16:48:04.771875+02:00",
+    "symbol": "TOTAL/BINANCE:FETUSD",
+    "event": "Buy",
+    "price": 0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
   }
 ]
