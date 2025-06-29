@@ -17778,5 +17778,15 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": false
+  },
+  {
+    "timestamp": "2025-06-29T22:55:02.919052+02:00",
+    "symbol": "TOTAL/COINBASE:OPUSD",
+    "event": "Buy",
+    "price": 5700177149159.092,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
