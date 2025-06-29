@@ -78,9 +78,12 @@ df_lock = threading.Lock()
 @app.template_filter('percentage')
 def percentage_filter(value):
     try:
+        if value is None:
+            return "n/a"
         return "{:.0f}%".format(float(value) * 100)
     except:
         return "n/a"
+
 
 def lade_log_daten():
     global global_df
