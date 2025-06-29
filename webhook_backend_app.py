@@ -705,9 +705,10 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
     try:
         with open(KURSDATEI, "r", encoding="utf-8") as f:
             kursdaten = json.load(f)
-    except Exception:
-        kursdaten = {}
-        print("[DEBUG] Fehler beim Laden von kursdaten.json:", e)
+    except Exception as e:
+    kursdaten = {}
+    print("[DEBUG] Fehler beim Laden von kursdaten.json:", e)
+
 
     for asset in prognosen.keys():
         asset_kurs = kursdaten.get(asset, {}).get("price", None)
