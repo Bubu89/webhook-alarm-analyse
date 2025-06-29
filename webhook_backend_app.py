@@ -710,7 +710,7 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
         try:
             prognosen[asset]["price"] = round(float(asset_kurs), 2)
         except:
-            prognosen[asset]["price"] = "n/a"
+            prognosen[asset]["price"] = 0.0   # 🔹 statt "n/a"
 
     prognosen = dict(sorted(prognosen.items(), key=lambda item: sortschlüssel_prognose(item[0])))
     return prognosen
