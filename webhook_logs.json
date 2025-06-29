@@ -18138,5 +18138,15 @@
     "trend": "bearish",
     "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": false
+  },
+  {
+    "timestamp": "2025-06-30T00:10:18.074827+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
+    "event": "Sell",
+    "price": 2179668.606267428,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
   }
 ]
