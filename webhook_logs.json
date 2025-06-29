@@ -18238,5 +18238,15 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-06-30T00:20:44.481102+02:00",
+    "symbol": "DXY",
+    "event": "Buy",
+    "price": 96.766,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
