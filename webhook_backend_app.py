@@ -699,18 +699,19 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
             "trefferquote": None
         }
 
-    try:
-        with open(KURSDATEI, "r", encoding="utf-8") as f:
-            kursdaten = json.load(f)
-    except Exception:
-        kursdaten = {}
+try:
+    with open(KURSDATEI, "r", encoding="utf-8") as f:
+        kursdaten = json.load(f)
+except Exception:
+    kursdaten = {}
 
-    for asset in prognosen.keys():
-        asset_kurs = kursdaten.get(asset, {}).get("price", None)
+for asset in prognosen.keys():
+    asset_kurs = kursdaten.get(asset, {}).get("price", None)
     try:
         prognosen[asset]["price"] = round(float(asset_kurs), 2)
     except:
         prognosen[asset]["price"] = "n/a"
+
 
 
     prognosen = dict(sorted(prognosen.items(), key=lambda item: sortschlüssel_prognose(item[0])))
