@@ -16240,8 +16240,8 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-29T11:09:02.761986+02:00",
-    "symbol": "TOTAL/COINBASE:OPUSD",
+    "timestamp": "2025-06-29T11:11:00.630022+02:00",
+    "symbol": "TOTAL/BITGET:AEROUSDT",
     "event": "Buy",
     "price": 0,
     "interval": "unspecified",
