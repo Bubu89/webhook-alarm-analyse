@@ -14998,5 +14998,15 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": false
+  },
+  {
+    "timestamp": "2025-06-29T03:16:02.769355+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Buy",
+    "price": 0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
   }
 ]
