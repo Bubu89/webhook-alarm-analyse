@@ -16370,17 +16370,7 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-29T11:36:00.440358+02:00",
-    "symbol": "SUIUSDT",
-    "event": "Sell",
-    "price": 0.0,
-    "interval": "unspecified",
-    "trend": "bearish",
-    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
-    "valid": false
-  },
-  {
-    "timestamp": "2025-06-29T11:37:06.916571+02:00",
+    "timestamp": "2025-06-29T11:38:00.761181+02:00",
     "symbol": "BONKUSDT",
     "event": "Sell",
     "price": 0.0,
