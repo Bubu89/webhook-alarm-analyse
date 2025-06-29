@@ -663,7 +663,6 @@ def webhook():
     return jsonify({"status": "ok"})
 
 # ............................................................
-
 def berechne_prognosen(df: pd.DataFrame) -> dict:
     from pathlib import Path
 
@@ -696,11 +695,24 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
     prognosen = {}
     assets = ["BTCUSD", "ETHUSD", "COTIUSD", "VELOUSD", "TOTAL"]
     for asset in assets:
+        relation = treffer_data.get(asset, {}).get("relation", "n/a")
+        trefferquote_raw = treffer_data.get(asset, {}).get("trefferquote", None)
+
+        # Korrekte Behandlung von None und Anzeige "n/a"
+        if trefferquote_raw is None:
+            trefferquote = "n/a"
+        else:
+            try:
+                trefferquote = f"{float(trefferquote_raw) * 100:.0f}%"  # Anzeige als Prozent
+            except Exception as e:
+                print(f"[DEBUG] Fehler bei Trefferquote für {asset}: {trefferquote_raw} - {e}")
+                trefferquote = "n/a"
+
         prognosen[asset] = {
             "signal": "bullish" if get_current_trend(asset) == 1 else "bearish" if get_current_trend(asset) == -1 else "neutral",
             "score": get_cluster_score(asset),
-            "relation": treffer_data.get(asset, {}).get("relation", "n/a"),
-            "trefferquote": treffer_data.get(asset, {}).get("trefferquote", None)
+            "relation": relation,
+            "trefferquote": trefferquote
         }
 
     if not prognosen:
@@ -708,7 +720,7 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
             "signal": "neutral",
             "score": 0,
             "relation": "n/a",
-            "trefferquote": None
+            "trefferquote": "n/a"
         }
 
     try:
@@ -727,18 +739,11 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
             print(f"[DEBUG] Fehler bei Kurs für {asset}: {asset_kurs_raw} - {e}")
             prognosen[asset]["price"] = 0.0
 
-        # Trefferquote als float erzwingen
-        try:
-            tq_raw = prognosen[asset].get("trefferquote", 0)
-            prognosen[asset]["trefferquote"] = float(tq_raw)
-        except Exception as e:
-            print(f"[DEBUG] Fehler bei Trefferquote für {asset}: {tq_raw} - {e}")
-            prognosen[asset]["trefferquote"] = 0.0
-
     prognosen = dict(sorted(prognosen.items(), key=lambda item: sortschlüssel_prognose(item[0])))
 
     print("[DEBUG] Prognosen fertig berechnet:")
     print(json.dumps(prognosen, indent=2, ensure_ascii=False))
 
     return prognosen
+
 
