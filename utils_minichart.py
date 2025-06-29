@@ -31,10 +31,10 @@ def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
         right=False,
     )
 
-    grouped = df.groupby(["symbol", "slot", "trend"]).size().reset_index(name="anzahl")
+    grouped = df.groupby(["symbol", "slot", "trend"], observed=True).size().reset_index(name="anzahl")
 
     raw = defaultdict(lambda: {"stunden": [], "werte": [], "farben": []})
-    for (symbol, slot), g in grouped.groupby(["symbol", "slot"]):
+    for (symbol, slot), g in grouped.groupby(["symbol", "slot"], observed=True):
         bullish = g.loc[g["trend"] == "bullish", "anzahl"].sum()
         bearish = g.loc[g["trend"] == "bearish", "anzahl"].sum()
         score = int(bullish - bearish)
