@@ -1,7 +1,7 @@
 {
-  "BTCUSD": {"price": 64327.2, "timestamp": "2025-06-29T15:42:00Z"},
-  "ETHUSD": {"price": 3350.8, "timestamp": "2025-06-29T15:42:00Z"},
-  "COTIUSD": {"price": 0.125, "timestamp": "2025-06-29T15:42:00Z"},
-  "VELOUSD": {"price": 0.014, "timestamp": "2025-06-29T15:42:00Z"},
-  "TOTAL": {"price": 2100000000000, "timestamp": "2025-06-29T15:42:00Z"}
+  "BTCUSD": {"price": 2222, "timestamp": "2025-06-29T15:42:00Z"},
+  "ETHUSD": {"price": 2222, "timestamp": "2025-06-29T15:42:00Z"},
+  "COTIUSD": {"price": 2222, "timestamp": "2025-06-29T15:42:00Z"},
+  "VELOUSD": {"price": 2222, "timestamp": "2025-06-29T15:42:00Z"},
+  "TOTAL": {"price": 2222, "timestamp": "2025-06-29T15:42:00Z"}
 }
