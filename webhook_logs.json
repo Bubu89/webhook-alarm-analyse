@@ -15990,13 +15990,13 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-29T10:08:46.619407+02:00",
-    "symbol": "TOTAL/COINBASE:VELOUSD",
-    "event": "Buy",
+    "timestamp": "2025-06-29T10:17:00.624077+02:00",
+    "symbol": "FETUSDT",
+    "event": "Sell",
     "price": 0,
     "interval": "unspecified",
-    "trend": "bullish",
-    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": false
   }
 ]
