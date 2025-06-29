@@ -1,2 +1,4 @@
-{}
-
+{
+    "BTCUSD": {"relation": "0.7", "trefferquote": "0.8"},
+    "ETHUSD": {"relation": "0.6", "trefferquote": "0.75"}
+}
