@@ -266,22 +266,18 @@ def trend_verlauf_letzte_stunden(logs, stunden=6):
 @app.route("/dashboard")
 def dashboard():
     try:
-        # URL-Parameter auslesen
         year = request.args.get("year")
         mini_interval = request.args.get("mini_interval", "1")
         interval_hours = int(mini_interval) if mini_interval.isdigit() else 1
         stunden_interval = int(request.args.get("stunden_interval", "1"))
 
-        # Logs laden
         logs = lade_logs()
         if isinstance(logs, dict):
             logs = [logs]
         logs = [e for e in logs if isinstance(e, dict)]
 
-        # DataFrame aus Logs
         df = pd.DataFrame(logs)
         if df.empty:
-            # Fallback-Werte wenn keine Daten vorhanden
             jahre = [datetime.now().year]
             aktuelles_jahr = int(year) if year and year.isdigit() else jahre[0]
             monate = [datetime(aktuelles_jahr, m, 1).strftime("%b") for m in range(1, 13)]
@@ -293,22 +289,21 @@ def dashboard():
             trend_aggregat_view = {"labels": [], "werte": [], "farben": []}
             prognosen = {}
         else:
-            # Timestamp parsen und Zeitzone setzen
-            df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
+            df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True).dt.tz_convert(MEZ)
             df["symbol"] = df["symbol"].astype(str)
             df["jahr"] = df["timestamp"].dt.year
             aktuelles_jahr = int(year) if year and year.isdigit() else df["jahr"].max()
             df_jahr = df[df["jahr"] == aktuelles_jahr]
             monate = [datetime(aktuelles_jahr, m, 1).strftime("%b") for m in range(1, 13)]
 
-            # Prognosen laden oder berechnen
             try:
                 prognosen = berechne_prognosen(df)
             except Exception as e:
                 print("[Fehler beim Berechnen der Prognosen]", e)
                 prognosen = {}
+
         jahre = sorted(df["jahr"].unique())
-        # Matrix für monatliche Verteilung
+
         matrix = {}
         for symbol in sorted(df_jahr["symbol"].unique()):
             monatliche_werte = []
@@ -322,13 +317,10 @@ def dashboard():
                 monatliche_werte.append(bullish - bearish)
             matrix[symbol] = monatliche_werte
 
-        # Letzte 10 Alarme (sortiert nach timestamp absteigend)
         letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
 
-        # Stunden-Daten (für Stunden-Chart)
         stunden_daten = erzeuge_stunden_daten(df, stunden_interval)
 
-        # Gruppen-Trends für Farbdarstellung aufbereiten
         gruppen_trends = []
         farben_mapping = {
             "Dominance_bullish": "lightgreen",
@@ -352,18 +344,15 @@ def dashboard():
                     "farbe": farben_mapping.get(key, "#888")
                 })
 
-        # Mini-Charts Daten
         minicharts = erzeuge_minichart_daten(df, interval_hours=interval_hours)
         for daten in minicharts.values():
             daten["stunden"] = list(map(str, daten["stunden"]))
             daten["werte"] = [float(w) for w in daten["werte"]]
             daten["farben"] = list(map(str, daten["farben"]))
 
-        # Trend Aggregat Daten (für Balkendiagramme)
         trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
         labels = [
-            f"{e['stunde']}h ({e['symbol'][:6]}…)"
-            if len(e['symbol']) > 6 else f"{e['stunde']}h ({e['symbol']})"
+            f"{e['stunde']}h ({e['symbol'][:6]}…)" if len(e['symbol']) > 6 else f"{e['stunde']}h ({e['symbol']})"
             for e in trend_aggregat_roh
         ]
         werte = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
@@ -374,8 +363,6 @@ def dashboard():
             "farben": farben
         }
 
-
-        # Einstellungen laden
         einstellungen = {}
         if os.path.exists(SETTINGS_DATEI):
             try:
@@ -384,25 +371,26 @@ def dashboard():
             except Exception as e:
                 print("Fehler beim Laden der Einstellungen:", e)
 
-
-        # Template rendern mit allen nötigen Variablen
-        return render_template("dashboard.html",
-                               einstellungen=einstellungen,
-                               letzte_ereignisse=letzte_ereignisse,
-                               stunden_daten=stunden_daten,
-                               gruppen_trends=gruppen_trends,
-                               trend_aggregat_daten=trend_aggregat_view,
-                               minicharts=minicharts,
-                               mini_interval=mini_interval,
-                               stunden_interval=stunden_interval,
-                               matrix=matrix,
-                               monate=monate,
-                               aktuelles_jahr=aktuelles_jahr,
-                               verfuegbare_jahre=jahre,
-                               prognosen=prognosen)
+        return render_template(
+            "dashboard.html",
+            einstellungen=einstellungen,
+            letzte_ereignisse=letzte_ereignisse,
+            stunden_daten=stunden_daten,
+            gruppen_trends=gruppen_trends,
+            trend_aggregat_daten=trend_aggregat_view,
+            minicharts=minicharts,
+            mini_interval=mini_interval,
+            stunden_interval=stunden_interval,
+            matrix=matrix,
+            monate=monate,
+            aktuelles_jahr=aktuelles_jahr,
+            verfuegbare_jahre=jahre,
+            prognosen=prognosen
+        )
 
     except Exception as e:
         return f"Fehler im Dashboard: {e}"
+
 
 
 
