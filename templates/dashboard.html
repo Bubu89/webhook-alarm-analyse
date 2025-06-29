@@ -143,16 +143,22 @@
                     {{ daten.signal }}<br>
                     Score: {{ "%.2f"|format(daten.score) }}<br>
 
-                    {% if daten.price is defined %}
+                    {% if daten.price is defined and daten.price is not none %}
                         Preis: {{ "%.2f"|format(daten.price) }}<br>
+                    {% else %}
+                        Preis: n/a<br>
                     {% endif %}
 
-                    {% if daten.relation is defined %}
+                    {% if daten.relation is defined and daten.relation is not none %}
                         Ratio: {{ daten.relation }}<br>
+                    {% else %}
+                        Ratio: n/a<br>
                     {% endif %}
 
-                    {% if daten.trefferquote is defined %}
+                    {% if daten.trefferquote is defined and daten.trefferquote is not none %}
                         Treffer: {{ "%.0f%%"|format(daten.trefferquote * 100) }}
+                    {% else %}
+                        Treffer: n/a
                     {% endif %}
                 </div>
             {% endfor %}
