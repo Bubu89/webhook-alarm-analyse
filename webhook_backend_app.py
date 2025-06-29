@@ -75,6 +75,13 @@ cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 global_df = None
 df_lock = threading.Lock()
 
+@app.template_filter('percentage')
+def percentage_filter(value):
+    try:
+        return "{:.0f}%".format(float(value) * 100)
+    except:
+        return "n/a"
+
 def lade_log_daten():
     global global_df
     try:
