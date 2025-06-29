@@ -20,8 +20,6 @@ import time
 from kurs_handler import lade_kurse, verarbeite_kursdaten  # Kurs-Handling
 from utils_minichart import erzeuge_minichart_daten, MEZ
 
-from datetime import datetime, timedelta
-import pytz
 import calendar
 
 
@@ -647,34 +645,81 @@ def webhook():
 # ............................................................
 
 def berechne_prognosen(df: pd.DataFrame) -> dict:
+    from pathlib import Path
+
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True).dt.tz_convert(MEZ)
-    kurse = lade_kurse()                       # <- neue Kursbasis
     grenze = datetime.now(MEZ) - timedelta(days=ANALYSE_TAGE)
     df = df[df["timestamp"] >= grenze]
 
-    def trend_score(sym):
-        s = df[df["symbol"] == sym]
-        return len(s[s["trend"] == "bullish"]) - len(s[s["trend"] == "bearish"])
+    # 52W High/Low Clustering
+    def get_cluster_score(sym):
+        cluster_window = df[(df["symbol"] == sym)]
+        n_high = len(cluster_window[cluster_window["event"].str.contains("52W High", na=False)])
+        n_low = len(cluster_window[cluster_window["event"].str.contains("52W Low", na=False)])
+        return n_high - n_low
 
-    def kurs_info(key):                        # Helper für Preis / Trefferquote
-        k = kurse.get(key, {})
-        return k.get("neu", {}).get("wert", 0), k.get("trefferquote", 0)
+    # Trend Abgleich
+    def get_current_trend(sym):
+        trends = df[df["symbol"] == sym]["trend"].dropna().unique()
+        if "bullish" in trends:
+            return 1
+        elif "bearish" in trends:
+            return -1
+        else:
+            return 0
+
+    # Trefferquoten laden
+    treffer_file = "indikator_trefferquote.json"
+    if Path(treffer_file).exists():
+        with open(treffer_file, "r") as f:
+            treffer_data = json.load(f)
+    else:
+        treffer_data = {}
 
     prognosen = {}
-    for asset, key in {"COTI":"coti","ETH":"eth","VELO":"velo",
-                       "BTC":"btc","Altcoins":"total"}.items():
-        preis, treffer = kurs_info(key)
-        score = trend_score(f"{asset}USD") if asset not in ("Altcoins",) else \
-                trend_score("TOTAL") + trend_score("Others")
+    assets = ["BTCUSD", "ETHUSD", "COTIUSD", "VELOUSD", "TOTAL"]
+    for asset in assets:
+        # 1) Cluster-Score
+        cluster_score = get_cluster_score(asset)
+
+        # 2) Trend-Faktor
+        trend_factor = get_current_trend(asset)
+        adjusted_score = cluster_score * trend_factor
+
+        # 3) Trefferquote
+        config_key = f"{asset}_highlow:{cluster_score}_trend:{trend_factor}"
+        trefferquote = treffer_data.get(config_key, 0.5)  # fallback 0.5 neutral
+
+        # 4) Final Score
+        final_score = adjusted_score * trefferquote
+
+        # 5) Signal-Level
+        if abs(final_score) < 0.5:
+            signal = "⚪"
+        elif abs(final_score) < 1.5:
+            signal = "🟢" if final_score > 0 else "🔴"
+        else:
+            signal = "🟢🟢" if final_score > 0 else "🔴🔴"
 
         prognosen[asset] = {
-            "score": score,
-            "kurs": preis,
-            "trefferquote": treffer,
-            "signal": "🟢" if score > 0 else "🔴"
+            "cluster_score": cluster_score,
+            "trend_factor": trend_factor,
+            "trefferquote": trefferquote,
+            "score": round(final_score, 2),
+            "signal": signal
         }
 
-    # COTI-Sonderfall …
-        prognosen = dict(sorted(prognosen.items(), key=lambda item: sortschlüssel_prognose(item[0])))
+    # Fallback bei fehlenden Daten
+    if not prognosen:
+        prognosen["INFO"] = {
+            "score": 0,
+            "signal": "⚪",
+            "hinweis": "Keine ausreichenden Daten verfügbar, neutral angezeigt."
+        }
 
+  
+    prognosen = dict(sorted(prognosen.items(), key=lambda item: sortschlüssel_prognose(item[0])))
     return prognosen
+
+
+
