@@ -180,8 +180,6 @@ def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict
     df["zeitblock"] = df["timestamp"].dt.floor(f"{intervall_stunden}h")
     grenze = datetime.now(MEZ) - timedelta(days=ANALYSE_TAGE)
     df = df[df["timestamp"] >= grenze]
-    df = df[df["timestamp"] <= pd.Timestamp.now(tz=MEZ)]
-
 
     # 🔄 Gruppierung nach Symbolart (Dominance/Others)
     DOMI = {"BTC.D", "ETH.D", "USDT.D", "USDC.D"}          # kannst Du beliebig erweitern
@@ -377,65 +375,6 @@ def dashboard():
                     einstellungen = json.load(f)
             except Exception as e:
                 print("Fehler beim Laden der Einstellungen:", e)
-# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-# ░░░░░░░░░░░░░░░ LIVE-DATEN-PROGNOSEN-BLOCK ░░░░░░░░░░░░░░░░░░░░░░
-# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-
-# Kursdaten laden scheinbar try defekt?
-#try:
-    #with open("kursdaten.json", encoding="utf-8") as f:
-       # kursdaten = json.load(f)
-#except Exception as e:
-    #kursdaten = {}
-    #print("[DASHBOARD] Fehler beim Laden von kursdaten.json:", e)
-#try:
-    # dein bisheriger Code
-#except Exception as e:
-    #print("[Fehler]", e)
-
-# Webhook-Logs laden
-try:
-    with open("webhook_logs.json", encoding="utf-8") as f:
-        webhook_logs = json.load(f)
-except Exception as e:
-    webhook_logs = []
-    print("[DASHBOARD] Fehler beim Laden von webhook_logs.json:", e)
-
-live_stats = {}
-now = datetime.now(MEZ)
-
-for symbol, info in kursdaten.items():
-    preis = info.get("price", 0)
-    live_stats[symbol] = {
-        "price": preis,
-        "score": 0,
-        "trend": "neutral",
-        "ratio": "n/a",
-        "trefferquote": "n/a"
-    }
-
-    symbol_logs = [log for log in webhook_logs if log.get("symbol") == symbol]
-    if symbol_logs:
-        bullish_count = sum(1 for log in symbol_logs if log.get("trend") == "bullish")
-        bearish_count = sum(1 for log in symbol_logs if log.get("trend") == "bearish")
-        gesamt = bullish_count + bearish_count
-
-        if gesamt > 0:
-            ratio = bullish_count / gesamt * 100
-            live_stats[symbol]["ratio"] = f"{ratio:.1f}%"
-            trefferquote = ratio  # Platzhalter-Logik
-            live_stats[symbol]["trefferquote"] = f"{trefferquote:.1f}%"
-
-        live_stats[symbol]["score"] = bullish_count - bearish_count
-        if live_stats[symbol]["score"] > 0:
-            live_stats[symbol]["trend"] = "bullish"
-        elif live_stats[symbol]["score"] < 0:
-            live_stats[symbol]["trend"] = "bearish"
-        else:
-            live_stats[symbol]["trend"] = "neutral"
-
-
-# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
         # Template rendern mit allen nötigen Variablen
         return render_template("dashboard.html",
@@ -652,17 +591,6 @@ def webhook():
         return jsonify({"error": "Content-Type muss application/json sein"}), 415
 
     raw_data = request.get_json()
-
-    # Debug-Log für eingehende Webhooks
-    print("[WEBHOOK] Eingehend:", json.dumps(raw_data, indent=2, ensure_ascii=False))
-
-    # Falls du die Anfrage zusätzlich in eine Datei loggen willst:
-    with open("webhook_debug_log.json", "a", encoding="utf-8") as debug_log_file:
-        debug_log_file.write(json.dumps({
-            "timestamp": datetime.now(MEZ).isoformat(),
-            "data": raw_data
-        }, ensure_ascii=False) + ",\n")
-
     now = datetime.now(MEZ)
 
     data = {
@@ -674,7 +602,6 @@ def webhook():
         "trend": raw_data.get("trend") or None,
         "nachricht": raw_data.get("nachricht", None)
     }
-
 
     if data["trend"] not in ["bullish", "bearish"]:
         return jsonify({"status": "Trend nicht ausgewertet – neutral oder leer"}), 200
@@ -790,7 +717,3 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
 
     prognosen = dict(sorted(prognosen.items(), key=lambda item: sortschlüssel_prognose(item[0])))
     return prognosen
-
-
-
-
