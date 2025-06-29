@@ -17230,8 +17230,8 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-29T17:52:00.762829+02:00",
-    "symbol": "FETUSDT",
+    "timestamp": "2025-06-29T18:06:01.877851+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
     "event": "Buy",
     "price": 0.0,
     "interval": "unspecified",
@@ -17240,8 +17240,8 @@
     "valid": false
   },
   {
-    "timestamp": "2025-06-29T17:52:13.189881+02:00",
-    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "timestamp": "2025-06-29T18:06:16.214161+02:00",
+    "symbol": "BTC.D-CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D",
     "event": "Sell",
     "price": 0.0,
     "interval": "unspecified",
