@@ -745,5 +745,3 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
     print(json.dumps(prognosen, indent=2, ensure_ascii=False))
 
     return prognosen
-
-
