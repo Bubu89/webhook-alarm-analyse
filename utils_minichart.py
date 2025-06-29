@@ -41,7 +41,7 @@ def erzeuge_minichart_daten(df: pd.DataFrame, interval_hours: int = 1) -> dict:
         farbe = "#00cc66" if score > 0 else "#ff3333" if score < 0 else "#aaaaaa"
 
         raw[symbol]["stunden"].append(str(slot))
-        raw[symbol]["werte"].append(score)
+        raw[symbol]["werte"].append(float(score))
         raw[symbol]["farben"].append(farbe)
 
     dominanz_set = {
