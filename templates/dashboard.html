@@ -130,24 +130,29 @@
     <h2>📊 Mini-Prognosen (aus Systemdaten)</h2>
 
     {% if prognosen %}
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             {% for asset, daten in prognosen.items() %}
-                <div style="background:#222;padding:10px;border-radius:6px;
-                            width:130px;text-align:center;">
+                <div style="
+                    background: #222;
+                    padding: 10px;
+                    border-radius: 6px;
+                    width: 130px;
+                    text-align: center;
+                ">
                     <strong>{{ asset }}</strong><br>
                     {{ daten.signal }}<br>
-                    Score: {{ daten.score }}<br>
+                    Score: {{ "%.2f"|format(daten.score) }}<br>
+
+                    {% if daten.price is defined %}
+                        Preis: {{ "%.2f"|format(daten.price) }}<br>
+                    {% endif %}
 
                     {% if daten.relation is defined %}
                         Ratio: {{ daten.relation }}<br>
                     {% endif %}
 
-                    {% if daten.kurs is defined %}
-                        Kurs: {{ "%.4f"|format(daten.kurs) }}<br>
-                    {% endif %}
-
                     {% if daten.trefferquote is defined %}
-                        Treffer: {{ "%.0f%%"|format(daten.trefferquote*100) }}
+                        Treffer: {{ "%.0f%%"|format(daten.trefferquote * 100) }}
                     {% endif %}
                 </div>
             {% endfor %}
@@ -156,6 +161,7 @@
         <p>Keine Prognosedaten verfügbar.</p>
     {% endif %}
 </div>
+
 
 
 
