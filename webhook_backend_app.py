@@ -22,6 +22,8 @@ from utils_minichart import erzeuge_minichart_daten, MEZ
 
 from datetime import datetime, timedelta
 import pytz
+import calendar
+
 
 MEZ = pytz.timezone("Europe/Vienna")
 ANALYSE_TAGE = 3   # <=== Nutze diesen Wert als globalen Analysezeitraum
@@ -168,11 +170,14 @@ def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict
 
     # 🕓 Korrekte Zuordnung zur Stunden-Zeitgruppe
     df["zeitblock"] = df["timestamp"].dt.floor(f"{intervall_stunden}h")
+    grenze = datetime.now(MEZ) - timedelta(days=ANALYSE_TAGE)
+    df = df[df["timestamp"] >= grenze]
 
     # 🔄 Gruppierung nach Symbolart (Dominance/Others)
     DOMI = {"BTC.D", "ETH.D", "USDT.D", "USDC.D"}          # kannst Du beliebig erweitern
     df["symbolgruppe"] = df["symbol"].apply(
         lambda s: "Dominance" if s.upper() in DOMI else "Others"
+        
     )
 
 
@@ -396,6 +401,8 @@ def erzeuge_trend_aggregat_daten(df: pd.DataFrame) -> list[dict]:
 
     if df["timestamp"].dt.tz is None:
         df["timestamp"] = df["timestamp"].dt.tz_localize("UTC")
+    grenze = datetime.now(MEZ) - timedelta(days=ANALYSE_TAGE)
+    df = df[df["timestamp"] >= grenze]
 
     df["timestamp"] = df["timestamp"].dt.tz_convert(MEZ)
     df = df[df["timestamp"].notna()]
@@ -441,6 +448,9 @@ def erzeuge_trend_score_daten(df: pd.DataFrame) -> list[dict]:
 
     df = df[df["trend"].isin(["bullish", "bearish"])].copy()
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
+    grenze = datetime.now(MEZ) - timedelta(days=ANALYSE_TAGE)
+    df = df[df["timestamp"] >= grenze]
+
     df["stunde"] = df["timestamp"].dt.hour
 
     df["gruppe"] = df["symbol"].apply(lambda x: "Gruppe 1" if x in gruppe_1 else "Gruppe 2" if x in gruppe_2 else None)
