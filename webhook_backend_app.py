@@ -381,13 +381,17 @@ def dashboard():
 # ░░░░░░░░░░░░░░░ LIVE-DATEN-PROGNOSEN-BLOCK ░░░░░░░░░░░░░░░░░░░░░░
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-# Kursdaten laden
-try:
-    with open("kursdaten.json", encoding="utf-8") as f:
-        kursdaten = json.load(f)
-except Exception as e:
-    kursdaten = {}
-    print("[DASHBOARD] Fehler beim Laden von kursdaten.json:", e)
+# Kursdaten laden scheinbar try defekt?
+#try:
+    #with open("kursdaten.json", encoding="utf-8") as f:
+       # kursdaten = json.load(f)
+#except Exception as e:
+    #kursdaten = {}
+    #print("[DASHBOARD] Fehler beim Laden von kursdaten.json:", e)
+#try:
+    # dein bisheriger Code
+#except Exception as e:
+    #print("[Fehler]", e)
 
 # Webhook-Logs laden
 try:
