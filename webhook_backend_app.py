@@ -381,22 +381,21 @@ def dashboard():
 # ░░░░░░░░░░░░░░░ LIVE-DATEN-PROGNOSEN-BLOCK ░░░░░░░░░░░░░░░░░░░░░░
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-# Kursdaten laden
 try:
+    # Kursdaten laden
     with open("kursdaten.json", encoding="utf-8") as f:
         kursdaten = json.load(f)
 except Exception as e:
     kursdaten = {}
     print("[DASHBOARD] Fehler beim Laden von kursdaten.json:", e)
 
-# Webhook-Logs laden
 try:
+    # Webhook-Logs laden
     with open("webhook_logs.json", encoding="utf-8") as f:
         webhook_logs = json.load(f)
 except Exception as e:
     webhook_logs = []
     print("[DASHBOARD] Fehler beim Laden von webhook_logs.json:", e)
-
 
 live_stats = {}
 now = datetime.now(MEZ)
@@ -420,7 +419,7 @@ for symbol, info in kursdaten.items():
         if gesamt > 0:
             ratio = bullish_count / gesamt * 100
             live_stats[symbol]["ratio"] = f"{ratio:.1f}%"
-            trefferquote = ratio  # Platzhalter-Logik
+            trefferquote = ratio  # Platzhalter-Logik, falls deine Logik keine eigene Quote zieht
             live_stats[symbol]["trefferquote"] = f"{trefferquote:.1f}%"
 
         live_stats[symbol]["score"] = bullish_count - bearish_count
@@ -430,6 +429,7 @@ for symbol, info in kursdaten.items():
             live_stats[symbol]["trend"] = "bearish"
         else:
             live_stats[symbol]["trend"] = "neutral"
+
 
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
