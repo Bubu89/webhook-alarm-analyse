@@ -375,9 +375,6 @@ def dashboard():
         }
 
 
-
-            jahre = sorted(df["jahr"].unique())
-
         # Einstellungen laden
         einstellungen = {}
         if os.path.exists(SETTINGS_DATEI):
@@ -386,6 +383,7 @@ def dashboard():
                     einstellungen = json.load(f)
             except Exception as e:
                 print("Fehler beim Laden der Einstellungen:", e)
+
 
         # Template rendern mit allen nötigen Variablen
         return render_template("dashboard.html",
