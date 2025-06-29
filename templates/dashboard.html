@@ -360,7 +360,7 @@ document.addEventListener("DOMContentLoaded", function () {
             data: {
                 labels: daten.stunden,
                 datasets: [{
-                    data: daten.werte,
+                    data: daten.werte.map(parseFloat),
                     backgroundColor: daten.farben
                 }]
             },
@@ -383,6 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
 
 function toggleAndSave(id) {
     const el = document.getElementById(id);
