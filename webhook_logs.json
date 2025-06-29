@@ -18398,5 +18398,15 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": false
+  },
+  {
+    "timestamp": "2025-06-30T00:25:20.384386+02:00",
+    "symbol": "BTC.D",
+    "event": "Buy",
+    "price": 65.37669058643597,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
