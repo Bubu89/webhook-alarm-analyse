@@ -668,8 +668,7 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
         else:
             return 0
 
-    # Trefferquoten laden
-    treffer_file = "indikator_trefferquote.json"
+treffer_file = "indikator_trefferquote.json"
     if Path(treffer_file).exists():
         with open(treffer_file, "r") as f:
             treffer_data = json.load(f)
@@ -679,45 +678,23 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
     prognosen = {}
     assets = ["BTCUSD", "ETHUSD", "COTIUSD", "VELOUSD", "TOTAL"]
     for asset in assets:
-        # 1) Cluster-Score
-        cluster_score = get_cluster_score(asset)
+        ...
+        prognosen[asset] = {...}
 
-        # 2) Trend-Faktor
-        trend_factor = get_current_trend(asset)
-        adjusted_score = cluster_score * trend_factor
-
-        # 3) Trefferquote
-        config_key = f"{asset}_highlow:{cluster_score}_trend:{trend_factor}"
-        trefferquote = treffer_data.get(config_key, 0.5)  # fallback 0.5 neutral
-
-        # 4) Final Score
-        final_score = adjusted_score * trefferquote
-
-        # 5) Signal-Level
-        if abs(final_score) < 0.5:
-            signal = "⚪"
-        elif abs(final_score) < 1.5:
-            signal = "🟢" if final_score > 0 else "🔴"
-        else:
-            signal = "🟢🟢" if final_score > 0 else "🔴🔴"
-
-        prognosen[asset] = {
-            "cluster_score": cluster_score,
-            "trend_factor": trend_factor,
-            "trefferquote": trefferquote,
-            "score": round(final_score, 2),
-            "signal": signal
-        }
-
-    # Fallback bei fehlenden Daten
     if not prognosen:
-        prognosen["INFO"] = {
-            "score": 0,
-            "signal": "⚪",
-            "hinweis": "Keine ausreichenden Daten verfügbar, neutral angezeigt."
-        }
+        prognosen["INFO"] = {...}
 
-  
+    # ➜ Dieser Block MUSS innerhalb der Funktion liegen:
+    try:
+        with open(KURSDATEI, "r", encoding="utf-8") as f:
+            kursdaten = json.load(f)
+    except Exception:
+        kursdaten = {}
+
+    for asset in prognosen.keys():
+        asset_kurs = kursdaten.get(asset, {}).get("price", None)
+        prognosen[asset]["price"] = round(asset_kurs, 2) if asset_kurs else "n/a"
+
     prognosen = dict(sorted(prognosen.items(), key=lambda item: sortschlüssel_prognose(item[0])))
     return prognosen
 
