@@ -350,6 +350,7 @@ def dashboard():
                 daten["werte"] = [float(w) for w in daten["werte"]]
                 daten["farben"] = list(map(str, daten["farben"]))
 
+
             # Trend Aggregat Daten (für Balkendiagramme)
             trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
             labels = [f"{e['stunde']}h ({e['symbol'][:6]}…)" if len(e['symbol']) > 6 else f"{e['stunde']}h ({e['symbol']})" for e in trend_aggregat_roh]
@@ -593,7 +594,7 @@ def webhook():
         "timestamp": now.isoformat(),
         "symbol": str(raw_data.get("symbol", "UNKNOWN")),
         "event": raw_data.get("event", "unspecified"),
-        "price": raw_data.get("price", 0),
+        "price": float(raw_data.get("price", 0) or 0),
         "interval": raw_data.get("interval", "unspecified"),
         "trend": raw_data.get("trend") or None,
         "nachricht": raw_data.get("nachricht", None)
@@ -706,7 +707,11 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
 
     for asset in prognosen.keys():
         asset_kurs = kursdaten.get(asset, {}).get("price", None)
-        prognosen[asset]["price"] = round(asset_kurs, 2) if asset_kurs else "n/a"
+    try:
+        prognosen[asset]["price"] = round(float(asset_kurs), 2)
+    except:
+        prognosen[asset]["price"] = "n/a"
+
 
     prognosen = dict(sorted(prognosen.items(), key=lambda item: sortschlüssel_prognose(item[0])))
     return prognosen
