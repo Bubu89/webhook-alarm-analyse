@@ -718,13 +718,27 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
         kursdaten = {}
         print("[DEBUG] Fehler beim Laden von kursdaten.json:", e)
 
-
     for asset in prognosen.keys():
-        asset_kurs = kursdaten.get(asset, {}).get("price", None)
         try:
-            prognosen[asset]["price"] = round(float(asset_kurs), 2)
-        except:
-            prognosen[asset]["price"] = 0.0   # 🔹 statt "n/a"
+            asset_kurs_raw = kursdaten.get(asset, {}).get("price", 0)
+            asset_kurs = float(asset_kurs_raw)
+            prognosen[asset]["price"] = round(asset_kurs, 2)
+        except Exception as e:
+            print(f"[DEBUG] Fehler bei Kurs für {asset}: {asset_kurs_raw} - {e}")
+            prognosen[asset]["price"] = 0.0
+
+        # Trefferquote als float erzwingen
+        try:
+            tq_raw = prognosen[asset].get("trefferquote", 0)
+            prognosen[asset]["trefferquote"] = float(tq_raw)
+        except Exception as e:
+            print(f"[DEBUG] Fehler bei Trefferquote für {asset}: {tq_raw} - {e}")
+            prognosen[asset]["trefferquote"] = 0.0
 
     prognosen = dict(sorted(prognosen.items(), key=lambda item: sortschlüssel_prognose(item[0])))
+
+    print("[DEBUG] Prognosen fertig berechnet:")
+    print(json.dumps(prognosen, indent=2, ensure_ascii=False))
+
     return prognosen
+
