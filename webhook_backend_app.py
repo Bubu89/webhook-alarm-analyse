@@ -397,6 +397,7 @@ except Exception as e:
     webhook_logs = []
     print("[DASHBOARD] Fehler beim Laden von webhook_logs.json:", e)
 
+
 live_stats = {}
 now = datetime.now(MEZ)
 
