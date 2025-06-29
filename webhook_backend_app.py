@@ -302,68 +302,76 @@ def dashboard():
             monate = [datetime(aktuelles_jahr, m, 1).strftime("%b") for m in range(1, 13)]
 
             # Prognosen laden oder berechnen
-            prognosen = berechne_prognosen(df)
+    prognosen = berechne_prognosen(df)
 
-            # Matrix für monatliche Verteilung
-            matrix = {}
-            for symbol in sorted(df_jahr["symbol"].unique()):
-                monatliche_werte = []
-                for monat in monate:
-                    df_monat = df_jahr[(df_jahr["symbol"] == symbol) & (df_jahr["timestamp"].dt.strftime("%b") == monat)]
-                    bullish = df_monat[df_monat["trend"] == "bullish"].shape[0]
-                    bearish = df_monat[df_monat["trend"] == "bearish"].shape[0]
-                    monatliche_werte.append(bullish - bearish)
-                matrix[symbol] = monatliche_werte
+    # Matrix für monatliche Verteilung
+    matrix = {}
+    for symbol in sorted(df_jahr["symbol"].unique()):
+        monatliche_werte = []
+        for monat in monate:
+            df_monat = df_jahr[
+                (df_jahr["symbol"] == symbol) &
+                (df_jahr["timestamp"].dt.strftime("%b") == monat)
+            ]
+            bullish = df_monat[df_monat["trend"] == "bullish"].shape[0]
+            bearish = df_monat[df_monat["trend"] == "bearish"].shape[0]
+            monatliche_werte.append(bullish - bearish)
+        matrix[symbol] = monatliche_werte
 
-            # Letzte 10 Alarme (sortiert nach timestamp absteigend)
-            letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
+    # Letzte 10 Alarme (sortiert nach timestamp absteigend)
+    letzte_ereignisse = df.sort_values("timestamp", ascending=False).head(10).to_dict("records")
 
-            # Stunden-Daten (für Stunden-Chart)
-            stunden_daten = erzeuge_stunden_daten(df, stunden_interval)
+    # Stunden-Daten (für Stunden-Chart)
+    stunden_daten = erzeuge_stunden_daten(df, stunden_interval)
 
-            # Gruppen-Trends für Farbdarstellung aufbereiten
-            gruppen_trends = []
-            farben_mapping = {
-                "Dominance_bullish": "lightgreen",
-                "Dominance_bearish": "lightcoral",
-                "Others_bullish": "#7CFC00",
-                "Others_bearish": "#FF4500",
-                "Total_bullish": "#00CED1",
-                "Total_bearish": "#DC143C"
-            }
-            for eintrag in stunden_daten:
-                stunde = eintrag["stunde"]
-                for key, wert in eintrag.items():
-                    if key == "stunde":
-                        continue
-                    gruppe, richtung = key.split("_")
-                    gruppen_trends.append({
-                        "stunde": stunde,
-                        "gruppe": gruppe,
-                        "richtung": richtung,
-                        "wert": wert,
-                        "farbe": farben_mapping.get(key, "#888")
-                    })
+    # Gruppen-Trends für Farbdarstellung
+    gruppen_trends = []
+    farben_mapping = {
+        "Dominance_bullish": "lightgreen",
+        "Dominance_bearish": "lightcoral",
+        "Others_bullish": "#7CFC00",
+        "Others_bearish": "#FF4500",
+        "Total_bullish": "#00CED1",
+        "Total_bearish": "#DC143C"
+    }
+    for eintrag in stunden_daten:
+        stunde = eintrag["stunde"]
+        for key, wert in eintrag.items():
+            if key == "stunde":
+                continue
+            gruppe, richtung = key.split("_")
+            gruppen_trends.append({
+                "stunde": stunde,
+                "gruppe": gruppe,
+                "richtung": richtung,
+                "wert": wert,
+                "farbe": farben_mapping.get(key, "#888")
+            })
 
-            # Mini-Charts Daten
-            minicharts = erzeuge_minichart_daten(df, interval_hours=interval_hours)
-            # Daten für Chart.js (string, int, string)
-            for daten in minicharts.values():
-                daten["stunden"] = list(map(str, daten["stunden"]))
-                daten["werte"] = [float(w) for w in daten["werte"]]
-                daten["farben"] = list(map(str, daten["farben"]))
+    # Mini-Charts Daten
+    minicharts = erzeuge_minichart_daten(df, interval_hours=interval_hours)
+    for daten in minicharts.values():
+        daten["stunden"] = [str(s) for s in daten["stunden"]]
+        daten["werte"] = [float(w) for w in daten["werte"]]
+        daten["farben"] = [str(f) for f in daten["farben"]]
+
+    # Trend Aggregat Daten (für Balkendiagramme)
+    trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
+    labels = [
+        f"{e['stunde']}h ({e['symbol'][:6]}…)"
+        if len(e['symbol']) > 6 else
+        f"{e['stunde']}h ({e['symbol']})"
+        for e in trend_aggregat_roh
+    ]
+    werte = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
+    farben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
+    trend_aggregat_view = {
+        "labels": labels,
+        "werte": werte,
+        "farben": farben
+    }
 
 
-            # Trend Aggregat Daten (für Balkendiagramme)
-            trend_aggregat_roh = erzeuge_trend_aggregat_daten(df)
-            labels = [f"{e['stunde']}h ({e['symbol'][:6]}…)" if len(e['symbol']) > 6 else f"{e['stunde']}h ({e['symbol']})" for e in trend_aggregat_roh]
-            werte = [e["bullish"] - e["bearish"] for e in trend_aggregat_roh]
-            farben = [e["farbe"] if e["farbe"] in ["green", "red"] else "#888" for e in trend_aggregat_roh]
-            trend_aggregat_view = {
-                "labels": labels,
-                "werte": werte,
-                "farben": farben
-            }
 
             jahre = sorted(df["jahr"].unique())
 
