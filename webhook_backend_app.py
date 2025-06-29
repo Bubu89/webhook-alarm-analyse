@@ -347,7 +347,7 @@ def dashboard():
             # Daten für Chart.js (string, int, string)
             for daten in minicharts.values():
                 daten["stunden"] = list(map(str, daten["stunden"]))
-                daten["werte"] = [int(w) for w in daten["werte"]]
+                daten["werte"] = [float(w) for w in daten["werte"]]
                 daten["farben"] = list(map(str, daten["farben"]))
 
             # Trend Aggregat Daten (für Balkendiagramme)
