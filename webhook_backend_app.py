@@ -688,13 +688,13 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
 
         # Korrekte Behandlung von None und Anzeige "n/a"
         if trefferquote_raw is None:
-            trefferquote = "n/a"
+            trefferquote = None
         else:
             try:
-                trefferquote = f"{float(trefferquote_raw) * 100:.0f}%"  # Anzeige als Prozent
+                trefferquote = float(trefferquote_raw)
             except Exception as e:
                 print(f"[DEBUG] Fehler bei Trefferquote für {asset}: {trefferquote_raw} - {e}")
-                trefferquote = "n/a"
+                trefferquote = None
 
         prognosen[asset] = {
             "signal": "bullish" if get_current_trend(asset) == 1 else "bearish" if get_current_trend(asset) == -1 else "neutral",
