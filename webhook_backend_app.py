@@ -20,7 +20,11 @@ import time
 from kurs_handler import lade_kurse, verarbeite_kursdaten  # Kurs-Handling
 from utils_minichart import erzeuge_minichart_daten, MEZ
 
+from datetime import datetime, timedelta
+import pytz
 
+MEZ = pytz.timezone("Europe/Vienna")
+ANALYSE_TAGE = 3   # <=== Nutze diesen Wert als globalen Analysezeitraum
 # ─────────────────────────  pandas-Warnung ausblenden  ─────────────────────────
 import warnings
 warnings.filterwarnings(
@@ -635,6 +639,8 @@ def webhook():
 def berechne_prognosen(df: pd.DataFrame) -> dict:
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True).dt.tz_convert(MEZ)
     kurse = lade_kurse()                       # <- neue Kursbasis
+    grenze = datetime.now(MEZ) - timedelta(days=ANALYSE_TAGE)
+    df = df[df["timestamp"] >= grenze]
 
     def trend_score(sym):
         s = df[df["symbol"] == sym]
