@@ -180,6 +180,8 @@ def erzeuge_stunden_daten(df: pd.DataFrame, intervall_stunden: int) -> list[dict
     df["zeitblock"] = df["timestamp"].dt.floor(f"{intervall_stunden}h")
     grenze = datetime.now(MEZ) - timedelta(days=ANALYSE_TAGE)
     df = df[df["timestamp"] >= grenze]
+    df = df[df["timestamp"] <= pd.Timestamp.now(tz=MEZ)]
+
 
     # 🔄 Gruppierung nach Symbolart (Dominance/Others)
     DOMI = {"BTC.D", "ETH.D", "USDT.D", "USDC.D"}          # kannst Du beliebig erweitern
@@ -591,6 +593,17 @@ def webhook():
         return jsonify({"error": "Content-Type muss application/json sein"}), 415
 
     raw_data = request.get_json()
+
+    # Debug-Log für eingehende Webhooks
+    print("[WEBHOOK] Eingehend:", json.dumps(raw_data, indent=2, ensure_ascii=False))
+
+    # Falls du die Anfrage zusätzlich in eine Datei loggen willst:
+    with open("webhook_debug_log.json", "a", encoding="utf-8") as debug_log_file:
+        debug_log_file.write(json.dumps({
+            "timestamp": datetime.now(MEZ).isoformat(),
+            "data": raw_data
+        }, ensure_ascii=False) + ",\n")
+
     now = datetime.now(MEZ)
 
     data = {
@@ -602,6 +615,7 @@ def webhook():
         "trend": raw_data.get("trend") or None,
         "nachricht": raw_data.get("nachricht", None)
     }
+
 
     if data["trend"] not in ["bullish", "bearish"]:
         return jsonify({"status": "Trend nicht ausgewertet – neutral oder leer"}), 200
