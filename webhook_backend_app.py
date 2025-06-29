@@ -116,7 +116,6 @@ EMAIL_ABSENDER = os.getenv("EMAIL_ABSENDER")
 EMAIL_PASSWORT = os.getenv("EMAIL_PASSWORT")
 EMAIL_EMPFANGER = os.getenv("EMAIL_EMPFANGER")
 
-MEZ = pytz.timezone("Europe/Vienna")
 
 #...................................................... Neu
 def erzeuge_monats_matrix(df: pd.DataFrame, jahr: int) -> pd.DataFrame:
@@ -708,7 +707,7 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
             "signal": "neutral",
             "score": 0,
             "relation": "n/a",
-            "trefferquote": "n/a"
+            "trefferquote": None
         }
 
     try:
