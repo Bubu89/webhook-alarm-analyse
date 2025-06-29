@@ -278,35 +278,35 @@ def dashboard():
             logs = [logs]
         logs = [e for e in logs if isinstance(e, dict)]
 
-            # DataFrame aus Logs
-    df = pd.DataFrame(logs)
-    if df.empty:
-        # Fallback-Werte wenn keine Daten vorhanden
-        jahre = [datetime.now().year]
-        aktuelles_jahr = int(year) if year and year.isdigit() else jahre[0]
-        monate = [datetime(aktuelles_jahr, m, 1).strftime("%b") for m in range(1, 13)]
-        matrix = {}
-        letzte_ereignisse = []
-        stunden_daten = []
-        minicharts = {}
-        gruppen_trends = []
-        trend_aggregat_view = {"labels": [], "werte": [], "farben": []}
-        prognosen = {}
-    else:
-        # Timestamp parsen und Zeitzone setzen
-        df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
-        df["symbol"] = df["symbol"].astype(str)
-        df["jahr"] = df["timestamp"].dt.year
-        aktuelles_jahr = int(year) if year and year.isdigit() else df["jahr"].max()
-        df_jahr = df[df["jahr"] == aktuelles_jahr]
-        monate = [datetime(aktuelles_jahr, m, 1).strftime("%b") for m in range(1, 13)]
-
-        # Prognosen laden oder berechnen
-        try:
-            prognosen = berechne_prognosen(df)
-        except Exception as e:
-            print("[Fehler beim Berechnen der Prognosen]", e)
+        # DataFrame aus Logs
+        df = pd.DataFrame(logs)
+        if df.empty:
+            # Fallback-Werte wenn keine Daten vorhanden
+            jahre = [datetime.now().year]
+            aktuelles_jahr = int(year) if year and year.isdigit() else jahre[0]
+            monate = [datetime(aktuelles_jahr, m, 1).strftime("%b") for m in range(1, 13)]
+            matrix = {}
+            letzte_ereignisse = []
+            stunden_daten = []
+            minicharts = {}
+            gruppen_trends = []
+            trend_aggregat_view = {"labels": [], "werte": [], "farben": []}
             prognosen = {}
+        else:
+            # Timestamp parsen und Zeitzone setzen
+            df["timestamp"] = pd.to_datetime(df["timestamp"], errors='coerce', utc=True).dt.tz_convert(MEZ)
+            df["symbol"] = df["symbol"].astype(str)
+            df["jahr"] = df["timestamp"].dt.year
+            aktuelles_jahr = int(year) if year and year.isdigit() else df["jahr"].max()
+            df_jahr = df[df["jahr"] == aktuelles_jahr]
+            monate = [datetime(aktuelles_jahr, m, 1).strftime("%b") for m in range(1, 13)]
+
+            # Prognosen laden oder berechnen
+            try:
+                prognosen = berechne_prognosen(df)
+            except Exception as e:
+                print("[Fehler beim Berechnen der Prognosen]", e)
+                prognosen = {}
 
         # Matrix für monatliche Verteilung
         matrix = {}
