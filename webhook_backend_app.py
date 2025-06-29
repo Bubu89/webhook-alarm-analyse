@@ -658,14 +658,12 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
     grenze = datetime.now(MEZ) - timedelta(days=ANALYSE_TAGE)
     df = df[df["timestamp"] >= grenze]
 
-    # 52W High/Low Clustering
     def get_cluster_score(sym):
         cluster_window = df[(df["symbol"] == sym)]
         n_high = len(cluster_window[cluster_window["event"].str.contains("52W High", na=False)])
         n_low = len(cluster_window[cluster_window["event"].str.contains("52W Low", na=False)])
         return n_high - n_low
 
-    # Trend Abgleich
     def get_current_trend(sym):
         trends = df[df["symbol"] == sym]["trend"].dropna().unique()
         if "bullish" in trends:
@@ -675,7 +673,7 @@ def berechne_prognosen(df: pd.DataFrame) -> dict:
         else:
             return 0
 
-treffer_file = "indikator_trefferquote.json"
+    treffer_file = "indikator_trefferquote.json"
     if Path(treffer_file).exists():
         with open(treffer_file, "r") as f:
             treffer_data = json.load(f)
@@ -685,13 +683,21 @@ treffer_file = "indikator_trefferquote.json"
     prognosen = {}
     assets = ["BTCUSD", "ETHUSD", "COTIUSD", "VELOUSD", "TOTAL"]
     for asset in assets:
-        ...
-        prognosen[asset] = {...}
+        prognosen[asset] = {
+            "signal": "bullish" if get_current_trend(asset) == 1 else "bearish" if get_current_trend(asset) == -1 else "neutral",
+            "score": get_cluster_score(asset),
+            "relation": treffer_data.get(asset, {}).get("relation", "n/a"),
+            "trefferquote": treffer_data.get(asset, {}).get("trefferquote", None)
+        }
 
     if not prognosen:
-        prognosen["INFO"] = {...}
+        prognosen["INFO"] = {
+            "signal": "neutral",
+            "score": 0,
+            "relation": "n/a",
+            "trefferquote": None
+        }
 
-    # ➜ Dieser Block MUSS innerhalb der Funktion liegen:
     try:
         with open(KURSDATEI, "r", encoding="utf-8") as f:
             kursdaten = json.load(f)
