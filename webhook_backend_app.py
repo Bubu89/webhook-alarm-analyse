@@ -307,7 +307,7 @@ def dashboard():
             except Exception as e:
                 print("[Fehler beim Berechnen der Prognosen]", e)
                 prognosen = {}
-
+        jahre = sorted(df["jahr"].unique())
         # Matrix für monatliche Verteilung
         matrix = {}
         for symbol in sorted(df_jahr["symbol"].unique()):
