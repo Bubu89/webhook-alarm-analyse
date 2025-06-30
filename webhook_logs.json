@@ -19758,5 +19758,15 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-06-30T17:10:03.468754+02:00",
+    "symbol": "NDQ/FRED:WM2NS",
+    "event": "Buy",
+    "price": 1.0309203e-09,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
