@@ -17768,5 +17768,15 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": false
+  },
+  {
+    "timestamp": "2025-06-30T02:45:21.892645+02:00",
+    "symbol": "BTCUSD",
+    "event": "Sell",
+    "price": 108783.86,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
   }
 ]
