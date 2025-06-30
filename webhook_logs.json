@@ -19338,5 +19338,15 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-06-30T16:10:58.778555+02:00",
+    "symbol": "BONKUSDT",
+    "event": "Buy",
+    "price": 1.419e-05,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
