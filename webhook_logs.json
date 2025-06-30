@@ -17738,5 +17738,15 @@
     "trend": "bearish",
     "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-06-30T06:43:03.119850+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Sell",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": false
   }
 ]
