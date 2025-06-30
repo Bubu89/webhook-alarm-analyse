@@ -21288,5 +21288,15 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-06-30T21:21:10.588136+02:00",
+    "symbol": "SPX",
+    "event": "Buy",
+    "price": 6197.85,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
