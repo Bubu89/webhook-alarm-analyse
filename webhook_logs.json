@@ -26048,5 +26048,15 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-01T19:25:02.159337+02:00",
+    "symbol": "SPX/FRED:WM2NS",
+    "event": "Buy",
+    "price": 2.826946e-10,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
