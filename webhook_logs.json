@@ -27268,5 +27268,15 @@
     "trend": "bearish",
     "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T00:55:02.940994+02:00",
+    "symbol": "FETUSDT",
+    "event": "Sell",
+    "price": 0.668,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
   }
 ]
