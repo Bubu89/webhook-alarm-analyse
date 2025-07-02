@@ -32198,5 +32198,115 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:05:02.281738+02:00",
+    "symbol": "SPX/FRED:WM2NS",
+    "event": "Buy",
+    "price": 2.836101e-10,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:05:35.328011+02:00",
+    "symbol": "NDQ/FRED:WM2NS",
+    "event": "Buy",
+    "price": 1.0313491e-09,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:10:02.265681+02:00",
+    "symbol": "NDQ/FRED:WM2NS",
+    "event": "Buy",
+    "price": 1.0311074e-09,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:10:34.930233+02:00",
+    "symbol": "SPX/FRED:WM2NS",
+    "event": "Buy",
+    "price": 2.836042e-10,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:15:04.116332+02:00",
+    "symbol": "NDQ/FRED:WM2NS",
+    "event": "Buy",
+    "price": 1.0307905e-09,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:15:35.441224+02:00",
+    "symbol": "SPX/FRED:WM2NS",
+    "event": "Buy",
+    "price": 2.835955e-10,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:20:01.986788+02:00",
+    "symbol": "SPX/FRED:WM2NS",
+    "event": "Buy",
+    "price": 2.835386e-10,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:20:35.827445+02:00",
+    "symbol": "NDQ/FRED:WM2NS",
+    "event": "Buy",
+    "price": 1.0304884e-09,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:21:08.729138+02:00",
+    "symbol": "RTY1!",
+    "event": "Buy",
+    "price": 2242.2,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:25:01.086870+02:00",
+    "symbol": "SPX/FRED:WM2NS",
+    "event": "Buy",
+    "price": 2.835372e-10,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:25:32.936858+02:00",
+    "symbol": "NDQ/FRED:WM2NS",
+    "event": "Buy",
+    "price": 1.0308685e-09,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
