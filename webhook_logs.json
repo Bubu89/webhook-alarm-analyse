@@ -27438,5 +27438,15 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T02:56:03.265112+02:00",
+    "symbol": "TOTAL/COINBASE:COTIUSD",
+    "event": "Buy",
+    "price": 64673664217474.74,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
