@@ -30458,5 +30458,95 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T17:50:32.739295+02:00",
+    "symbol": "SPX/FRED:WM2NS",
+    "event": "Buy",
+    "price": 2.832674e-10,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T17:55:02.289624+02:00",
+    "symbol": "NDQ/FRED:WM2NS",
+    "event": "Buy",
+    "price": 1.0300971e-09,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T17:55:33.930222+02:00",
+    "symbol": "SPX/FRED:WM2NS",
+    "event": "Buy",
+    "price": 2.832223e-10,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T18:00:07.259946+02:00",
+    "symbol": "NDQ/FRED:WM2NS",
+    "event": "Buy",
+    "price": 1.0304372e-09,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T18:00:39.030300+02:00",
+    "symbol": "SPX/FRED:WM2NS",
+    "event": "Buy",
+    "price": 2.83266e-10,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T18:05:02.924916+02:00",
+    "symbol": "SPX/FRED:WM2NS",
+    "event": "Buy",
+    "price": 2.831002e-10,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T18:05:35.739977+02:00",
+    "symbol": "NDQ/FRED:WM2NS",
+    "event": "Buy",
+    "price": 1.0301593e-09,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T18:06:10.330128+02:00",
+    "symbol": "FETUSDT",
+    "event": "Sell",
+    "price": 0.709,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T18:07:03.458117+02:00",
+    "symbol": "BTCUSD",
+    "event": "Sell",
+    "price": 109295.57,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
   }
 ]
