@@ -29248,5 +29248,35 @@
     "trend": "bearish",
     "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T14:17:24.397188+02:00",
+    "symbol": "ETHUSD",
+    "event": "Buy",
+    "price": 2443.4,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T14:30:10.486327+02:00",
+    "symbol": "BONKUSDT",
+    "event": "Buy",
+    "price": 1.409e-05,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T14:35:01.063702+02:00",
+    "symbol": "BONKUSDT",
+    "event": "Buy",
+    "price": 1.402e-05,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
