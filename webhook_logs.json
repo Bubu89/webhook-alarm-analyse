@@ -28458,5 +28458,35 @@
     "trend": "bearish",
     "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T08:51:03.370427+02:00",
+    "symbol": "BTCUSD",
+    "event": "Sell",
+    "price": 107026.53,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T08:51:38.834747+02:00",
+    "symbol": "RTY1!",
+    "event": "Buy",
+    "price": 2239.8,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T08:53:00.653755+02:00",
+    "symbol": "BONKUSDT",
+    "event": "Sell",
+    "price": 1.436e-05,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
   }
 ]
