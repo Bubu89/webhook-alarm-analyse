@@ -29328,5 +29328,25 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T14:43:30.096146+02:00",
+    "symbol": "DXY",
+    "event": "Buy",
+    "price": 96.647,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T14:44:02.374777+02:00",
+    "symbol": "BTCUSD",
+    "event": "Buy",
+    "price": 107280.65,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
