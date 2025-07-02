@@ -27408,5 +27408,15 @@
     "trend": "bearish",
     "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": false
+  },
+  {
+    "timestamp": "2025-07-02T02:03:04.347825+02:00",
+    "symbol": "DXY",
+    "event": "Buy",
+    "price": 96.246,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
