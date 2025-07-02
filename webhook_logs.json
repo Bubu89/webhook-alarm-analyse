@@ -29358,5 +29358,55 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T14:53:36.036287+02:00",
+    "symbol": "ETHUSD",
+    "event": "Buy",
+    "price": 2437.7,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T14:55:04.566385+02:00",
+    "symbol": "BTC.D-CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D",
+    "event": "Sell",
+    "price": 63.347736336809504,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T15:06:04.265362+02:00",
+    "symbol": "TOTAL/BINANCE:FETUSD",
+    "event": "Sell",
+    "price": 4751102838238.441,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T15:19:15.163703+02:00",
+    "symbol": "COTIUSDT",
+    "event": "Sell",
+    "price": 0.049,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T15:23:03.097249+02:00",
+    "symbol": "TOTAL/COINBASE:OPUSD",
+    "event": "Buy",
+    "price": 5981325596249.541,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
