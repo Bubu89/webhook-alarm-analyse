@@ -30718,5 +30718,45 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T18:20:33.230387+02:00",
+    "symbol": "NDQ/FRED:WM2NS",
+    "event": "Buy",
+    "price": 1.0309503e-09,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T18:21:04.732711+02:00",
+    "symbol": "FETUSDT",
+    "event": "Sell",
+    "price": 0.716,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T18:21:37.227968+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Buy",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-02T18:22:09.837952+02:00",
+    "symbol": "TOTAL/BINANCE:FETUSD",
+    "event": "Buy",
+    "price": 4647936770706.204,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
