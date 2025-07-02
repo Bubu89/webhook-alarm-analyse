@@ -28758,5 +28758,25 @@
     "trend": "bearish",
     "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T10:22:42.176140+02:00",
+    "symbol": "BTC.D",
+    "event": "Sell",
+    "price": 65.56370897547498,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T10:23:13.934686+02:00",
+    "symbol": "BTCUSD",
+    "event": "Sell",
+    "price": 107690.43,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
   }
 ]
