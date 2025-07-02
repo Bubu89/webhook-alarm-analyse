@@ -32418,5 +32418,25 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:53:37.813398+02:00",
+    "symbol": "OPUSD",
+    "event": "Sell",
+    "price": 0.56927504,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-02T21:54:43.397481+02:00",
+    "symbol": "SPX",
+    "event": "Buy",
+    "price": 6225.65,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
