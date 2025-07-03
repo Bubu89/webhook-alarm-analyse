@@ -33378,5 +33378,35 @@
     "trend": "bearish",
     "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": false
+  },
+  {
+    "timestamp": "2025-07-03T01:58:02.719456+02:00",
+    "symbol": "TOTAL/COINBASE:OPUSD",
+    "event": "Sell",
+    "price": 5879033736874.114,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T02:00:17.379757+02:00",
+    "symbol": "TOTAL/COINBASE:COTIUSD",
+    "event": "Sell",
+    "price": 63174409466133.336,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T02:01:19.040092+02:00",
+    "symbol": "ETHUSD",
+    "event": "Buy",
+    "price": 2574.1,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
