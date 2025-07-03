@@ -33938,5 +33938,35 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T07:14:02.950898+02:00",
+    "symbol": "TOTAL/BINANCE:FETUSD",
+    "event": "Buy",
+    "price": 4544363893252.293,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T07:14:34.738225+02:00",
+    "symbol": "DXY",
+    "event": "Sell",
+    "price": 96.422,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T07:15:15.067970+02:00",
+    "symbol": "DXY",
+    "event": "Sell",
+    "price": 96.423,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
   }
 ]
