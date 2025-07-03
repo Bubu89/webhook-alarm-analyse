@@ -35968,5 +35968,105 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T15:56:06.932060+02:00",
+    "symbol": "SPX",
+    "event": "Buy",
+    "price": 6266.73,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T15:56:39.133475+02:00",
+    "symbol": "QQQ",
+    "event": "Buy",
+    "price": 554.76,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T15:57:11.931513+02:00",
+    "symbol": "BTC.D-CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D",
+    "event": "Buy",
+    "price": 62.300679600096345,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T15:57:17.479370+02:00",
+    "symbol": "ETHUSD",
+    "event": "Sell",
+    "price": 2631.1,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T15:58:03.443765+02:00",
+    "symbol": "TOTAL/COINBASE:OPUSD",
+    "event": "Buy",
+    "price": 5748386222865.316,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T16:00:16.218071+02:00",
+    "symbol": "QQQ",
+    "event": "Buy",
+    "price": 554.94,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T16:00:50.035367+02:00",
+    "symbol": "NDQ/FRED:WM2NS",
+    "event": "Buy",
+    "price": 1.0388097e-09,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T16:01:21.639905+02:00",
+    "symbol": "SPX/FRED:WM2NS",
+    "event": "Buy",
+    "price": 2.853746e-10,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T16:01:55.035478+02:00",
+    "symbol": "SPX",
+    "event": "Buy",
+    "price": 6267.73,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-03T16:05:03.755359+02:00",
+    "symbol": "NDQ/FRED:WM2NS",
+    "event": "Buy",
+    "price": 1.0405231e-09,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
