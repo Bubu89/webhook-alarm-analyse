@@ -38638,5 +38638,35 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": false
+  },
+  {
+    "timestamp": "2025-07-04T04:53:32.638669+02:00",
+    "symbol": "BTC.D-CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D",
+    "event": "Sell",
+    "price": 62.583406716859116,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-04T04:54:04.830825+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
+    "event": "Buy",
+    "price": 2156059.583534496,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-04T04:54:37.829340+02:00",
+    "symbol": "TOTAL/COINBASE:OPUSD",
+    "event": "Sell",
+    "price": 5856908771589.789,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
   }
 ]
