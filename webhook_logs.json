@@ -38368,5 +38368,75 @@
     "trend": "bearish",
     "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-04T03:01:05.309969+02:00",
+    "symbol": "BTC.D",
+    "event": "Buy",
+    "price": 65.2488517930757,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-04T03:07:00.464653+02:00",
+    "symbol": "BONKUSDT",
+    "event": "Sell",
+    "price": 1.728e-05,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-04T03:07:32.134653+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Buy",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-04T03:08:05.131091+02:00",
+    "symbol": "BONKUSDT",
+    "event": "Sell",
+    "price": 1.728e-05,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-04T03:16:03.808777+02:00",
+    "symbol": "BTCUSD",
+    "event": "Buy",
+    "price": 109670.71,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-04T03:21:00.927068+02:00",
+    "symbol": "ETHUSD",
+    "event": "Buy",
+    "price": 2596.7,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-04T03:22:00.630734+02:00",
+    "symbol": "BONKUSDT",
+    "event": "Sell",
+    "price": 1.744e-05,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
   }
 ]
