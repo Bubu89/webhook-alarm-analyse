@@ -38888,5 +38888,35 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-04T06:42:00.959931+02:00",
+    "symbol": "SUIUSDT",
+    "event": "Buy",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-04T06:42:34.028814+02:00",
+    "symbol": "DXY",
+    "event": "Buy",
+    "price": 96.462,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-04T06:45:12.036512+02:00",
+    "symbol": "TOTAL/BINANCE:FETUSD",
+    "event": "Sell",
+    "price": 4682586368677.176,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
   }
 ]
