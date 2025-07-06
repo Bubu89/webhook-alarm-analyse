@@ -45148,5 +45148,625 @@
     "trend": "bearish",
     "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T04:45:00.588208+02:00",
+    "symbol": "SUIUSDT",
+    "event": "Sell",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-06T04:50:00.972105+02:00",
+    "symbol": "BONKUSDT",
+    "event": "Sell",
+    "price": 1.959e-05,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T04:54:02.778540+02:00",
+    "symbol": "TOTAL/BINANCE:FETUSD",
+    "event": "Sell",
+    "price": 5018810349516.257,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:00:00.531013+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.654,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:01:00.954601+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.654,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:11:03.313497+02:00",
+    "symbol": "TOTAL/COINBASE:COTIUSD",
+    "event": "Sell",
+    "price": 67002536364346.94,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:12:03.357158+02:00",
+    "symbol": "TOTAL/COINBASE:COTIUSD",
+    "event": "Sell",
+    "price": 67001491294836.734,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:14:02.832189+02:00",
+    "symbol": "TOTAL/COINBASE:OPUSD",
+    "event": "Sell",
+    "price": 6218318404409.091,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:14:34.236703+02:00",
+    "symbol": "BTC.D",
+    "event": "Sell",
+    "price": 65.48769011604037,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:15:06.627654+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
+    "event": "Buy",
+    "price": 2116768.6147955754,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:19:05.047013+02:00",
+    "symbol": "BTCUSD",
+    "event": "Buy",
+    "price": 108149.05,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:24:02.129330+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.653,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:25:00.644837+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.653,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:25:35.029659+02:00",
+    "symbol": "BTC.D-CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D",
+    "event": "Sell",
+    "price": 62.97608077148869,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:25:39.530468+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
+    "event": "Buy",
+    "price": 2115731.7566677276,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:26:13.030585+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.653,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:26:17.134595+02:00",
+    "symbol": "BTC.D-CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D",
+    "event": "Sell",
+    "price": 62.98335855011709,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:28:00.557207+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.653,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:29:14.698176+02:00",
+    "symbol": "ETHUSD",
+    "event": "Buy",
+    "price": 2511.9,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:30:00.591193+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.653,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:30:36.930529+02:00",
+    "symbol": "TOTAL/COINBASE:COTIUSD",
+    "event": "Sell",
+    "price": 66971722191448.98,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:31:14.331246+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.653,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:32:03.278648+02:00",
+    "symbol": "BTC.D",
+    "event": "Sell",
+    "price": 65.49176891676909,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:33:00.469817+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.653,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:34:00.606114+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.652,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:34:32.631554+02:00",
+    "symbol": "TOTAL/BINANCE:FETUSD",
+    "event": "Sell",
+    "price": 5033638986215.467,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:35:15.337121+02:00",
+    "symbol": "TOTAL/BINANCE:FETUSD",
+    "event": "Sell",
+    "price": 5038665463938.826,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:36:00.463641+02:00",
+    "symbol": "TOTAL/BITGET:AEROUSDT",
+    "event": "Sell",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-06T05:36:33.232483+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.653,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:39:02.809938+02:00",
+    "symbol": "BTC.D-CRYPTOCAP:ETH.D+CRYPTOCAP:USDT.D+CRYPTOCAP:USDC.D",
+    "event": "Sell",
+    "price": 62.974650508175344,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:42:06.818488+02:00",
+    "symbol": "AEROUSD",
+    "event": "Buy",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-06T05:43:05.450269+02:00",
+    "symbol": "BTCUSD",
+    "event": "Buy",
+    "price": 108108.57,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:45:42.519897+02:00",
+    "symbol": "ETHUSD",
+    "event": "Buy",
+    "price": 2513.0,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T05:53:02.802925+02:00",
+    "symbol": "TOTAL/BINANCE:FETUSD",
+    "event": "Sell",
+    "price": 5026821354779.721,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T06:16:00.470743+02:00",
+    "symbol": "BONKUSDT",
+    "event": "Sell",
+    "price": 2.02e-05,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T06:22:03.219435+02:00",
+    "symbol": "TOTAL/COINBASE:COTIUSD",
+    "event": "Sell",
+    "price": 66878730216843.18,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T06:25:03.000997+02:00",
+    "symbol": "BTC.D",
+    "event": "Buy",
+    "price": 65.4518736438342,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T06:42:00.837968+02:00",
+    "symbol": "TOTAL/BITGET:AEROUSDT",
+    "event": "Sell",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-06T06:44:02.609091+02:00",
+    "symbol": "TOTAL/BITGET:AEROUSDT",
+    "event": "Sell",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-06T06:45:05.655246+02:00",
+    "symbol": "BTCUSD",
+    "event": "Buy",
+    "price": 108061.28,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T06:52:00.847009+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.652,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T06:55:00.395496+02:00",
+    "symbol": "TOTAL/BITGET:AEROUSDT",
+    "event": "Sell",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-06T06:57:29.111354+02:00",
+    "symbol": "AEROUSD",
+    "event": "Buy",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-06T07:06:00.500743+02:00",
+    "symbol": "BONKUSDT",
+    "event": "Sell",
+    "price": 2.024e-05,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T07:14:03.196778+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Sell",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-06T07:15:00.951957+02:00",
+    "symbol": "AEROUSD",
+    "event": "Buy",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-06T07:15:36.428803+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Sell",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-06T07:21:02.899582+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Sell",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-06T07:24:00.634022+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.651,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T07:25:00.665782+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.651,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T07:26:00.825345+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.651,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T07:31:01.832551+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.651,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T07:32:00.400364+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.651,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T07:33:00.537418+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.651,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T07:34:03.623856+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Sell",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-06T07:35:00.777983+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.651,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T07:40:00.604726+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.65,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T07:41:00.922240+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.65,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T07:43:00.926249+02:00",
+    "symbol": "FETUSDT",
+    "event": "Buy",
+    "price": 0.65,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T07:56:02.893062+02:00",
+    "symbol": "TOTAL/BINANCE:FETUSD",
+    "event": "Sell",
+    "price": 5044634789159.283,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T08:01:02.634205+02:00",
+    "symbol": "TOTAL/BINANCE:FETUSD",
+    "event": "Sell",
+    "price": 5044593281259.696,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-06T08:03:55.500188+02:00",
+    "symbol": "ETHUSD",
+    "event": "Buy",
+    "price": 2510.0,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
