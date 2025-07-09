@@ -58178,5 +58178,325 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:02:03.217589+02:00",
+    "symbol": "BTC.D",
+    "event": "Buy",
+    "price": 65.037784249618,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:04:03.481905+02:00",
+    "symbol": "BTC.D",
+    "event": "Buy",
+    "price": 65.0295719952575,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:09:10.539021+02:00",
+    "symbol": "DXY",
+    "event": "Sell",
+    "price": 97.214,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:11:03.391405+02:00",
+    "symbol": "BTC.D",
+    "event": "Buy",
+    "price": 65.03311449011173,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:11:35.230080+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Buy",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-09T05:12:03.136129+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Buy",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-09T05:16:03.420871+02:00",
+    "symbol": "BTCUSD",
+    "event": "Buy",
+    "price": 108483.72,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:16:35.528977+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Buy",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-09T05:17:07.035983+02:00",
+    "symbol": "BTCUSD",
+    "event": "Buy",
+    "price": 108482.71,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:23:02.680919+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
+    "event": "Sell",
+    "price": 2162089.146724026,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:25:45.626869+02:00",
+    "symbol": "COTIUSDT",
+    "event": "Sell",
+    "price": 0.0491,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:26:18.032271+02:00",
+    "symbol": "DXY",
+    "event": "Sell",
+    "price": 97.203,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:29:03.930233+02:00",
+    "symbol": "BTCUSD",
+    "event": "Buy",
+    "price": 108488.27,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:31:05.310166+02:00",
+    "symbol": "ETHUSD",
+    "event": "Buy",
+    "price": 2597.8,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:32:02.850090+02:00",
+    "symbol": "TOTAL/COINBASE:OPUSD",
+    "event": "Sell",
+    "price": 6164580467022.305,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:41:48.575124+02:00",
+    "symbol": "COTIUSDT",
+    "event": "Sell",
+    "price": 0.0494,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:55:03.531347+02:00",
+    "symbol": "BTCUSD",
+    "event": "Buy",
+    "price": 108408.95,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T05:55:35.332117+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Buy",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-09T05:56:05.516484+02:00",
+    "symbol": "BTCUSD",
+    "event": "Buy",
+    "price": 108405.61,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T06:00:30.971150+02:00",
+    "symbol": "COTIUSDT",
+    "event": "Sell",
+    "price": 0.0494,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T06:04:04.417982+02:00",
+    "symbol": "BTCUSD",
+    "event": "Buy",
+    "price": 108423.01,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T06:05:05.058068+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Buy",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-09T06:06:42.875790+02:00",
+    "symbol": "ETHUSD",
+    "event": "Buy",
+    "price": 2593.8,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T06:15:06.432662+02:00",
+    "symbol": "TOTAL/COINBASE:COTIUSD",
+    "event": "Buy",
+    "price": 64977264022941.18,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T06:15:38.135248+02:00",
+    "symbol": "TOTAL/COINBASE:VELOUSD",
+    "event": "Buy",
+    "price": 0.0,
+    "interval": "unspecified",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": false
+  },
+  {
+    "timestamp": "2025-07-09T06:22:13.485365+02:00",
+    "symbol": "DXY",
+    "event": "Sell",
+    "price": 97.229,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T06:26:02.911013+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
+    "event": "Sell",
+    "price": 2163647.0962025863,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T06:28:03.724512+02:00",
+    "symbol": "TOTAL/COINBASE:COTIUSD",
+    "event": "Buy",
+    "price": 64994199896411.766,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T06:35:04.289975+02:00",
+    "symbol": "BTCUSD",
+    "event": "Buy",
+    "price": 108511.06,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T06:38:05.128377+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
+    "event": "Sell",
+    "price": 2165809.98210921,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T06:45:09.709171+02:00",
+    "symbol": "TOTAL/COINBASE:COTIUSD",
+    "event": "Buy",
+    "price": 64953601375009.79,
+    "interval": "1",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-09T06:50:05.656440+02:00",
+    "symbol": "OTHERS/INDEX:BTCUSD",
+    "event": "Sell",
+    "price": 2168833.793391829,
+    "interval": "1",
+    "trend": "bearish",
+    "nachricht": "\ud83d\udd34 B\u00e4risches Momentum erkannt",
+    "valid": true
   }
 ]
