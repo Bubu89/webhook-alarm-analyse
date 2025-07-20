@@ -24778,5 +24778,615 @@
     "trend": "bullish",
     "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
     "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T11:12:54.399900+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09034,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T11:15:01.263703+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09057,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T12:40:05.384319+02:00",
+    "symbol": "DOGEUSDT",
+    "event": "Buy",
+    "price": 0.25714,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T13:08:17.989985+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09057,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T13:11:59.948574+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09067,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T13:29:44.121993+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09084,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T13:30:42.133427+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09084,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T13:38:53.913518+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09121,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T13:45:53.740227+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09124,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T16:57:26.452989+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.0914,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T17:09:35.304701+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09159,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T17:10:07.555783+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09159,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T17:15:17.979101+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09171,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T17:20:00.860316+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09179,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T17:27:49.503948+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09211,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T17:33:22.687611+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09211,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T17:35:00.570971+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09211,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T17:40:00.388613+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09276,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T17:54:08.560816+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09319,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T17:55:09.441898+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09326,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T18:00:01.101333+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09338,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T18:27:10.907927+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.42,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T18:31:34.913877+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.4254,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T18:40:44.728578+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.4273,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T21:36:34.708604+02:00",
+    "symbol": "AVAXUSDT",
+    "event": "Buy",
+    "price": 25.02,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T21:43:00.049634+02:00",
+    "symbol": "AVAXUSDT",
+    "event": "Buy",
+    "price": 25.12,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-19T22:07:53.707175+02:00",
+    "symbol": "AVAXUSDT",
+    "event": "Buy",
+    "price": 25.17,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T00:00:26.504345+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.4277,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T00:06:16.663536+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.4283,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T00:10:00.809715+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.4342,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T00:47:55.691623+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.4391,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T00:50:05.803970+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.4415,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T01:00:57.936991+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09345,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T01:12:17.879459+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09351,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T01:25:33.259196+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09355,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T01:30:01.179254+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09356,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T01:36:35.760704+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09367,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T01:49:36.515377+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09369,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T01:50:07.955677+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09375,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T01:59:33.877142+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09376,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T02:00:06.451413+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09396,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T02:05:26.027843+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09417,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T02:12:14.742817+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09425,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T02:16:24.855736+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09467,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T02:26:26.589186+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09504,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T02:32:23.528726+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09567,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T02:41:44.155629+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09577,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T02:45:00.918893+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09597,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T02:53:16.502734+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09636,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T02:56:12.385041+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09656,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T03:04:52.529656+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09714,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T03:06:21.891954+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09735,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T03:07:53.093175+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.4416,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T03:10:16.080389+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09769,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T03:10:49.152106+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.4436,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T03:18:13.919985+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.0978,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T03:26:46.335026+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.4451,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T03:42:33.485460+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.4461,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T03:45:03.452175+02:00",
+    "symbol": "ENAUSDT",
+    "event": "Buy",
+    "price": 0.4477,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T03:57:59.828989+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.09819,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
+  },
+  {
+    "timestamp": "2025-07-20T04:02:25.683020+02:00",
+    "symbol": "XDCUSDT",
+    "event": "Buy",
+    "price": 0.0982,
+    "interval": "5",
+    "trend": "bullish",
+    "nachricht": "\ud83d\udfe2 Bullisches Signal erkannt",
+    "valid": true
   }
 ]
